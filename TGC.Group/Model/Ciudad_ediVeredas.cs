@@ -8,9 +8,12 @@ using TGC.Core.Input;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
-using TGC.Core.Camara;
 using System.Collections.Generic;
 using TGC.Examples.Camara;
+using TGC.Core.Terrain;
+using TGC.Core.UserControls;
+using TGC.Core.UserControls.Modifier;
+
 
 namespace TGC.Group.Model
 {
@@ -32,7 +35,8 @@ namespace TGC.Group.Model
         private List<TgcPlane> calles;
         private List<TgcMesh> meshes;
         private TgcSceneLoader loader;
-        
+        private TgcSkyBox skyBox;
+
 
         private TgcTexture manzanaTexture;
         private TgcTexture cordonTexture;
@@ -41,6 +45,8 @@ namespace TGC.Group.Model
         private TgcTexture calleTexture;
         private TgcTexture intersectionTexture;
 
+
+
         private int CameraX, CameraY, CameraZ;
         List<int> ListaRandom = new List<int>(7);
         /// <summary>
@@ -48,8 +54,25 @@ namespace TGC.Group.Model
         /// </summary>
         /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
-        public Ciudad_ediVeredas(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
+        /// 
+
+
+
+        /// <summary>
+        ///     Utilidad para administrar las variables de usuario visibles en el panel derecho de la aplicacion.
+        /// </summary>
+        public TgcUserVars UserVars { get; set; }
+
+        /// <summary>
+        ///     Utilidad para crear modificadores de variables de usuario, que son mostradas en el panel derecho de la aplicacion.
+        /// </summary>
+        public TgcModifiers Modifiers { get; set; }
+
+
+        public Ciudad_ediVeredas(string mediaDir, string shadersDir)
+            : base(mediaDir, shadersDir)
         {
+            
             Category = Game.Default.Category;
             Name = Game.Default.Name;
             Description = Game.Default.Description;
@@ -97,7 +120,33 @@ namespace TGC.Group.Model
             crearAuto();
             crearSemaforos();
             crearPlantas();
+
             crearCalles();
+
+            //Crear SkyBox
+            skyBox = new TgcSkyBox();
+            skyBox.Center = new Vector3(1000, 0, 1000);
+            skyBox.Size = new Vector3(20000, 20000, 20000);
+
+
+            var texturesPath = MediaDir + "Texturas\\Quake\\SkyBox3\\";
+
+            //Configurar las texturas para cada una de las 6 caras
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, texturesPath + "Up.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, texturesPath + "Down.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, texturesPath + "Left.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, texturesPath + "Right.jpg");
+
+            //Hay veces es necesario invertir las texturas Front y Back si se pasa de un sistema RightHanded a uno LeftHanded
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, texturesPath + "Back.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, texturesPath + "Front.jpg");
+            skyBox.SkyEpsilon = 40f;
+            //Inicializa todos los valores para crear el SkyBox
+            skyBox.Init();
+
+            //Modifier para mover el skybox con la posicion de la caja con traslaciones.
+           Modifiers.addBoolean("moveWhitCamera", "Move Whit Camera", true);
+
         }
 
         /// <summary>
@@ -113,6 +162,18 @@ namespace TGC.Group.Model
             //desplazar();
             //Capturar Input Mouse
             //movimientosCamara();
+
+
+            //Se cambia el valor por defecto del farplane para evitar cliping de farplane.
+            D3DDevice.Instance.Device.Transform.Projection =
+                Matrix.PerspectiveFovLH(D3DDevice.Instance.FieldOfView,
+                    D3DDevice.Instance.AspectRatio,
+                    D3DDevice.Instance.ZNearPlaneDistance,
+                    D3DDevice.Instance.ZFarPlaneDistance * 2f);
+
+            //Se actualiza la posicion del skybox.
+            if ((bool)Modifiers.getValue("moveWhitCamera"))
+                skyBox.Center = Camara.Position;
 
         }
 
@@ -133,6 +194,11 @@ namespace TGC.Group.Model
             //Renderizar suelo
             suelo.render();
             //calle.render();
+
+
+            //Renderizar SkyBox
+            skyBox.render();
+
             //Renderizar instancias
             foreach (var mesh in meshes)
             {
@@ -183,6 +249,9 @@ namespace TGC.Group.Model
             buggy.dispose();
             patrullero.dispose();
             //disposeListas();
+
+            //Liberar recursos del SkyBox
+            skyBox.dispose();
 
         }
 
@@ -562,7 +631,7 @@ namespace TGC.Group.Model
             patrullero.AutoTransformEnable = true;
             patrullero.move(1000, 5, (suelo.Size.Z) - 2200);
             patrullero.rotateY(FastMath.PI);
-            patrullero.Scale = new Vector3(3/2, 1, 3/2);
+            patrullero.Scale = new Vector3(1, 1, 1);
             meshes.Add(patrullero);
 
         }
@@ -601,6 +670,7 @@ namespace TGC.Group.Model
         }
 
         private TgcMesh Planta;
+
         private enum Plantas {Pino = 2, Palmera = 1, Nada = 0, Arbol = 3 };
         private void crearUnaPlanta(TgcScene unaScene, int i, Vector3 vectorPosicion)
         {
