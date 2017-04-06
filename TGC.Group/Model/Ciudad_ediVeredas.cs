@@ -332,7 +332,7 @@ namespace TGC.Group.Model
         }
         private void crearPisoDeFondo()
         {
-            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\unnamed.jpg"); 
+            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\calles.jpg"); 
             //var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road.jpg"); 
                                                                                                                            
             suelo = new TgcPlane(new Vector3(-500, 0, -500), new Vector3(6000, 0, 6000), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
