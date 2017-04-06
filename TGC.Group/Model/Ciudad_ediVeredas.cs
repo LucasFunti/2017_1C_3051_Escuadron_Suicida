@@ -29,6 +29,7 @@ namespace TGC.Group.Model
         private List<TgcPlane> veredas;
         private List<TgcPlane> cordones;
         private List<TgcPlane> paredes;
+        private List<TgcPlane> calles;
         private List<TgcMesh> meshes;
         private TgcSceneLoader loader;
         
@@ -38,6 +39,7 @@ namespace TGC.Group.Model
         private TgcTexture veredaTexture;
         private TgcTexture paredTexture;
         private TgcTexture calleTexture;
+        private TgcTexture intersectionTexture;
 
         private int CameraX, CameraY, CameraZ;
         List<int> ListaRandom = new List<int>(7);
@@ -77,6 +79,7 @@ namespace TGC.Group.Model
             veredaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\piso2.jpg");
             paredTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Textures\\Ladrillo\\brick1_2.jpg");
             calleTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\f1piso2.png");
+            intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union.jpg");
 
             //Crea el piso de fondo
 
@@ -87,13 +90,14 @@ namespace TGC.Group.Model
             veredas = new System.Collections.Generic.List<TgcPlane>();
             cordones = new System.Collections.Generic.List<TgcPlane>();
             paredes = new System.Collections.Generic.List<TgcPlane>();
+            calles = new System.Collections.Generic.List<TgcPlane>();
             crearEdificios();
             crearVeredas();
             crearParedes();
             crearAuto();
             crearSemaforos();
             crearPlantas();
-            //crearCalles();
+            crearCalles();
         }
 
         /// <summary>
@@ -152,6 +156,12 @@ namespace TGC.Group.Model
             {
                 p.render();
             }
+
+            //Renderizado de calles
+            foreach (var c in calles)
+            {
+                c.render();
+            }
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
@@ -168,9 +178,47 @@ namespace TGC.Group.Model
             //Al hacer dispose del original, se hace dispose automaticamente de todas las instancias
             edificio.dispose();
             auto.dispose();
+            hummer.dispose();
             camion.dispose();
+            buggy.dispose();
+            patrullero.dispose();
+            //disposeListas();
 
         }
+
+        private void disposeListas()
+        {
+            //Renderizar instancias
+            foreach (var mesh in meshes)
+            {
+                mesh.dispose();
+            }
+
+            //Renderizado de cordones
+            foreach (var cordon in cordones)
+            {
+                cordon.dispose();
+            }
+
+            //Renderizado de veredas
+            foreach (var v in veredas)
+            {
+                v.dispose();
+            }
+
+            //Renderizado de paredes
+            foreach (var p in paredes)
+            {
+                p.dispose();
+            }
+
+            //Renderizado de paredes
+            foreach (var c in calles)
+            {
+                c.dispose();
+            }
+        }
+
         private void movimientosCamara()
         {
             if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
@@ -386,6 +434,21 @@ namespace TGC.Group.Model
         private void crearCalles()
         {
 
+            intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union3.jpg");
+            var cuartoDeUnion = new TgcPlane(new Vector3(-445, 1, -225), new Vector3(290, 0, 220), TgcPlane.Orientations.XZplane, intersectionTexture, 1, 1);
+            calles.Add(cuartoDeUnion);
+
+            intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union2.jpg");
+            var cuartoDeUnion2 = new TgcPlane(new Vector3(-155, 1, -225), new Vector3(290, 0, 220), TgcPlane.Orientations.XZplane, intersectionTexture, 1, 1);
+            calles.Add(cuartoDeUnion2);
+
+            intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union1.jpg");
+            var cuartoDeUnion3 = new TgcPlane(new Vector3(-155, 1, -445), new Vector3(290, 0, 220), TgcPlane.Orientations.XZplane, intersectionTexture, 1, 1);
+            calles.Add(cuartoDeUnion3);
+
+            intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union4.jpg");
+            var cuartoDeUnion4 = new TgcPlane(new Vector3(-445, 1, -445), new Vector3(290, 0, 220), TgcPlane.Orientations.XZplane, intersectionTexture, 1, 1);
+            calles.Add(cuartoDeUnion4);
             //var CalleTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\f1piso2.png");
             //veredas.Add( new TgcPlane(new Vector3(-445, 1, -445), new Vector3(560, 0, 5890), TgcPlane.Orientations.XZplane, CalleTexture, 10f, 10f));
             //calle = new TgcPlane();
@@ -460,14 +523,17 @@ namespace TGC.Group.Model
         }
         private TgcMesh auto;
         private TgcMesh camion;
-        
+        private TgcMesh hummer;
+        private TgcMesh buggy;
+        private TgcMesh patrullero;
+
         private void crearAuto()
         {
-            var sceneAuto = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
-            auto = sceneAuto.Meshes[0];
-            auto.AutoTransformEnable = true;
-            auto.move(0, 5, 0);
-            meshes.Add(auto);
+            var sceneHummer = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
+            hummer = sceneHummer.Meshes[0];
+            hummer.AutoTransformEnable = true;
+            hummer.move(0, 5, 0);
+            meshes.Add(hummer);
 
             var sceneCamion = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\CamionCarga\\CamionCarga-TgcScene.xml");
             camion = sceneCamion.Meshes[0];
@@ -475,7 +541,29 @@ namespace TGC.Group.Model
             camion.move(((suelo.Size.X) - 600), 5, 0);
             meshes.Add(camion);
 
+            var sceneAuto = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
+            auto = sceneAuto.Meshes[0];
+            auto.AutoTransformEnable = true;
+            auto.move(((suelo.Size.X) - 2000 ), 5, (suelo.Size.Z) - 800);
+            auto.Scale = new Vector3(1,1,1);
+            auto.rotateY(FastMath.PI_HALF);
+            meshes.Add(auto);
 
+            var sceneBuggy = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Buggy\\Buggy-TgcScene.xml");
+            buggy = sceneBuggy.Meshes[0];
+            buggy.AutoTransformEnable = true;
+            buggy.move(((suelo.Size.X) - 4000), 5, (suelo.Size.Z) - 1600);
+            buggy.rotateY(FastMath.PI_HALF);
+            buggy.Scale = new Vector3(2, 2, 2);
+            meshes.Add(buggy);
+
+            var scenePatrullero = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Patrullero\\Patrullero-TgcScene.xml");
+            patrullero = scenePatrullero.Meshes[0];
+            patrullero.AutoTransformEnable = true;
+            patrullero.move(1000, 5, (suelo.Size.Z) - 2200);
+            patrullero.rotateY(FastMath.PI);
+            patrullero.Scale = new Vector3(3/2, 1, 3/2);
+            meshes.Add(patrullero);
 
         }
 
