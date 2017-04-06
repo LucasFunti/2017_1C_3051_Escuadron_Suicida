@@ -188,8 +188,10 @@ namespace TGC.Group.Model
 
             //Dibuja un texto por pantalla
             DrawText.drawText(
-                "Con clic izquierdo subimos la camara [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30,
+                "Con clic izquierdo y el puntero movemos la camara [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30,
                 Color.OrangeRed);
+            DrawText.drawText(
+                "Con A,W,D,S nos desplazamos por el escenario.", 0, 45,Color.OrangeRed);
             //Renderizar suelo
             suelo.render();
             //calle.render();
