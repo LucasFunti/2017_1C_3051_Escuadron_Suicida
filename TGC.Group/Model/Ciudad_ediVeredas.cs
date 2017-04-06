@@ -139,9 +139,6 @@ namespace TGC.Group.Model
             skyBox.SkyEpsilon = 40f;
             //Inicializa todos los valores para crear el SkyBox
             skyBox.Init();
-
-            //Modifier para mover el skybox con la posicion de la caja con traslaciones.
-           Modifiers.addBoolean("moveWhitCamera", "Move Whit Camera", true);
         }
 
         /// <summary>
@@ -167,7 +164,6 @@ namespace TGC.Group.Model
                     D3DDevice.Instance.ZFarPlaneDistance * 2f);
 
             //Se actualiza la posicion del skybox.
-            if ((bool)Modifiers.getValue("moveWhitCamera"))
                 skyBox.Center = Camara.Position;
 
         }
