@@ -145,7 +145,7 @@ namespace TGC.Group.Model
             skyBox.Init();
 
             //Modifier para mover el skybox con la posicion de la caja con traslaciones.
-           Modifiers.addBoolean("moveWhitCamera", "Move Whit Camera", true);
+           //Modifiers.addBoolean("moveWhitCamera", "Move Whit Camera", true);
 
         }
 
@@ -332,9 +332,9 @@ namespace TGC.Group.Model
         }
         private void crearPisoDeFondo()
         {
-            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\f1piso2.png"); //"Texturas\\piso2.jpg");
-                                                                                                                           //var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Grass.jpg"); //"Texturas\\piso2.jpg");
-
+            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\f1piso2.png"); 
+            //var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road.jpg"); 
+                                                                                                                           
             suelo = new TgcPlane(new Vector3(-500, 0, -500), new Vector3(6000, 0, 6000), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
 
         }
@@ -670,13 +670,18 @@ namespace TGC.Group.Model
 
         private TgcMesh Planta;
 
-        private enum Plantas {Pino = 2, Palmera = 1, Nada = 0, Arbol = 3 };
-        private void crearUnaPlanta(TgcScene unaScene, int i, Vector3 vectorPosicion)
+        private enum Plantas {Pino = 2, Palmera = 1, Nada = 4, Arbol = 3 };
+        private void crearUnaPlanta(TgcScene unaScene, int i, Vector3 vectorPosicion,int n)
         {
             Planta = unaScene.Meshes[0];
             var instancia = Planta.createMeshInstance(Planta.Name + i);
             instancia.AutoTransformEnable = true;
+            instancia.AlphaBlendEnable = true;
             instancia.move(vectorPosicion.X, vectorPosicion.Y, vectorPosicion.Z);
+            if(n == 3)
+            {
+                instancia.Scale = new Vector3((float)0.5, (float)0.5, (float)0.5);
+            }
             meshes.Add(instancia);
 
         }
@@ -690,19 +695,50 @@ namespace TGC.Group.Model
         }
         private Vector3 vectorTraseroMitadVereda(int i)
         {
-            var posicionX = (veredas[i].Position.X);
+            var posicionX = (veredas[i].Position.X) + ((veredas[i].Size.X) / 2) ;
             var posicionY = 10;
-            var posicionZ = veredas[i].Position.Z + ((veredas[i].Size.Z) / 2);
+            var posicionZ = veredas[i].Position.Z + ((veredas[i].Size.Z)) - 20;
             return new Vector3(posicionX, posicionY, posicionZ);
 
         }
         private Vector3 vectorLateralDerechoMitadVereda(int i)
         {
-            var posicionX = (veredas[i].Position.X) + ((veredas[i].Size.X))-20;
+            var posicionX = (veredas[i].Position.X) + ((veredas[i].Size.X)) - 20;
             var posicionY = 10;
             var posicionZ = veredas[i].Position.Z + ((veredas[i].Size.Z)/2);
             return new Vector3(posicionX, posicionY, posicionZ);
 
+        }
+        private Vector3 vectorLateralIzquierdoMitadVereda(int i)
+        {
+            var posicionX = (veredas[i].Position.X)  +20 ;
+            var posicionY = 10;
+            var posicionZ = veredas[i].Position.Z + ((veredas[i].Size.Z)/2) - 20;
+            return new Vector3(posicionX, posicionY, posicionZ);
+
+        }
+        private void dibujarPlantaRandom(int j, Vector3 vectorPosicion,TgcScene scene,int i,int n)
+        {
+            switch (j)
+            {
+                case 1:
+                    vectorPosicion = vectorFrontalMitadVereda(i);
+                    crearUnaPlanta(scene, i, vectorPosicion,n);
+                    break;
+                case 2:
+                    vectorPosicion = vectorTraseroMitadVereda(i);
+                    crearUnaPlanta(scene, i, vectorPosicion,n);
+                    break;
+                case 3:
+                    vectorPosicion = vectorLateralIzquierdoMitadVereda(i);
+                    crearUnaPlanta(scene, i, vectorPosicion,n);
+                    break;
+                case 4:
+                    vectorPosicion = vectorLateralDerechoMitadVereda(i);
+                    crearUnaPlanta(scene, i, vectorPosicion,n);
+                    break;
+            }
+            
         }
         private void crearPlantas()
         {   
@@ -710,7 +746,8 @@ namespace TGC.Group.Model
             {
                 var vectorPosicion = new Vector3(0, 0, 0);
                 System.Random generator = new System.Random();
-                int n = generator.Next(1, 3);
+                for(int k = 1; k <= 4; k++) { 
+                int n = generator.Next(1, 4);
                 switch (n)
                 { 
                     
@@ -718,24 +755,21 @@ namespace TGC.Group.Model
                         break;
                     case (int)Plantas.Pino:
                         var scenePlanta = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vegetacion\\Pino\\Pino-TgcScene.xml");
-                        vectorPosicion = vectorFrontalMitadVereda(i);
-                        crearUnaPlanta(scenePlanta, i, vectorPosicion);
+                        dibujarPlantaRandom(k,vectorPosicion,scenePlanta,i,n);
                         break;
                     case (int)Plantas.Palmera:
                         var scenePlanta2 = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vegetacion\\Palmera3\\Palmera3-TgcScene.xml");
-                        vectorPosicion = vectorLateralDerechoMitadVereda(i);
-                        crearUnaPlanta(scenePlanta2, i, vectorPosicion);
+                        dibujarPlantaRandom(k, vectorPosicion, scenePlanta2, i,n);
                         break;
                     case (int)Plantas.Arbol:
                         var scenePlanta3 = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vegetacion\\ArbolBosque\\ArbolBosque-TgcScene.xml");
-                        vectorPosicion = vectorTraseroMitadVereda(i);
-                        crearUnaPlanta(scenePlanta3, i, vectorPosicion);
+                        dibujarPlantaRandom(k, vectorPosicion, scenePlanta3, i,n);
                         break;
                 }
-                 
-                
-                
-                
+
+
+                }
+
 
             }
         }
