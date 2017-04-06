@@ -172,7 +172,6 @@ namespace TGC.Group.Model
                     D3DDevice.Instance.ZFarPlaneDistance * 2f);
 
             //Se actualiza la posicion del skybox.
-            if ((bool)Modifiers.getValue("moveWhitCamera"))
                 skyBox.Center = Camara.Position;
 
         }
