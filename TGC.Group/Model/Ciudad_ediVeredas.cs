@@ -359,8 +359,6 @@ namespace TGC.Group.Model
         {
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
-
-
             var scene =
                 loader.loadSceneFromFile(MediaDir + "MeshCreator\\Scenes\\Ciudad\\Ciudad-TgcScene.xml");
 
@@ -423,52 +421,38 @@ namespace TGC.Group.Model
             float offset_Y = 5;
             if (nMesh == 0)
             { //Edificio Blanco Espejado - chiquito
-                //offset_row = 300 + ((i - 1) * 900);
-                //offset_Col = 300 + ((j - 1) * 750);
                 offset_row = 220 + ((i - 1) * 900);
                 offset_Col = 10 + ((j - 1) * 900);
             }
             if (nMesh == 2)
             {//Edicio Ladrillos
-                //offset_row = -100 + ((i - 1) * 900);
-                //offset_Col = 850 + ((j - 1) * 750);
                 offset_row = -280 + ((i - 1) * 900);
                 offset_Col = 480 + ((j - 1) * 900);
             }
             if (nMesh == 3)
             { //edifcio amarillo
-                //offset_row = 1000 + ((i - 1) * 900);
-                //offset_Col = 1290 + ((j - 1) * 750);
                 offset_row = 1050 + ((i - 1) * 900);
                 offset_Col = 900 + ((j - 1) * 900);
             }
 
             if (nMesh == 4)
             { //Edificio espejado - gris mediano
-                //offset_row = 395 + ((i - 1) * 900);
-                //offset_Col = 1290 + ((j - 1) * 750);
                 offset_row = 300 + ((i - 1) * 900);
                 offset_Col = 1000 + ((j - 1) * 900);
                 offset_Y = -65;
             }
             if (nMesh == 5)
             { //Edificio alto blanco finito espejado
-                //offset_row = 1000 + ((i - 1) * 900);
-                //offset_Col = -70 + ((j - 1) * 750);
                 offset_row = 1020 + ((i - 1) * 900);
                 offset_Col = -400 + ((j - 1) * 900);
             }
             if (nMesh == 6)
             { //Edificio gris U
-                //offset_row = -100 + ((i - 1) * 900);
-                //offset_Col = -70 + ((j - 1) * 750);
                 offset_row = -130 + ((i - 1) * 900);
                 offset_Col = -380 + ((j - 1) * 900);
             }
             if (nMesh == 7)
             { //Edificio alto blanco finito espejado - Rascacielos blanco
-                //offset_row = 1100 + ((i - 1) * 900);
-                //offset_Col = 600 + ((j - 1) * 750);
                 offset_row = 1065 + ((i - 1) * 900);
                 offset_Col = 200 + ((j - 1) * 900);
             }
