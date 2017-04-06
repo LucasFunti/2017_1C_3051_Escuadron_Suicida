@@ -332,7 +332,7 @@ namespace TGC.Group.Model
         }
         private void crearPisoDeFondo()
         {
-            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\f1piso2.png"); 
+            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\unnamed.jpg"); 
             //var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road.jpg"); 
                                                                                                                            
             suelo = new TgcPlane(new Vector3(-500, 0, -500), new Vector3(6000, 0, 6000), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
@@ -486,21 +486,21 @@ namespace TGC.Group.Model
         private void crearCalles()
         {
 
-            intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union3.jpg");
-            var cuartoDeUnion = new TgcPlane(new Vector3(-445, 1, -225), new Vector3(290, 0, 220), TgcPlane.Orientations.XZplane, intersectionTexture, 1, 1);
-            calles.Add(cuartoDeUnion);
+            //intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union3.jpg");
+            //var cuartoDeUnion = new TgcPlane(new Vector3(-445, 1, -225), new Vector3(290, 0, 220), TgcPlane.Orientations.XZplane, intersectionTexture, 1, 1);
+            //calles.Add(cuartoDeUnion);
 
-            intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union2.jpg");
-            var cuartoDeUnion2 = new TgcPlane(new Vector3(-155, 1, -225), new Vector3(290, 0, 220), TgcPlane.Orientations.XZplane, intersectionTexture, 1, 1);
-            calles.Add(cuartoDeUnion2);
+            //intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union2.jpg");
+            //var cuartoDeUnion2 = new TgcPlane(new Vector3(-155, 1, -225), new Vector3(290, 0, 220), TgcPlane.Orientations.XZplane, intersectionTexture, 1, 1);
+            //calles.Add(cuartoDeUnion2);
 
-            intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union1.jpg");
-            var cuartoDeUnion3 = new TgcPlane(new Vector3(-155, 1, -445), new Vector3(290, 0, 220), TgcPlane.Orientations.XZplane, intersectionTexture, 1, 1);
-            calles.Add(cuartoDeUnion3);
+            //intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union1.jpg");
+            //var cuartoDeUnion3 = new TgcPlane(new Vector3(-155, 1, -445), new Vector3(290, 0, 220), TgcPlane.Orientations.XZplane, intersectionTexture, 1, 1);
+            //calles.Add(cuartoDeUnion3);
 
-            intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union4.jpg");
-            var cuartoDeUnion4 = new TgcPlane(new Vector3(-445, 1, -445), new Vector3(290, 0, 220), TgcPlane.Orientations.XZplane, intersectionTexture, 1, 1);
-            calles.Add(cuartoDeUnion4);
+            // intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union4.jpg");
+            //var cuartoDeUnion4 = new TgcPlane(new Vector3(-445, 1, -445), new Vector3(290, 0, 220), TgcPlane.Orientations.XZplane, intersectionTexture, 1, 1);
+            //calles.Add(cuartoDeUnion4);
             //var CalleTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\f1piso2.png");
             //veredas.Add( new TgcPlane(new Vector3(-445, 1, -445), new Vector3(560, 0, 5890), TgcPlane.Orientations.XZplane, CalleTexture, 10f, 10f));
             //calle = new TgcPlane();
