@@ -84,11 +84,15 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\CamaraTerceraPersona.cs" />
     <Compile Include="Model\Ciudad.cs" />
-    <Compile Include="Model\Ciudad2.cs" />
     <Compile Include="Model\Ciudad_ediVeredas.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\PrintMessageText.cs" />
     <Compile Include="Model\TgcFpsCamera.cs" />
+    <Compile Include="Model\TwistedMetal.cs" />
+    <Compile Include="Model\Vehiculo.cs" />
+    <Compile Include="Model\VehiculoPrincipal.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
