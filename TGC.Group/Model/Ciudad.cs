@@ -46,7 +46,7 @@ namespace TGC.Group.Model
         private Core.Example.TgcExample env;
         List<int> ListaRandom = new List<int>(7);
        
-        private int CameraX, CameraY, CameraZ;
+      //  private int CameraX, CameraY, CameraZ;
        
         public Ciudad(Core.Example.TgcExample env)
         {
@@ -56,9 +56,9 @@ namespace TGC.Group.Model
             this.MediaDir = this.env.MediaDir;
             this.Input = this.env.Input;
            
-            CameraX = -890;
-            CameraY = 460;
-            CameraZ = 110;
+        //    CameraX = -890;
+         //   CameraY = 460;
+         //   CameraZ = 110;
             //Carga Texturas
             manzanaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Floor.jpg");
             cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
@@ -144,8 +144,7 @@ namespace TGC.Group.Model
         private void crearPisoDeFondo()
         {
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\calles.jpg");
-            //var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road.jpg"); 
-
+           
             suelo = new TgcPlane(new Vector3(-500, 0, -500), new Vector3(6000, 0, 6000), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
 
         }
@@ -156,14 +155,14 @@ namespace TGC.Group.Model
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
-            var cameraPosition = new Vector3(CameraX, CameraY, CameraZ);
+           // var cameraPosition = new Vector3(CameraX, CameraY, CameraZ);
             //Quiero que la camara mire hacia el origen (0,0,0).
-            var lookAt = suelo.BoundingBox.calculateBoxCenter();
+            //var lookAt = suelo.BoundingBox.calculateBoxCenter();
 
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             //Camara.SetCamera(cameraPosition, lookAt);
             //Camara en 1ra persona
-            env.Camara = new TgcFpsCamera(new Vector3(300, 600, -600), Input);
+            //env.Camara = new TgcFpsCamera(new Vector3(300, 600, -600), Input);
 
         }
         private void crearEdificios()
@@ -333,13 +332,13 @@ namespace TGC.Group.Model
             hummer = sceneHummer.Meshes[0];
             hummer.AutoTransformEnable = true;
             hummer.move(0, 5, 0);
-          //  meshes.Add(hummer);
+            meshes.Add(hummer);
 
             var sceneCamion = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\CamionCarga\\CamionCarga-TgcScene.xml");
             camion = sceneCamion.Meshes[0];
             camion.AutoTransformEnable = true;
             camion.move(((suelo.Size.X) - 600), 5, 0);
-           // meshes.Add(camion);
+            meshes.Add(camion);
 
             var sceneAuto = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
             auto = sceneAuto.Meshes[0];
@@ -347,7 +346,7 @@ namespace TGC.Group.Model
             auto.move(((suelo.Size.X) - 2000), 5, (suelo.Size.Z) - 800);
             auto.Scale = new Vector3(1, 1, 1);
             auto.rotateY(FastMath.PI_HALF);
-           // meshes.Add(auto);
+            meshes.Add(auto);
 
             var sceneBuggy = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Buggy\\Buggy-TgcScene.xml");
             buggy = sceneBuggy.Meshes[0];
@@ -355,7 +354,7 @@ namespace TGC.Group.Model
             buggy.move(((suelo.Size.X) - 4000), 5, (suelo.Size.Z) - 1600);
             buggy.rotateY(FastMath.PI_HALF);
             buggy.Scale = new Vector3(2, 2, 2);
-            //meshes.Add(buggy);
+            meshes.Add(buggy);
 
             var scenePatrullero = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Patrullero\\Patrullero-TgcScene.xml");
             patrullero = scenePatrullero.Meshes[0];
@@ -363,7 +362,7 @@ namespace TGC.Group.Model
             patrullero.move(1000, 5, (suelo.Size.Z) - 2200);
             patrullero.rotateY(FastMath.PI);
             patrullero.Scale = new Vector3(1, 1, 1);
-            //meshes.Add(patrullero);
+            meshes.Add(patrullero);
 
         }
 

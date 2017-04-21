@@ -82,7 +82,8 @@ namespace TGC.Group.Model
         {
             //Inicio el rende de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
-            messages.render();
+            messages.MostrarComandosPorPantalla();
+            messages.MostrarVelocidadPorPantalla(this.autoPrincipal.getVelocidadX());
             Ciudad.Render();
             autoPrincipal.Render();
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
