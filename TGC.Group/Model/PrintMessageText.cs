@@ -26,5 +26,17 @@ namespace TGC.Group.Model
             this.env.DrawText.drawText("Velocidad: " + Velocidad, 0, 60, System.Drawing.Color.Red);
  
         }
+        public void MostrarAlturaPorPantalla(float altura)
+        {
+            //Dibuja un texto por pantalla
+            this.env.DrawText.drawText("Altura: " + altura, 0, 75, System.Drawing.Color.Red);
+
+        }
+        public void MostrarVelocidadYPorPantalla(float altura)
+        {
+            //Dibuja un texto por pantalla
+            this.env.DrawText.drawText("Velocidad Y: " + altura, 0, 90, System.Drawing.Color.Red);
+
+        }
     }
 }

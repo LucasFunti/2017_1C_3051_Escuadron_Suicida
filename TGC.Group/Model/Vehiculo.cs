@@ -14,19 +14,23 @@ namespace TGC.Group.Model
     {
      
         Core.Example.TgcExample env;
-        
+        private bool alturaL = false;
         private TgcMesh mesh;       
 
         public Vehiculo(TgcMesh Mesh, Vector3 pos)
         {
             this.mesh = Mesh;
-            this.setPosicion(pos);
-            this.setVelocidadY(0);
+            base.setPosicion(pos);
+            base.setVelocidadY(0);
+            base.setAluraMaxima(20);
+          //  base.setAlturaInicial(Mesh.Position.Y);
         }
         public Vehiculo(Core.Example.TgcExample env)
         {
             this.env = env;
             this.setVelocidadY(0);
+            base.setAluraMaxima(100);
+   
         }
         public void setMesh(TgcMesh Mesh)
         {
@@ -38,6 +42,7 @@ namespace TGC.Group.Model
         }       
         public virtual void Update()
         {
+            base.setAlturaActual(this.getMesh().Position.Y);
             base.calculosDePosicion();
         }
         public void Render()
@@ -56,7 +61,9 @@ namespace TGC.Group.Model
         public override void mover()
         {
             var lastPos = this.getMesh().Position;
-            this.getMesh().moveOrientedY(this.getVelocidadX() * this.ElapsedTime);
+              this.getMesh().move(new Vector3(Core.Utils.FastMath.Sin(this.getMesh().Rotation.Y) * this.getVelocidadX(),
+           this.getVelocidadY(), Core.Utils.FastMath.Cos(this.getMesh().Rotation.Y) * this.getVelocidadX()));
+          
         }
         public virtual void rotarCamara(float rotacion)
         {

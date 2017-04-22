@@ -25,6 +25,8 @@ namespace TGC.Group.Model
             this.setMesh(mesh);
             this.setVelocidadMaxima(30);
             this.setVelocidadMinima(-30);
+         //   this.setAlturaInicial(this.getMesh().Position.Y);
+            
             camaraManager();
 
         }
@@ -56,6 +58,14 @@ namespace TGC.Group.Model
         public override bool moverAIzquierda()
         {
             return this.env.Input.keyDown(Key.A);
+        }
+        public override bool moverArriba()
+        {
+            return this.env.Input.keyDown(Key.J);
+        }
+        public override bool moverAbajo()
+        {
+            return this.env.Input.keyDown(Key.K);
         }
         public override void rotarCamara(float rotAngle)
         {

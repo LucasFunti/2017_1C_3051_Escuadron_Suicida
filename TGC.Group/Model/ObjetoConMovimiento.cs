@@ -9,15 +9,33 @@ namespace TGC.Group.Model
 {
     class ObjetoConMovimiento
     {
+        //Movimiento Horizontal
         private float VelocidadX = 0;
-        private float VelocidadY = 0; //Para cuando Salta.
-        private float const_aceleracion = 0.4f;
+        private float const_aceleracionX = 0.4f;
         private float friccion = 0.2f;
         private float velocidad_maxima = 0;
         private float velocidad_minima = 0;
+        //Movimiento Vertical
+        private float VelocidadY = 0; //Para cuando Salta.
+        private float const_aceleracionY = 0.5f;
+        private float alturaMax = 0f;
+        private float alturaActual = 5f;
+        private float alturaInicial = 5f;
+        private float gravedad = 1f; //Para cuando Salta.
+        private bool subiendo = false;
+       
+
+        private float velocidadRotacion = 2f;
         public float ElapsedTime { get; set; }
         private Vector3 posicion;
-
+        public float getAlturaActual()
+        {
+            return this.alturaActual;
+        }
+        public void setAlturaActual(float alt)
+        {
+            this.alturaActual= alt;
+        }
         public void setPosicion(Vector3 posicion)
         {
             this.posicion = posicion;
@@ -54,13 +72,21 @@ namespace TGC.Group.Model
         {
             this.velocidad_minima = VelocidadMin;
         }
-        public float getConstanteDeAsceleracion()
+        public float getConstanteDeAsceleracionX()
         {
-            return this.const_aceleracion;
+            return this.const_aceleracionX;
         }
-        public void setConstanteDeAsceleracion(float c_aceleracion)
+        public void setConstanteDeAsceleracionX(float c_aceleracion)
         {
-            this.const_aceleracion = c_aceleracion;
+            this.const_aceleracionX = c_aceleracion;
+        }
+        public float getConstanteDeAsceleracionY()
+        {
+            return this.const_aceleracionY;
+        }
+        public void setConstanteDeAsceleracionY(float c_aceleracion)
+        {
+            this.const_aceleracionY = c_aceleracion;
         }
         public float getFriccion()
         {
@@ -70,7 +96,19 @@ namespace TGC.Group.Model
         {
             this.friccion = c_friccion;
         }
-        public float accelerar(int direccion,float aceleracion)
+        public float getAluraMaxima()
+        {
+            return this.alturaMax;
+        }
+        public void setAluraMaxima(float alturaMaxima)
+        {
+            this.alturaMax = alturaMaxima;
+        }
+        public float getGravedad()
+        {
+            return this.gravedad;
+        }
+        public float accelerarX(int direccion,float aceleracion)
         {
             this.setVelocidadX(this.VelocidadX + (direccion * aceleracion));
   
@@ -82,70 +120,54 @@ namespace TGC.Group.Model
 
             return this.getVelocidadX();
         }
+        public float accelerarY(int direccion)
+        {
 
+            if (direccion > 0)
+            {
+                this.setVelocidadY(this.VelocidadY + (direccion * this.getConstanteDeAsceleracionY()));
+                if ((alturaActual + 1) > this.getAluraMaxima())
+                {
+                    subiendo = false;
+                    this.setVelocidadY(0);
+                }
+                else
+                    alturaActual = alturaActual + 1;
+            }
+            else
+            {
+                this.setVelocidadY(this.VelocidadY + (direccion * this.getGravedad()));
+                alturaActual = alturaActual - 1;
+            }
+            return this.getVelocidadY();
+        }
+       
+        public float getVelocidadRotacion()
+        {
+            return this.velocidadRotacion;
+        }
+        public void setVelocidadRotacion(float VRotacion)
+        {
+            this.velocidadRotacion= VRotacion;
+        }
         public void calculosDePosicion()
         {
 
-            //obtener velocidades de Modifiers
-            var velocidadRotacion = 2f;
-
             //Calcular proxima posicion de personaje segun Input
             float rotate = 0;
-            var moving = false;
+            var movingX = false;
+            var movingY = false;
             var rotating = false;
             ElapsedTime = 1;
 
-            //Adelante
-            if (this.moverAdelante())
+            movingY = ProcesarMovimientoEnY();
+            if (!movingY)
             {
-                // moveForward = -velocidadCaminar;
-                this.accelerar(-1,this.getConstanteDeAsceleracion());
-                moving = true;
+                movingX = ProcesarMovimientoEnX();
+                rotate = ProcesarRotacion();
             }
-
-            //Atras
-            if (this.moverAtras())
-            {
-                // moveForward = velocidadCaminar;
-                this.accelerar(1, this.getConstanteDeAsceleracion());
-                moving = true;
-            }
-
-            //Derecha
-            if (this.moverADerecha())
-            {
-                rotate = velocidadRotacion;
-                rotating = true;
-            }
-
-            //Izquierda
-            if (this.moverAIzquierda())
-            {
-                rotate = -velocidadRotacion;
-                rotating = true;
-            }
-
-            //Si -1 < velocidad > 1 entonces está frenado.
-            if (this.getVelocidadX() > -1 && this.getVelocidadX() <1  && !moving)
-            {
-                this.setVelocidadX(0);
-            }
-
-            if (this.getVelocidadX() > 0 && !moving)
-            {
-                this.accelerar(-1,this.getFriccion());
-                moving = true;
-            }
-            if (this.getVelocidadX() < 0 && !moving)
-            {
-                this.accelerar(1, this.getFriccion());
-                moving = true;
-            }
-
-
-
-            //Si hubo rotacion
-            if (rotating && moving)
+             //Rota solo si hay movimiento en X y no hay movimiento en Y
+            if (rotate!=0 && movingX && !movingY)
             {
 
                 //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
@@ -153,15 +175,15 @@ namespace TGC.Group.Model
                 var rotAngle = (float)(System.Math.PI * (rotate * ElapsedTime) / 180.0f);
                 this.rotar(rotAngle);
 
+                //Si hubo rotacion y no movimiento mover las ruedas unicamente
+                if (rotating && !movingX)
+                {
+                }
             }
-            //Si hubo rotacion
-            if (rotating && !moving)
-            {
+           
 
-                //mover las ruedas
-            }
             //Si hubo desplazamiento
-            if (moving)
+            if (movingX || movingY)
             {
                 this.mover();
                 //Activar animacion de caminando
@@ -280,6 +302,92 @@ namespace TGC.Group.Model
                 //  mesh.playAnimation("Parado", true);
             }
         }
+        private bool ProcesarMovimientoEnY()
+        {
+            bool movingY = false;
+
+            if (this.moverArriba() && this.alturaActual == this.alturaInicial)
+                subiendo = true;
+
+            if (this.moverAbajo())
+            {
+                //       this.accelerarY(-1);
+                //     movingY = true;
+            }
+            //Mover en Y (Altura)
+            if (subiendo)
+            {
+                this.accelerarY(1);
+                movingY = true;
+            }
+
+            //Mover en Y (Altura)
+            if (!movingY && this.alturaActual > this.alturaInicial && !subiendo)
+            {
+                this.accelerarY(-1);
+                movingY = true;
+            }
+
+            if (!movingY && ((this.alturaInicial > this.alturaActual) || this.getVelocidadY() != 0))
+            {
+                if (this.alturaInicial > this.alturaActual)
+                    this.setVelocidadY(this.alturaInicial - this.alturaActual);
+                else
+                    this.setVelocidadY(0);
+
+                movingY = true;
+            }
+
+            return movingY;
+        }
+        public bool ProcesarMovimientoEnX()
+        {
+            bool movingX=false;
+
+            //Adelante
+            if (this.moverAdelante())
+            {
+                // moveForward = -velocidadCaminar;
+                this.accelerarX(-1, this.getConstanteDeAsceleracionX());
+                movingX = true;
+            }
+
+            //Atras
+            if (this.moverAtras())
+            {
+                // moveForward = velocidadCaminar;
+                this.accelerarX(1, this.getConstanteDeAsceleracionX());
+                movingX = true;
+            }
+            //Si -1 < velocidad > 1 entonces está frenado.
+            if (this.getVelocidadX() > -1 && this.getVelocidadX() < 1 && !movingX)
+                       this.setVelocidadX(0);
+            
+
+            if (this.getVelocidadX() > 0 && !movingX)
+            {
+                this.accelerarX(-1, this.getFriccion());
+                movingX = true;
+            }
+            if (this.getVelocidadX() < 0 && !movingX)
+            {
+                this.accelerarX(1, this.getFriccion());
+                movingX = true;
+            }
+            return movingX;
+        }
+        public float ProcesarRotacion()
+        {
+            //Derecha
+            if (this.moverADerecha())
+            return this.getVelocidadRotacion();
+          
+            //Izquierda
+            if (this.moverAIzquierda())
+              return -this.getVelocidadRotacion();
+         
+            return 0;
+        }
         public virtual bool moverAdelante()
         {
             return false;
@@ -303,6 +411,14 @@ namespace TGC.Group.Model
         public virtual void mover()
         {
 
+        }
+        public virtual bool moverArriba()
+        {
+            return false;
+        }
+        public virtual bool moverAbajo()
+        {
+            return false;
         }
     }
 }

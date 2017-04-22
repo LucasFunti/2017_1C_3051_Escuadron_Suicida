@@ -84,6 +84,8 @@ namespace TGC.Group.Model
             PreRender();
             messages.MostrarComandosPorPantalla();
             messages.MostrarVelocidadPorPantalla(this.autoPrincipal.getVelocidadX());
+            messages.MostrarAlturaPorPantalla(this.autoPrincipal.getMesh().Position.Y);
+            messages.MostrarVelocidadYPorPantalla(this.autoPrincipal.getVelocidadY());
             Ciudad.Render();
             autoPrincipal.Render();
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
