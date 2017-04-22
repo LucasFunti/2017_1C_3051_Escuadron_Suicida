@@ -23,7 +23,8 @@ namespace TGC.Group.Model
             mesh.AutoTransformEnable = true;
             mesh.move(0, 5, 0);
             this.setMesh(mesh);
-
+            this.setVelocidadMaxima(30);
+            this.setVelocidadMinima(-30);
             camaraManager();
 
         }

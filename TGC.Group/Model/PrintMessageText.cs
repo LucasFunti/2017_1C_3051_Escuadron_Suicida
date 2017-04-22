@@ -24,6 +24,7 @@ namespace TGC.Group.Model
         {
             //Dibuja un texto por pantalla
             this.env.DrawText.drawText("Velocidad: " + Velocidad, 0, 60, System.Drawing.Color.Red);
+ 
         }
     }
 }
