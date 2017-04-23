@@ -78,7 +78,7 @@ namespace TGC.Group.Form
 
             //Inicio Device
             D3DDevice.Instance.InitializeD3DDevice(panel3D);
-
+            
             //Inicio inputs
             Input = new TgcD3dInput();
             Input.Initialize(this, panel3D);

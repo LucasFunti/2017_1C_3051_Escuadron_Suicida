@@ -13,11 +13,11 @@ namespace TGC.Group.Model
     {
         private readonly List<Colisionador> objetosColisionables = new List<Colisionador>();
         private SphereTriangleCollisionManager collisionManager;
-
+        private bool Collision = false;
         public ManejadorDeColisiones()
         {
             collisionManager = new SphereTriangleCollisionManager();
-       //     collisionManager.GravityEnabled = true;
+            //     collisionManager.GravityEnabled = true;
         }
 
         public void addBoundingBoxMeshColisionable(TgcMesh mesh)
@@ -39,12 +39,17 @@ namespace TGC.Group.Model
         {
             return this.objetosColisionables;
         }
-
+        public SphereTriangleCollisionManager Manager()
+        {
+            return this.collisionManager;
+        }
         public Vector3 moverConColision(TgcMesh personaje, Vector3 movementVector)
         {
             TgcBoundingSphere characterSphere = new TgcBoundingSphere(personaje.BoundingBox.calculateBoxCenter(),
                personaje.BoundingBox.calculateBoxRadius());
             var realMovement = collisionManager.moveCharacter(characterSphere, movementVector, objetosColisionables);
+
+            Collision = collisionManager.Collision;
 
             if (collisionManager.Collision)
                 return realMovement;

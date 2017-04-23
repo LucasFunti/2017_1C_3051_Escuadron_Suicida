@@ -2,17 +2,18 @@
 using Microsoft.DirectX.Direct3D;
 using TGC.Core.SceneLoader;
 using Microsoft.DirectX.DirectInput;
-
+using TGC.Core.Geometry;
+using System.Drawing;
 
 namespace TGC.Group.Model
 {
     class VehiculoPrincipal : Vehiculo
     {
         
-        private Vector3 pos;
         private TgcSceneLoader loader;
         private CamaraTerceraPersona camaraInterna;
         private TwistedMetal env;
+ 
 
         public VehiculoPrincipal(TwistedMetal env) : base(env)
         {
@@ -25,12 +26,11 @@ namespace TGC.Group.Model
             this.setMesh(mesh);
             this.setVelocidadMaxima(30);
             this.setVelocidadMinima(-30);
-         //   this.setAlturaInicial(this.getMesh().Position.Y);
-            
-            camaraManager();
+            //   this.setAlturaInicial(this.getMesh().Position.Y);
+             camaraManager();
 
         }
-
+      
         private void camaraManager()
         {
             camaraInterna = new CamaraTerceraPersona(this.getMesh().Position, 100, 300);
@@ -40,9 +40,17 @@ namespace TGC.Group.Model
         public override void Update()
         {
             base.Update();
-            //Hacer que la camara siga al personaje en su nueva posicion
+          
             camaraInterna.Target = this.getMesh().Position;
         }
+        public override void Render()
+        {
+            base.Render();
+            TgcBoundingSphere characterSphere = new TgcBoundingSphere(this.getMesh().BoundingBox.calculateBoxCenter(),
+            this.getMesh().BoundingBox.calculateBoxRadius());
+            characterSphere.render();
+        }
+        
         public override bool moverAdelante()
         {
             return this.env.Input.keyDown(Key.W);

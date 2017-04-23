@@ -494,7 +494,7 @@ namespace TGC.Group.Model
                 mesh.render();
          //       mesh.BoundingBox.render();
             }
-
+          
 
             //Renderizado de cordones
             foreach (var cordon in cordones)
@@ -520,8 +520,8 @@ namespace TGC.Group.Model
                 c.render();
             }
 
-       
-           
+
+            mostrarBounding();
           
         }
         public void dispose()
@@ -542,6 +542,17 @@ namespace TGC.Group.Model
             skyBox.dispose();
 
 
+        }
+        private void mostrarBounding()
+        {
+            foreach (var mesh in edificios)
+            {
+                mesh.BoundingBox.render();
+            }
+            foreach (var mesh in semaforos)
+            {
+                mesh.BoundingBox.render();
+            }
         }
         private void iniciarCielo()
         {
