@@ -12,8 +12,8 @@ namespace TGC.Group.Model
 {
     class Vehiculo : ObjetoConMovimiento
     {
-     
-        Core.Example.TgcExample env;
+
+        TwistedMetal env;
         private bool alturaL = false;
         private TgcMesh mesh;       
 
@@ -25,7 +25,7 @@ namespace TGC.Group.Model
             base.setAluraMaxima(20);
           //  base.setAlturaInicial(Mesh.Position.Y);
         }
-        public Vehiculo(Core.Example.TgcExample env)
+        public Vehiculo(TwistedMetal env)
         {
             this.env = env;
             this.setVelocidadY(0);
@@ -48,6 +48,7 @@ namespace TGC.Group.Model
         public void Render()
         {
             this.mesh.render();
+            this.mesh.BoundingBox.render();
         }
         public void dispose()
         {
@@ -61,9 +62,13 @@ namespace TGC.Group.Model
         public override void mover()
         {
             var lastPos = this.getMesh().Position;
-              this.getMesh().move(new Vector3(Core.Utils.FastMath.Sin(this.getMesh().Rotation.Y) * this.getVelocidadX(),
+            Vector3 v3=  this.env.GetManejadorDeColision().moverConColision(this.getMesh(), new Vector3(Core.Utils.FastMath.Sin(this.getMesh().Rotation.Y) * this.getVelocidadX(),
            this.getVelocidadY(), Core.Utils.FastMath.Cos(this.getMesh().Rotation.Y) * this.getVelocidadX()));
-          
+            //  this.getMesh().move(new Vector3(Core.Utils.FastMath.Sin(this.getMesh().Rotation.Y) * this.getVelocidadX(),
+            // this.getVelocidadY(), Core.Utils.FastMath.Cos(this.getMesh().Rotation.Y) * this.getVelocidadX()));
+            this.getMesh().move(v3);
+
+
         }
         public virtual void rotarCamara(float rotacion)
         {

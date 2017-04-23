@@ -60,6 +60,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.Direct3D.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DirectX.Direct3DX, Version=1.0.2911.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="Microsoft.DirectX.DirectInput, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.DirectInput.dll</HintPath>
@@ -84,15 +85,21 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
-    <Compile Include="Model\CamaraTerceraPersona.cs" />
-    <Compile Include="Model\Ciudad.cs" />
-    <Compile Include="Model\Ciudad_ediVeredas.cs" />
-    <Compile Include="Model\GameModel.cs" />
-    <Compile Include="Model\PrintMessageText.cs" />
-    <Compile Include="Model\TgcFpsCamera.cs" />
+    <Compile Include="Model\UtilsColisiones\BoundingBoxCollider.cs" />
+    <Compile Include="Model\UtilsCamara\CamaraTerceraPersona.cs" />
+    <Compile Include="Model\UtilsCiudad\Ciudad.cs" />
+    <Compile Include="Model\UtilsColisiones\Colisionador.cs" />
+    <Compile Include="Model\UtilsColisiones\ManejadorDeColisiones.cs" />
+    <Compile Include="Model\UtilsVehiculos\ObjetoConMovimiento.cs" />
+    <Compile Include="Model\UtilsColisiones\PrintMessageText.cs" />
+    <Compile Include="Model\UtilsColisiones\SphereTriangleCollisionManager.cs" />
+    <Compile Include="Model\UtilsColisiones\TgcBoundingSphere.cs" />
+    <Compile Include="Model\UtilsColisiones\TgcCollisionUtils.cs" />
+    <Compile Include="Model\UtilsCamara\TgcFpsCamera.cs" />
+    <Compile Include="Model\UtilsColisiones\TriangleMeshCollider.cs" />
     <Compile Include="Model\TwistedMetal.cs" />
-    <Compile Include="Model\Vehiculo.cs" />
-    <Compile Include="Model\VehiculoPrincipal.cs" />
+    <Compile Include="Model\UtilsVehiculos\Vehiculo.cs" />
+    <Compile Include="Model\UtilsVehiculos\VehiculoPrincipal.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">

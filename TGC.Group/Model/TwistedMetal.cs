@@ -28,6 +28,7 @@ namespace TGC.Group.Model
         private Ciudad Ciudad;
         private PrintMessageText messages;
         private VehiculoPrincipal autoPrincipal;
+        private ManejadorDeColisiones manejadorDeColiciones;
 
         public TwistedMetal(string mediaDir, string shadersDir)
             : base(mediaDir, shadersDir)
@@ -47,12 +48,21 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Init()
         {
-             //Carga la estructura de la ciudad
+            //Carga la estructura de la ciudad
+            manejadorDeColiciones = new ManejadorDeColisiones();
             Ciudad = new Ciudad(this);
             messages = new PrintMessageText(this);
             autoPrincipal = new VehiculoPrincipal(this);
-        }
 
+            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getEdificios());
+            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getSemaforos());
+            manejadorDeColiciones.addBoundingBoxMeshColisionable(autoPrincipal.getMesh());
+
+        }
+        public ManejadorDeColisiones GetManejadorDeColision()
+        {
+            return this.manejadorDeColiciones;
+        }
         /// <summary>
         ///     Se llama en cada frame.
         ///     Se debe escribir toda la lógica de computo del modelo, así como también verificar entradas del usuario y reacciones
@@ -69,7 +79,7 @@ namespace TGC.Group.Model
                     D3DDevice.Instance.ZNearPlaneDistance,
                     D3DDevice.Instance.ZFarPlaneDistance * 2f);
 
-            Ciudad.Update();
+             Ciudad.Update();
             autoPrincipal.Update();
         }
 

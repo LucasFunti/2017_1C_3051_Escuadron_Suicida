@@ -28,6 +28,8 @@ namespace TGC.Group.Model
         private float velocidadRotacion = 2f;
         public float ElapsedTime { get; set; }
         private Vector3 posicion;
+
+
         public float getAlturaActual()
         {
             return this.alturaActual;
@@ -186,19 +188,7 @@ namespace TGC.Group.Model
             if (movingX || movingY)
             {
                 this.mover();
-                //Activar animacion de caminando
-                //  personaje.playAnimation("Caminando", true);
-                //this.env.DrawText.drawText("Caminando", 50, 20, System.Drawing.Color.Red);
-
-                //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
-             //   var lastPos = this.getMesh().Position;
-
-                //La velocidad de movimiento tiene que multiplicarse por el elapsedTime para hacerse independiente de la velocida de CPU
-                //Ver Unidad 2: Ciclo acoplado vs ciclo desacoplado
-
-                //NO SE RECOMIENDA UTILIZAR! moveOrientedY mueve el personaje segun la direccion actual, realiza operaciones de seno y coseno.
-               // this.getMesh().moveOrientedY(this.getVelocidadX() * ElapsedTime);
-
+             
                 //Detectar colisiones
                 /*  var collide = false;
                   //Guardamos los objetos colicionados para luego resolver la respuesta. (para este ejemplo simple es solo 1 caja)

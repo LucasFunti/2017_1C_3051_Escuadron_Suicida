@@ -12,9 +12,9 @@ namespace TGC.Group.Model
         private Vector3 pos;
         private TgcSceneLoader loader;
         private CamaraTerceraPersona camaraInterna;
-        private Core.Example.TgcExample env;
+        private TwistedMetal env;
 
-        public VehiculoPrincipal(Core.Example.TgcExample env) : base(env)
+        public VehiculoPrincipal(TwistedMetal env) : base(env)
         {
             loader = new TgcSceneLoader();
             this.env = env;

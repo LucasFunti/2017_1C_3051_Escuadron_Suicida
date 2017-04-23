@@ -14,7 +14,7 @@ using TGC.Examples.Camara;
 using TGC.Core.Terrain;
 using TGC.Core.UserControls;
 using TGC.Core.UserControls.Modifier;
-
+using TGC.Core.BoundingVolumes;
 namespace TGC.Group.Model
 {
     /// <summary>
@@ -25,6 +25,7 @@ namespace TGC.Group.Model
     /// </summary>
     public class Ciudad 
     {
+        private readonly List<Colisionador> objetosColisionables = new List<Colisionador>();
         private string MediaDir;
         private TgcPlane suelo;
         private TgcMesh edificio;
@@ -32,79 +33,65 @@ namespace TGC.Group.Model
         private List<TgcPlane> cordones;
         private List<TgcPlane> paredes;
         private List<TgcPlane> calles;
+        private List<TgcMesh> edificios;
+        private List<TgcMesh> semaforos;
         private List<TgcMesh> meshes;
         private TgcSceneLoader loader;
         private TgcSkyBox skyBox;
-
-        TgcD3dInput Input;
-        private TgcTexture manzanaTexture;
-        private TgcTexture cordonTexture;
+         private TgcTexture cordonTexture;
         private TgcTexture veredaTexture;
         private TgcTexture paredTexture;
-        private TgcTexture calleTexture;
-        private TgcTexture intersectionTexture;
         private Core.Example.TgcExample env;
         List<int> ListaRandom = new List<int>(7);
-       
-      //  private int CameraX, CameraY, CameraZ;
-       
+        private TgcMesh semaforo;
+        private TgcMesh auto;
+        private TgcMesh camion;
+        private TgcMesh hummer;
+        private TgcMesh buggy;
+        private TgcMesh patrullero;
+
+        //  colicion
+        private TgcArrow collisionNormalArrow;
+        private TgcBox collisionPoint;
+        private TgcArrow directionArrow;
+        private TgcBoundingSphere characterSphere;
+        private SphereTriangleCollisionManager collisionManager;
+
         public Ciudad(Core.Example.TgcExample env)
         {
             //Device de DirectX para crear primitivas.
             this.env = env;
             var d3dDevice = D3DDevice.Instance.Device;
             this.MediaDir = this.env.MediaDir;
-            this.Input = this.env.Input;
-           
-        //    CameraX = -890;
-         //   CameraY = 460;
-         //   CameraZ = 110;
+         
             //Carga Texturas
-            manzanaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Floor.jpg");
-            cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
             veredaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\piso2.jpg");
-            paredTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Textures\\Ladrillo\\brick1_2.jpg");
-            calleTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\f1piso2.png");
-            intersectionTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Road Union.jpg");
-
+            cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
             //Crea el piso de fondo
 
             loader = new TgcSceneLoader();
-            crearPisoDeFondo();
-            crearCamara(env);
+            
             meshes = new System.Collections.Generic.List<TgcMesh>();
+            edificios = new System.Collections.Generic.List<TgcMesh>();
+            semaforos = new System.Collections.Generic.List<TgcMesh>();
             veredas = new System.Collections.Generic.List<TgcPlane>();
             cordones = new System.Collections.Generic.List<TgcPlane>();
             paredes = new System.Collections.Generic.List<TgcPlane>();
             calles = new System.Collections.Generic.List<TgcPlane>();
+
+            crearPisoDeFondo();
             crearEdificios();
+            meshes.AddRange(edificios);
             crearVeredas();
             crearParedes();
             crearAuto();
             crearSemaforos();
+            meshes.AddRange(semaforos);
             crearPlantas();
-            
+            iniciarCielo();
+         //   iniciarColisionador();
 
-            //Crear SkyBox
-            skyBox = new TgcSkyBox();
-            skyBox.Center = new Vector3(1000, 0, 1000);
-            skyBox.Size = new Vector3(20000, 20000, 20000);
-
-
-            var texturesPath = MediaDir + "Texturas\\Quake\\SkyBox3\\";
-
-            //Configurar las texturas para cada una de las 6 caras
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, texturesPath + "Up.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, texturesPath + "Down.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, texturesPath + "Left.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, texturesPath + "Right.jpg");
-
-            //Hay veces es necesario invertir las texturas Front y Back si se pasa de un sistema RightHanded a uno LeftHanded
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, texturesPath + "Back.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, texturesPath + "Front.jpg");
-            skyBox.SkyEpsilon = 40f;
-            //Inicializa todos los valores para crear el SkyBox
-            skyBox.Init();
+           
         }
 
 
@@ -149,22 +136,6 @@ namespace TGC.Group.Model
 
         }
 
-        private void crearCamara(Core.Example.TgcExample env)
-        {
-            //Suelen utilizarse objetos que manejan el comportamiento de la camara.
-            //Lo que en realidad necesitamos gráficamente es una matriz de View.
-            //El framework maneja una cámara estática, pero debe ser inicializada.
-            //Posición de la camara.
-           // var cameraPosition = new Vector3(CameraX, CameraY, CameraZ);
-            //Quiero que la camara mire hacia el origen (0,0,0).
-            //var lookAt = suelo.BoundingBox.calculateBoxCenter();
-
-            //Configuro donde esta la posicion de la camara y hacia donde mira.
-            //Camara.SetCamera(cameraPosition, lookAt);
-            //Camara en 1ra persona
-            //env.Camara = new TgcFpsCamera(new Vector3(300, 600, -600), Input);
-
-        }
         private void crearEdificios()
         {
             //Internamente el framework construye la matriz de view con estos dos vectores.
@@ -267,7 +238,6 @@ namespace TGC.Group.Model
             //No recomendamos utilizar AutoTransform, en juegos complejos se pierde el control. mejor utilizar Transformaciones con matrices.
             instance.AutoTransformEnable = true;
             //Desplazarlo
-            // instance.move(i * offset_row, 0, j * offset_Col);
             instance.move(offset_row, offset_Y, offset_Col);
             if (nMesh == 0)
                 instance.Scale = new Vector3(0.70f, 1f, 1f);
@@ -275,8 +245,8 @@ namespace TGC.Group.Model
             if (nMesh == 4)
                 instance.Scale = new Vector3(0.40f, 1f, 1f);
 
-            meshes.Add(instance);
-
+            edificios.Add(instance);
+            
             var posicionX = instance.BoundingBox.calculateBoxCenter().X - (550 / 2);
             var posicionZ = instance.BoundingBox.calculateBoxCenter().Z - (550 / 2);
             var posicion = new Vector3(posicionX, 5, posicionZ);
@@ -291,7 +261,6 @@ namespace TGC.Group.Model
 
         private void crearVeredas()
         {
-
             cordones.Add(new TgcPlane(new Vector3(-450, 5, -450), new Vector3(5900, 0, 5), TgcPlane.Orientations.XZplane, cordonTexture, 40, 1));
             cordones.Add(new TgcPlane(new Vector3(-450, 0, -445), new Vector3(5895, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
             cordones.Add(new TgcPlane(new Vector3(-500, 5, -500), new Vector3(6000, 0, 50), TgcPlane.Orientations.XZplane, veredaTexture, 60, 1));
@@ -312,6 +281,7 @@ namespace TGC.Group.Model
 
         private void crearParedes()
         {
+            paredTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Textures\\Ladrillo\\brick1_2.jpg");
 
             paredes.Add(new TgcPlane(new Vector3(-500, 0, -500), new Vector3(0, 100, 6000), TgcPlane.Orientations.YZplane, paredTexture, 60, 1));
             paredes.Add(new TgcPlane(new Vector3(-500, 0, -500), new Vector3(6000, 100, 0), TgcPlane.Orientations.XYplane, paredTexture, 60, 1));
@@ -320,11 +290,7 @@ namespace TGC.Group.Model
 
         }
 
-        private TgcMesh auto;
-        private TgcMesh camion;
-        private TgcMesh hummer;
-        private TgcMesh buggy;
-        private TgcMesh patrullero;
+       
 
         private void crearAuto()
         {
@@ -332,7 +298,7 @@ namespace TGC.Group.Model
             hummer = sceneHummer.Meshes[0];
             hummer.AutoTransformEnable = true;
             hummer.move(0, 5, 0);
-            meshes.Add(hummer);
+          //  meshes.Add(hummer);
 
             var sceneCamion = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\CamionCarga\\CamionCarga-TgcScene.xml");
             camion = sceneCamion.Meshes[0];
@@ -367,7 +333,7 @@ namespace TGC.Group.Model
         }
 
 
-        private TgcMesh semaforo;
+
         private void crearSemaforos()
         {
 
@@ -384,7 +350,7 @@ namespace TGC.Group.Model
                 var posicionY = 40;
                 var posicionZ = veredas[i].Position.Z + 20;
                 instanciaIda.move(posicionX, posicionY, posicionZ);
-                meshes.Add(instanciaIda);
+                semaforos.Add(instanciaIda);
 
                 var instanciaVuelta = semaforo.createMeshInstance(semaforo.Name + i);
                 instanciaVuelta.AutoTransformEnable = true;
@@ -393,7 +359,7 @@ namespace TGC.Group.Model
                 var posicionZ2 = veredas[i].Position.Z + (veredas[i].Size.Z) - 20;
                 instanciaVuelta.move(posicionX2, posicionY2, posicionZ2);
                 instanciaVuelta.rotateY(FastMath.PI);
-                meshes.Add(instanciaVuelta);
+                semaforos.Add(instanciaVuelta);
 
 
             }
@@ -526,7 +492,9 @@ namespace TGC.Group.Model
             foreach (var mesh in meshes)
             {
                 mesh.render();
+         //       mesh.BoundingBox.render();
             }
+
 
             //Renderizado de cordones
             foreach (var cordon in cordones)
@@ -551,6 +519,10 @@ namespace TGC.Group.Model
             {
                 c.render();
             }
+
+       
+           
+          
         }
         public void dispose()
         {
@@ -570,6 +542,95 @@ namespace TGC.Group.Model
             skyBox.dispose();
 
 
+        }
+        private void iniciarCielo()
+        {
+            //Crear SkyBox
+            skyBox = new TgcSkyBox();
+            skyBox.Center = new Vector3(1000, 0, 1000);
+            skyBox.Size = new Vector3(20000, 20000, 20000);
+
+
+            var texturesPath = MediaDir + "Texturas\\Quake\\SkyBox3\\";
+
+            //Configurar las texturas para cada una de las 6 caras
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, texturesPath + "Up.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, texturesPath + "Down.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, texturesPath + "Left.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, texturesPath + "Right.jpg");
+
+            //Hay veces es necesario invertir las texturas Front y Back si se pasa de un sistema RightHanded a uno LeftHanded
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, texturesPath + "Back.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, texturesPath + "Front.jpg");
+            skyBox.SkyEpsilon = 40f;
+            //Inicializa todos los valores para crear el SkyBox
+            skyBox.Init();
+        }
+        public List<TgcMesh> getEdificios()
+        {
+            return this.edificios;
+        }
+        public List<TgcMesh> getSemaforos()
+        {
+            return this.semaforos;
+        }
+        private void iniciarColisionador()
+        {
+            //Almacenar volumenes de colision del escenario
+            objetosColisionables.Clear();
+            //Renderizar instancias
+            foreach (var mesh in meshes)
+            {
+               // objetosColisionables.Add(TriangleMeshCollider.fromMesh(mesh));
+                //Los objetos del layer "TriangleCollision" son colisiones a nivel de triangulo
+                /*   if (mesh.Layer == "TriangleCollision")
+                   {
+                       objetosColisionables.Add(TriangleMeshCollider.fromMesh(mesh));
+                   }
+                   //El resto de los objetos son colisiones de BoundingBox
+                   else
+                   {
+                       objetosColisionables.Add(BoundingBoxCollider.fromBoundingBox(mesh.BoundingBox));
+                   }*/
+            }
+
+            //Crear linea para mostrar la direccion del movimiento del personaje
+            directionArrow = new TgcArrow();
+            directionArrow.BodyColor = Color.Red;
+            directionArrow.HeadColor = Color.Green;
+            directionArrow.Thickness = 0.4f;
+            directionArrow.HeadSize = new Vector2(5, 10);
+
+            //Linea para normal de colision
+            collisionNormalArrow = new TgcArrow();
+            collisionNormalArrow.BodyColor = Color.Blue;
+            collisionNormalArrow.HeadColor = Color.Yellow;
+            collisionNormalArrow.Thickness = 0.4f;
+            collisionNormalArrow.HeadSize = new Vector2(2, 5);
+
+            //Caja para marcar punto de colision
+            collisionPoint = TgcBox.fromSize(new Vector3(4, 4, 4), Color.Red);
+            collisionPoint.AutoTransformEnable = true;
+
+            //Crear manejador de colisiones
+            collisionManager = new SphereTriangleCollisionManager();
+            collisionManager.GravityEnabled = true;
+
+
+
+            /*  foreach (var mesh in escenario.Meshes)
+              {
+                  //Los objetos del layer "TriangleCollision" son colisiones a nivel de triangulo
+                  if (mesh.Layer == "TriangleCollision")
+                  {
+                      objetosColisionables.Add(TriangleMeshCollider.fromMesh(mesh));
+                  }
+                  //El resto de los objetos son colisiones de BoundingBox
+                  else
+                  {
+                      objetosColisionables.Add(BoundingBoxCollider.fromBoundingBox(mesh.BoundingBox));
+                  }
+              }*/
         }
     }
 }
