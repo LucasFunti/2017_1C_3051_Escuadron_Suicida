@@ -106,7 +106,7 @@ namespace TGC.Group.Model
         }
         public override void mover()
         {
-            var lastPos = this.getMesh().Position;
+          //  var lastPos = this.getMesh().Position;
             Vector3 v3=  this.env.GetManejadorDeColision().moverConColision(this.getMesh(), new Vector3(Core.Utils.FastMath.Sin(this.getMesh().Rotation.Y) * this.getVelocidadX(),
            this.getVelocidadY(), Core.Utils.FastMath.Cos(this.getMesh().Rotation.Y) * this.getVelocidadX()));
             //  this.getMesh().move(new Vector3(Core.Utils.FastMath.Sin(this.getMesh().Rotation.Y) * this.getVelocidadX(),

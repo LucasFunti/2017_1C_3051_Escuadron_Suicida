@@ -14,6 +14,7 @@ namespace TGC.Group.Model
         private readonly List<Colisionador> objetosColisionables = new List<Colisionador>();
         private SphereTriangleCollisionManager collisionManager;
         private bool Collision = false;
+      
         public ManejadorDeColisiones()
         {
             collisionManager = new SphereTriangleCollisionManager();
@@ -48,14 +49,24 @@ namespace TGC.Group.Model
             TgcBoundingSphere characterSphere = new TgcBoundingSphere(personaje.BoundingBox.calculateBoxCenter(),
                personaje.BoundingBox.calculateBoxRadius());
             var realMovement = collisionManager.moveCharacter(characterSphere, movementVector, objetosColisionables);
-
+            
             Collision = collisionManager.Collision;
-
-            if (collisionManager.Collision)
-                return realMovement;
-
             characterSphere.dispose();
-            return movementVector;
+            if (collisionManager.Collision)
+            {
+                float x= -1*movementVector.X;
+                float z =-1* movementVector.Z;
+
+           //     if (movementVector.X == collisionManager.LastCollisionPoint.X)
+             //       x = (-200);
+              //  if (movementVector.Z == collisionManager.LastCollisionPoint.Z)
+               //     z = -200;
+
+              
+                return new Vector3(x, movementVector.Y, z);
+            }
+            //return realMovement;
+                 return movementVector;
             //Si hubo colision, restaurar la posicion anterior, CUIDADO!!!!!
             //Hay que tener cuidado con este tipo de respuesta a colision, puede darse el caso que el objeto este parcialmente dentro en este y en el frame anterior.
             //para solucionar el problema que tiene hacer este tipo de respuesta a colisiones y que los elementos no queden pegados hay varios algoritmos y hacks.

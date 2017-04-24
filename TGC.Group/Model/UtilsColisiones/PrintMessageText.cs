@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.DirectX;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,6 +38,14 @@ namespace TGC.Group.Model
             //Dibuja un texto por pantalla
             this.env.DrawText.drawText("Velocidad Y: " + altura, 0, 90, System.Drawing.Color.Red);
 
+        }
+        public void MostrarDireccionVehiculoPrincipal(Vector3 vector)
+        {
+            this.env.DrawText.drawText("Dirección ("+vector.X+";" + vector.Y+";" + vector.Z+")", 0, 105, System.Drawing.Color.Red);
+        }
+        public void MostrarPuntoColisionVehiculoPrincipal(Vector3 vector)
+        {
+            this.env.DrawText.drawText("Colision en (" + vector.X + ";" + vector.Y + ";" + vector.Z + ")", 0, 120, System.Drawing.Color.Red);
         }
     }
 }

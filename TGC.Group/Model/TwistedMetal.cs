@@ -96,10 +96,13 @@ namespace TGC.Group.Model
             messages.MostrarVelocidadPorPantalla(this.autoPrincipal.getVelocidadX());
             messages.MostrarAlturaPorPantalla(this.autoPrincipal.getMesh().Position.Y);
             messages.MostrarVelocidadYPorPantalla(this.autoPrincipal.getVelocidadY());
+            messages.MostrarDireccionVehiculoPrincipal(this.autoPrincipal.getMesh().Position);
             Ciudad.Render();
             autoPrincipal.Render();
-            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
-            PostRender();
+             messages.MostrarPuntoColisionVehiculoPrincipal(manejadorDeColiciones.Manager().LastCollisionPoint);
+            
+                //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
+                PostRender();
         }
 
         /// <summary>
