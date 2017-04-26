@@ -21,7 +21,7 @@ namespace TGC.Group.Model
         private float alturaMax = 0f;
         private float alturaActual = 5f;
         private float alturaInicial = 5f;
-        private float gravedad = 1f; //Para cuando Salta.
+        private float gravedad = 0.3f; //Para cuando Salta.
         private bool subiendo = false;
        
 
@@ -330,6 +330,10 @@ namespace TGC.Group.Model
 
             return movingY;
         }
+        public virtual void ProcesarMovimientoDeCamara(float offsetHeight, float offsetForward)
+        {
+           
+        }
         public bool ProcesarMovimientoEnX()
         {
             bool movingX=false;
@@ -407,6 +411,10 @@ namespace TGC.Group.Model
             return false;
         }
         public virtual bool moverAbajo()
+        {
+            return false;
+        }
+        public virtual bool cambiarCamara()
         {
             return false;
         }
