@@ -27,6 +27,7 @@ namespace TGC.Group.Model
             this.setVelocidadMaxima(10);
             this.setVelocidadMinima(-10);
             this.setConstanteDeAsceleracionX(0.1f);
+            base.setPEndDirectionArrow(new Vector3(this.getMesh().Position.X, this.getMesh().Position.Y, -500));
             //   this.setAlturaInicial(this.getMesh().Position.Y);
              camaraManager();
 
@@ -102,7 +103,8 @@ namespace TGC.Group.Model
         }
         public override void rotarCamara(float rotAngle)
         {
-                camaraInterna.rotateY(rotAngle);
+            camaraInterna.rotateY(rotAngle);
+            base.updateDirectionArrowWithAngle(rotAngle);
         }
     }
 }
