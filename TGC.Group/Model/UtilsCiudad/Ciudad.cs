@@ -50,6 +50,8 @@ namespace TGC.Group.Model
         private TgcMesh buggy;
         private TgcMesh patrullero;
 
+        private TgcMesh posteDeLuz;
+
         //  colicion
         private TgcArrow collisionNormalArrow;
         private TgcBox collisionPoint;
@@ -88,6 +90,7 @@ namespace TGC.Group.Model
             crearSemaforos();
             meshes.AddRange(semaforos);
             crearPlantas();
+        //    crearRueda();
             iniciarCielo();
          //   iniciarColisionador();
 
@@ -135,6 +138,17 @@ namespace TGC.Group.Model
             suelo = new TgcPlane(new Vector3(-500, 0, -500), new Vector3(6000, 0, 6000), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
 
         }
+        //private void crearRueda()
+        //{
+        //    var texturaRueda = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "rueda.jpg");
+//
+ //           rueda = new TgcCylinder(new Vector3(0,10,0),100,5);
+  //          rueda.UseTexture = true;
+   //         rueda.Scale=new Vector3(400,400,400);
+    //        rueda.move(-100,0,0);
+            
+
+      //  }
 
         private void crearEdificios()
         {
@@ -264,7 +278,16 @@ namespace TGC.Group.Model
             cordones.Add(new TgcPlane(new Vector3(-450, 5, -450), new Vector3(5900, 0, 5), TgcPlane.Orientations.XZplane, cordonTexture, 40, 1));
             cordones.Add(new TgcPlane(new Vector3(-450, 0, -445), new Vector3(5895, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
             cordones.Add(new TgcPlane(new Vector3(-500, 5, -500), new Vector3(6000, 0, 50), TgcPlane.Orientations.XZplane, veredaTexture, 60, 1));
-
+            for(int i = 0; i < 30; i++)
+            {
+                var sceneRueda = loader.loadSceneFromFile(MediaDir + "PosteDeLuz\\Poste de luz-TgcScene.xml");
+                posteDeLuz = sceneRueda.Meshes[0];
+                posteDeLuz.AutoTransformEnable = true;
+                posteDeLuz.Position = new Vector3(-455 + (i * (5900 / 30)), 5, -450);
+                posteDeLuz.rotateY(FastMath.PI_HALF);
+                posteDeLuz.Scale = new Vector3(1, 3, 1);
+                meshes.Add(posteDeLuz);
+            }
             cordones.Add(new TgcPlane(new Vector3(-450, 5, -445), new Vector3(5, 0, 5890), TgcPlane.Orientations.XZplane, cordonTexture, 1, 40));
             cordones.Add(new TgcPlane(new Vector3(-445, 0, -445), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
             cordones.Add(new TgcPlane(new Vector3(-500, 5, -450), new Vector3(50, 0, 5950), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
@@ -276,7 +299,7 @@ namespace TGC.Group.Model
             cordones.Add(new TgcPlane(new Vector3(5445, 5, -445), new Vector3(5, 0, 5890), TgcPlane.Orientations.XZplane, cordonTexture, 1, 40));
             cordones.Add(new TgcPlane(new Vector3(5445, 0, -445), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
             cordones.Add(new TgcPlane(new Vector3(5450, 5, -450), new Vector3(50, 0, 5900), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
-
+            
         }
 
         private void crearParedes()
