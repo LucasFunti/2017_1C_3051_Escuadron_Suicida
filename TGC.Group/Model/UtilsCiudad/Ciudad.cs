@@ -585,6 +585,15 @@ namespace TGC.Group.Model
         {
             return this.semaforos;
         }
+        public List<TgcMesh> getMeshParedes()
+        {
+            List<TgcMesh> meshDeParedes = new System.Collections.Generic.List<TgcMesh>();
+            foreach (var p in this.paredes)
+            {
+                meshDeParedes.Add(p.toMesh("Pared") );
+            }
+            return meshDeParedes;
+        }
         private void iniciarColisionador()
         {
             //Almacenar volumenes de colision del escenario

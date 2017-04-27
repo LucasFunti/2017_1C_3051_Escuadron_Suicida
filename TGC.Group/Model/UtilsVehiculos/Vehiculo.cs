@@ -92,7 +92,9 @@ namespace TGC.Group.Model
             this.mesh.BoundingBox.render();
             //Render linea
             directionArrow.render();
-           
+            collisionNormalArrow.render();
+            collisionPoint.render();
+
         }
         public void dispose()
         {
@@ -103,6 +105,7 @@ namespace TGC.Group.Model
         {
             this.getMesh().rotateY(rotAngle);
             this.rotarCamara(rotAngle);
+           //this.directionArrow.PEnd.
         }
         public override void mover()
         {

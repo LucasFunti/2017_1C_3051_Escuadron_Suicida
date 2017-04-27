@@ -24,8 +24,9 @@ namespace TGC.Group.Model
             mesh.AutoTransformEnable = true;
             mesh.move(0, 5, 0);
             this.setMesh(mesh);
-            this.setVelocidadMaxima(30);
-            this.setVelocidadMinima(-30);
+            this.setVelocidadMaxima(10);
+            this.setVelocidadMinima(-10);
+            this.setConstanteDeAsceleracionX(0.1f);
             //   this.setAlturaInicial(this.getMesh().Position.Y);
              camaraManager();
 
@@ -40,7 +41,21 @@ namespace TGC.Group.Model
         public override void Update()
         {
             base.Update();
-          
+            if (cambiarCamara())
+            {
+                var height = camaraInterna.OffsetHeight;
+                var forward = camaraInterna.OffsetForward;
+                if (height == 100)
+                {
+                    height = 200;
+                    forward = 500;
+                } else
+                {
+                    height = 100;
+                    forward = 300;
+                }
+                ProcesarMovimientoDeCamara(height, forward);
+            }
             camaraInterna.Target = this.getMesh().Position;
         }
         public override void Render()
@@ -50,7 +65,13 @@ namespace TGC.Group.Model
             this.getMesh().BoundingBox.calculateBoxRadius());
             characterSphere.render();
         }
-        
+        public override void ProcesarMovimientoDeCamara(float offsetHeight, float offsetForward)
+        {
+            
+            camaraInterna.OffsetHeight = offsetHeight;
+            camaraInterna.OffsetForward = offsetForward;
+
+        }
         public override bool moverAdelante()
         {
             return this.env.Input.keyDown(Key.W);
@@ -74,6 +95,10 @@ namespace TGC.Group.Model
         public override bool moverAbajo()
         {
             return this.env.Input.keyDown(Key.K);
+        }
+        public override bool cambiarCamara()
+        {
+            return this.env.Input.keyDown(Key.C);
         }
         public override void rotarCamara(float rotAngle)
         {

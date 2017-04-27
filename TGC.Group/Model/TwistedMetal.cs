@@ -57,7 +57,7 @@ namespace TGC.Group.Model
             manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getEdificios());
             manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getSemaforos());
             manejadorDeColiciones.addBoundingBoxMeshColisionable(autoPrincipal.getMesh());
-
+            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getMeshParedes());
         }
         public ManejadorDeColisiones GetManejadorDeColision()
         {
