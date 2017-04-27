@@ -14,6 +14,7 @@ namespace TGC.Group.Model
         private readonly List<Colisionador> objetosColisionables = new List<Colisionador>();
         private SphereTriangleCollisionManager collisionManager;
         private bool Collision = false;
+        TwistedMetal env;
       
         public ManejadorDeColisiones()
         {
@@ -54,18 +55,18 @@ namespace TGC.Group.Model
             characterSphere.dispose();
             if (collisionManager.Collision)
             {
-                float x= -1*(movementVector.X * 3);
-                float z =-1*(movementVector.Z * 3);
-                if (movementVector.X == collisionManager.LastCollisionPoint.X) x = x * 2;
-                if (movementVector.Z == collisionManager.LastCollisionPoint.Z) z = z * 2;
+                //float x= -1*(movementVector.X * 3);
+                // float z =-1*(movementVector.Z * 3);
+                //if (movementVector.X == collisionManager.LastCollisionPoint.X) x = x * 2;
+                //if (movementVector.Z == collisionManager.LastCollisionPoint.Z) z = z * 2;
 
-                    //     if (movementVector.X == collisionManager.LastCollisionPoint.X)
-                    //       x = (-200);
-                    //  if (movementVector.Z == collisionManager.LastCollisionPoint.Z)
-                    //     z = -200;
+                //     if (movementVector.X == collisionManager.LastCollisionPoint.X)
+                //       x = (-200);
+                //  if (movementVector.Z == collisionManager.LastCollisionPoint.Z)
+                //     z = -200;
 
-
-                    return new Vector3(x, movementVector.Y, z);
+                
+                return new Vector3(1, movementVector.Y, movementVector.Z * -0.9f);
             }
             //return realMovement;
                  return movementVector;

@@ -89,7 +89,8 @@ namespace TGC.Group.Model
             crearAuto();
             crearSemaforos();
             meshes.AddRange(semaforos);
-            crearPlantas();
+            crearPlantas(1);
+            crearPlantas(70);
         //    crearRueda();
             iniciarCielo();
          //   iniciarColisionador();
@@ -285,21 +286,52 @@ namespace TGC.Group.Model
                 posteDeLuz.AutoTransformEnable = true;
                 posteDeLuz.Position = new Vector3(-455 + (i * (5900 / 30)), 5, -450);
                 posteDeLuz.rotateY(FastMath.PI_HALF);
-                posteDeLuz.Scale = new Vector3(1, 3, 1);
+                posteDeLuz.Scale = new Vector3(1, 1, 1);
+                posteDeLuz.move(0, 50, 0);
                 meshes.Add(posteDeLuz);
             }
             cordones.Add(new TgcPlane(new Vector3(-450, 5, -445), new Vector3(5, 0, 5890), TgcPlane.Orientations.XZplane, cordonTexture, 1, 40));
             cordones.Add(new TgcPlane(new Vector3(-445, 0, -445), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
             cordones.Add(new TgcPlane(new Vector3(-500, 5, -450), new Vector3(50, 0, 5950), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
-
+            for (int i = 0; i < 30; i++)
+            {
+                var sceneRueda = loader.loadSceneFromFile(MediaDir + "PosteDeLuz\\Poste de luz-TgcScene.xml");
+                posteDeLuz = sceneRueda.Meshes[0];
+                posteDeLuz.AutoTransformEnable = true;
+                posteDeLuz.Position = new Vector3(-455 , 5, -450 + (i * (5900 / 30)));
+                posteDeLuz.rotateY(FastMath.PI);
+                posteDeLuz.Scale = new Vector3(1, 1, 1);
+                posteDeLuz.move(0, 50, 0);
+                meshes.Add(posteDeLuz);
+            }
             cordones.Add(new TgcPlane(new Vector3(-450, 5, 5445), new Vector3(5900, 0, 5), TgcPlane.Orientations.XZplane, cordonTexture, 40, 1));
             cordones.Add(new TgcPlane(new Vector3(-450, 0, 5445), new Vector3(5900, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
             cordones.Add(new TgcPlane(new Vector3(-450, 5, 5500), new Vector3(5950, 0, -50), TgcPlane.Orientations.XZplane, veredaTexture, 60, 1));
-
+            for (int i = 0; i < 30; i++)
+            {
+                var sceneRueda = loader.loadSceneFromFile(MediaDir + "PosteDeLuz\\Poste de luz-TgcScene.xml");
+                posteDeLuz = sceneRueda.Meshes[0];
+                posteDeLuz.AutoTransformEnable = true;
+                posteDeLuz.Position = new Vector3(-455 + (i * (5900 / 30)), 5, 5445);
+                posteDeLuz.rotateY(FastMath.PI + FastMath.PI_HALF);
+                posteDeLuz.Scale = new Vector3(1, 1, 1);
+                posteDeLuz.move(0, 50, 0);
+                meshes.Add(posteDeLuz);
+            }
             cordones.Add(new TgcPlane(new Vector3(5445, 5, -445), new Vector3(5, 0, 5890), TgcPlane.Orientations.XZplane, cordonTexture, 1, 40));
             cordones.Add(new TgcPlane(new Vector3(5445, 0, -445), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
             cordones.Add(new TgcPlane(new Vector3(5450, 5, -450), new Vector3(50, 0, 5900), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
-            
+            for (int i = 0; i < 30; i++)
+            {
+                var sceneRueda = loader.loadSceneFromFile(MediaDir + "PosteDeLuz\\Poste de luz-TgcScene.xml");
+                posteDeLuz = sceneRueda.Meshes[0];
+                posteDeLuz.AutoTransformEnable = true;
+                posteDeLuz.Position = new Vector3(5445 , 5, -450 + (i * (5900 / 30)));
+                posteDeLuz.rotateY(FastMath.TWO_PI);
+                posteDeLuz.Scale = new Vector3(1, 1, 1);
+                posteDeLuz.move(0, 50, 0);
+                meshes.Add(posteDeLuz);
+            }
         }
 
         private void crearParedes()
@@ -307,11 +339,12 @@ namespace TGC.Group.Model
             paredTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Textures\\Ladrillo\\brick1_2.jpg");
 
             paredes.Add(new TgcPlane(new Vector3(-500, 0, -500), new Vector3(0, 100, 6000), TgcPlane.Orientations.YZplane, paredTexture, 60, 1));
+            
             paredes.Add(new TgcPlane(new Vector3(-500, 0, -500), new Vector3(6000, 100, 0), TgcPlane.Orientations.XYplane, paredTexture, 60, 1));
             paredes.Add(new TgcPlane(new Vector3(5500, 0, 5500), new Vector3(0, 100, -6000), TgcPlane.Orientations.YZplane, paredTexture, 60, 1));
             paredes.Add(new TgcPlane(new Vector3(-500, 0, 5500), new Vector3(6000, 100, 0), TgcPlane.Orientations.XYplane, paredTexture, 60, 1));
 
-        }
+       }
 
        
 
@@ -398,69 +431,80 @@ namespace TGC.Group.Model
             instancia.AutoTransformEnable = true;
             instancia.AlphaBlendEnable = true;
             instancia.move(vectorPosicion.X, vectorPosicion.Y, vectorPosicion.Z);
+
+            var scenePasto = loader.loadSceneFromFile(MediaDir + "Pasto\\Pasto-TgcScene.xml");
+            var pasto = scenePasto.Meshes[0];
+            pasto.AutoTransformEnable = true;
+            pasto.AlphaBlendEnable = true;
+            pasto.move(vectorPosicion.X, vectorPosicion.Y, vectorPosicion.Z);
+
             if (n == 3)
             {
                 instancia.Scale = new Vector3((float)0.5, (float)0.5, (float)0.5);
+                pasto.Scale = new Vector3(1,1,1);
             }
+            
             meshes.Add(instancia);
-
+            meshes.Add(pasto);
         }
-        private Vector3 vectorFrontalMitadVereda(int i)
+        private Vector3 vectorFrontalMitadVereda(int i,int variacionPosicion)
         {
             var posicionX = (veredas[i].Position.X) + ((veredas[i].Size.X) / 2);
             var posicionY = 10;
             var posicionZ = veredas[i].Position.Z + 20;
-            return new Vector3(posicionX, posicionY, posicionZ);
+            return new Vector3(posicionX + variacionPosicion, posicionY, posicionZ );
 
         }
-        private Vector3 vectorTraseroMitadVereda(int i)
+        private Vector3 vectorTraseroMitadVereda(int i,int variacionPosicion)
         {
             var posicionX = (veredas[i].Position.X) + ((veredas[i].Size.X) / 2);
             var posicionY = 10;
             var posicionZ = veredas[i].Position.Z + ((veredas[i].Size.Z)) - 20;
-            return new Vector3(posicionX, posicionY, posicionZ);
+            return new Vector3(posicionX + variacionPosicion, posicionY, posicionZ );
 
         }
-        private Vector3 vectorLateralDerechoMitadVereda(int i)
+        private Vector3 vectorLateralDerechoMitadVereda(int i,int variacionPosicion)
         {
             var posicionX = (veredas[i].Position.X) + ((veredas[i].Size.X)) - 20;
             var posicionY = 10;
             var posicionZ = veredas[i].Position.Z + ((veredas[i].Size.Z) / 2);
-            return new Vector3(posicionX, posicionY, posicionZ);
+            return new Vector3(posicionX , posicionY, posicionZ + variacionPosicion);
 
         }
-        private Vector3 vectorLateralIzquierdoMitadVereda(int i)
+        private Vector3 vectorLateralIzquierdoMitadVereda(int i,int variacionPosicion)
         {
             var posicionX = (veredas[i].Position.X) + 20;
             var posicionY = 10;
             var posicionZ = veredas[i].Position.Z + ((veredas[i].Size.Z) / 2) - 20;
-            return new Vector3(posicionX, posicionY, posicionZ);
+            return new Vector3(posicionX , posicionY, posicionZ + variacionPosicion);
 
         }
-        private void dibujarPlantaRandom(int j, Vector3 vectorPosicion, TgcScene scene, int i, int n)
+        private void dibujarPlantaRandom(int j, Vector3 vectorPosicion, TgcScene scene, int i, int n,int variacionPosicion)
         {
+            
             switch (j)
             {
                 case 1:
-                    vectorPosicion = vectorFrontalMitadVereda(i);
+                    vectorPosicion = vectorFrontalMitadVereda(i,variacionPosicion);
                     crearUnaPlanta(scene, i, vectorPosicion, n);
                     break;
                 case 2:
-                    vectorPosicion = vectorTraseroMitadVereda(i);
+                    vectorPosicion = vectorTraseroMitadVereda(i,variacionPosicion);
                     crearUnaPlanta(scene, i, vectorPosicion, n);
                     break;
                 case 3:
-                    vectorPosicion = vectorLateralIzquierdoMitadVereda(i);
+                    vectorPosicion = vectorLateralIzquierdoMitadVereda(i,variacionPosicion);
                     crearUnaPlanta(scene, i, vectorPosicion, n);
                     break;
                 case 4:
-                    vectorPosicion = vectorLateralDerechoMitadVereda(i);
-                    crearUnaPlanta(scene, i, vectorPosicion, n);
+                    vectorPosicion = vectorLateralDerechoMitadVereda(i,variacionPosicion);
+                    crearUnaPlanta(scene, i, vectorPosicion * variacionPosicion, n);
+                    
                     break;
             }
 
         }
-        private void crearPlantas()
+        private void crearPlantas(int variacionPosicion)
         {
             for (int i = 0; i < veredas.Count; i++)
             {
@@ -476,15 +520,15 @@ namespace TGC.Group.Model
                             break;
                         case (int)Plantas.Pino:
                             var scenePlanta = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vegetacion\\Pino\\Pino-TgcScene.xml");
-                            dibujarPlantaRandom(k, vectorPosicion, scenePlanta, i, n);
+                            dibujarPlantaRandom(k, vectorPosicion, scenePlanta, i, n,variacionPosicion);
                             break;
                         case (int)Plantas.Palmera:
                             var scenePlanta2 = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vegetacion\\Palmera3\\Palmera3-TgcScene.xml");
-                            dibujarPlantaRandom(k, vectorPosicion, scenePlanta2, i, n);
+                            dibujarPlantaRandom(k, vectorPosicion, scenePlanta2, i, n,variacionPosicion);
                             break;
                         case (int)Plantas.Arbol:
                             var scenePlanta3 = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vegetacion\\ArbolBosque\\ArbolBosque-TgcScene.xml");
-                            dibujarPlantaRandom(k, vectorPosicion, scenePlanta3, i, n);
+                            dibujarPlantaRandom(k, vectorPosicion, scenePlanta3, i, n,variacionPosicion);
                             break;
                     }
 
@@ -559,6 +603,7 @@ namespace TGC.Group.Model
             camion.dispose();
             buggy.dispose();
             patrullero.dispose();
+            
             //disposeListas();
 
             //Liberar recursos del SkyBox
