@@ -14,6 +14,7 @@ namespace TGC.Group.Model
         private readonly List<Colisionador> objetosColisionables = new List<Colisionador>();
         private SphereTriangleCollisionManager collisionManager;
         private bool Collision = false;
+        TwistedMetal env;
       
         public ManejadorDeColisiones()
         {
@@ -54,18 +55,36 @@ namespace TGC.Group.Model
             characterSphere.dispose();
             if (collisionManager.Collision)
             {
-                float x= -1*(movementVector.X * 3);
-                float z =-1*(movementVector.Z * 3);
-                if (movementVector.X == collisionManager.LastCollisionPoint.X) x = x * 2;
-                if (movementVector.Z == collisionManager.LastCollisionPoint.Z) z = z * 2;
+                //float x= -1*(movementVector.X * 3);
+                // float z =-1*(movementVector.Z * 3);
+                float x = 1;
+                float z = 1;
+                var RelativeVelocity = new Vector3(movementVector.X, movementVector.Y, movementVector.Z);
+                var CollisionNormal = new Vector3(collisionManager.LastCollisionPoint.X, collisionManager.LastCollisionPoint.Y, collisionManager.LastCollisionPoint.Z);
+                CollisionNormal.Normalize();
+                double collisionSpeed = RelativeVelocity.X * CollisionNormal.X + RelativeVelocity.Y * CollisionNormal.Y + RelativeVelocity.Z * CollisionNormal.Z;
+                var collisionCuadrada = CollisionNormal.X * CollisionNormal.X + CollisionNormal.Y * CollisionNormal.Y + CollisionNormal.Z * CollisionNormal.Z;
+                float impulse = (float)((2.50 * collisionSpeed) / ((collisionCuadrada)));
+                var velocity = (CollisionNormal * impulse) ;
 
-                    //     if (movementVector.X == collisionManager.LastCollisionPoint.X)
-                    //       x = (-200);
-                    //  if (movementVector.Z == collisionManager.LastCollisionPoint.Z)
-                    //     z = -200;
 
+                //if (movementVector.X == collisionManager.LastCollisionPoint.X)
+               // {
+               //       x = movementVector.X *  velocity.X;               
 
-                    return new Vector3(x, movementVector.Y, z);
+               // }
+                //if (movementVector.Z == collisionManager.LastCollisionPoint.Z)
+                //{
+                //    z = movementVector.Z * velocity.Z;
+                //}
+
+                //     if (movementVector.X == collisionManager.LastCollisionPoint.X)
+                //       x = (-200);
+                //  if (movementVector.Z == collisionManager.LastCollisionPoint.Z)
+                //     z = -200;
+
+                
+                return new Vector3(-velocity.X * 0.2f, movementVector.Y, -velocity.Z * 0.2f);
             }
             //return realMovement;
                  return movementVector;
