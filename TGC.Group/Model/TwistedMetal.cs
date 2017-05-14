@@ -50,7 +50,9 @@ namespace TGC.Group.Model
         {
             //Carga la estructura de la ciudad
             manejadorDeColiciones = new ManejadorDeColisiones();
+
             Ciudad = new Ciudad(this);
+
             messages = new PrintMessageText(this);
             autoPrincipal = new VehiculoPrincipal(this);
 
@@ -63,6 +65,7 @@ namespace TGC.Group.Model
         {
             return this.manejadorDeColiciones;
         }
+       
         /// <summary>
         ///     Se llama en cada frame.
         ///     Se debe escribir toda la lógica de computo del modelo, así como también verificar entradas del usuario y reacciones
@@ -94,12 +97,15 @@ namespace TGC.Group.Model
             PreRender();
             messages.MostrarComandosPorPantalla();
             messages.MostrarVelocidadPorPantalla(this.autoPrincipal.getVelocidadX());
-            messages.MostrarAlturaPorPantalla(this.autoPrincipal.getMesh().Position.Y);
+            messages.MostrarPosicioMeshPorPantalla(this.autoPrincipal.getMesh().Position);
             messages.MostrarVelocidadYPorPantalla(this.autoPrincipal.getVelocidadY());
             messages.MostrarDireccionVehiculoPrincipal(this.autoPrincipal.getMesh().Position);
+            messages.MostrarTiempo();
+          //  messages.test("BoudningBox", this.autoPrincipal.getMesh().BoundingBox.computeCorners());
+
             Ciudad.Render();
             autoPrincipal.Render();
-             messages.MostrarPuntoColisionVehiculoPrincipal(manejadorDeColiciones.Manager().LastCollisionPoint);
+        //    messages.MostrarPuntoColisionVehiculoPrincipal(manejadorDeColiciones.Manager().LastCollisionPoint);
             
                 //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
                 PostRender();

@@ -1,42 +1,32 @@
 ﻿using Microsoft.DirectX;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TGC.Core.SceneLoader;
-using Microsoft.DirectX.DirectInput;
-using TGC.Core.Geometry;
-using System.Drawing;
+
 
 namespace TGC.Group.Model
 {
     class Vehiculo : ObjetoConMovimiento
     {
-        private TgcArrow collisionNormalArrow;
-        private TgcBox collisionPoint;
-        private TgcArrow directionArrow;
+        
         TwistedMetal env;
-        private bool alturaL = false;
-        private TgcMesh mesh;       
+       
 
-        public Vehiculo(TgcMesh Mesh, Vector3 pos)
+        public Vehiculo(TgcMesh Mesh, Vector3 pos, TwistedMetal env) : base(env)
         {
-            this.mesh = Mesh;
-            base.setPosicion(pos);
+            this.env = env;
+            base.setMesh(Mesh);
+            base.getMesh().move(pos);
             base.setVelocidadY(0);
             base.setAluraMaxima(20);
-            //  base.setAlturaInicial(Mesh.Position.Y);
-            direcionadores();
+      //      direcionadores();
         }
-        public Vehiculo(TwistedMetal env)
+        public Vehiculo(TwistedMetal env) : base(env)
         {
             this.env = env;
             this.setVelocidadY(0);
             base.setAluraMaxima(100);
-            direcionadores();
+        //    direcionadores();
         }
-        private void direcionadores()
+   /*     private void direcionadores()
         {
             directionArrow = new TgcArrow();
             directionArrow.BodyColor = Color.Red;
@@ -54,70 +44,23 @@ namespace TGC.Group.Model
             //Caja para marcar punto de colision
             collisionPoint = TgcBox.fromSize(new Vector3(4, 4, 4), Color.Red);
             collisionPoint.AutoTransformEnable = true;
-        }
-        public void setMesh(TgcMesh Mesh)
-        {
-            this.mesh = Mesh;
-        }
-        public TgcMesh getMesh()
-        {
-            return this.mesh;
-        }
-        public void setPEndDirectionArrow(Vector3 vector)
+        }*/
+       
+     /*   public void setPEndDirectionArrow(Vector3 vector)
         {
             directionArrow.PEnd = vector;
         }
         public Vector3 getPEndDirectionArrow(Vector3 vector)
         {
             return directionArrow.PEnd;
-        }
-        public virtual void Update()
+        }*/
+        //Rota el objeto y si tiene camara sobre el.
+        public override void rotar(Vector3 v, Matrix m,float anguloCamara)
         {
-            base.setAlturaActual(this.getMesh().Position.Y);
-            base.calculosDePosicion();
-            //Actualizar valores de la linea de movimiento
-            directionArrow.PStart = this.getMesh().Position;
-            //directionArrow.PEnd = this.getMesh().Position + Vector3.Multiply(this.getMesh().Position, 50);
-            directionArrow.updateValues();
-
-            //Actualizar valores de normal de colision
-            if (this.env.GetManejadorDeColision().Manager().Collision)
-            {
-                collisionNormalArrow.PStart = this.env.GetManejadorDeColision().Manager().LastCollisionPoint;
-                collisionNormalArrow.PEnd = this.env.GetManejadorDeColision().Manager().LastCollisionPoint +
-                                            Vector3.Multiply(this.env.GetManejadorDeColision().Manager().LastCollisionNormal, 80);
-
-                collisionNormalArrow.updateValues();
-
-
-                collisionPoint.Position = this.env.GetManejadorDeColision().Manager().LastCollisionPoint;
-                collisionPoint.render();
-            }
+            base.rotar(v, m, anguloCamara);
+            this.rotarCamara(anguloCamara);
         }
-        public virtual void Render()
-        {
-            this.mesh.render();
-            this.mesh.BoundingBox.render();
-            //Render linea
-            directionArrow.render();
-            collisionNormalArrow.render();
-            collisionPoint.render();
-
-        }
-        public void dispose()
-        {
-            this.mesh.dispose();
-            directionArrow.dispose();
-        }
-        public override void rotar(float rotAngle)
-        {
-            this.getMesh().rotateY(rotAngle);
-            this.rotarCamara(rotAngle);
-
-            
-        }
-
-        public void updateDirectionArrowWithAngle(float rotAngle)
+     /*   public void updateDirectionArrowWithAngle(float rotAngle)
         {
             directionArrow.PStart = this.getMesh().Position;
             float nvoPtoZ = 0.0f;
@@ -184,7 +127,7 @@ namespace TGC.Group.Model
             directionArrow.PEnd = new Vector3(nvoPtoX, this.getMesh().Position.Y, nvoPtoZ);
             directionArrow.updateValues();
         }
-
+   
         public void updateDirectionArrow(Vector3 vectorMove)
         {
 
@@ -254,24 +197,57 @@ namespace TGC.Group.Model
             
             directionArrow.updateValues();
         }
-
+        */
         public override void mover()
         {
-            //var lastPos = this.getMesh().Position;
-            Vector3 moveVector = new Vector3(Core.Utils.FastMath.Sin(this.getMesh().Rotation.Y) * this.getVelocidadX(),
-                                             this.getVelocidadY(),
-                                             Core.Utils.FastMath.Cos(this.getMesh().Rotation.Y) * this.getVelocidadX());
-            Vector3 v3=  this.env.GetManejadorDeColision().moverConColision(this.getMesh(), moveVector);
-            //  this.getMesh().move(new Vector3(Core.Utils.FastMath.Sin(this.getMesh().Rotation.Y) * this.getVelocidadX(),
-            // this.getVelocidadY(), Core.Utils.FastMath.Cos(this.getMesh().Rotation.Y) * this.getVelocidadX()));
-            this.getMesh().move(v3);
-            updateDirectionArrow(moveVector);
-
-        }
+            base.mover(); 
+         }
+          
         public virtual void rotarCamara(float rotacion)
         {
 
         }
        
+       
+        public virtual void Update()
+        {
+            base.setPosicionAnterior(base.getMesh().Position);
+            base.setRotacionAnterior(base.getMesh().Rotation);
+            base.setAlturaActual(base.getMesh().Position.Y);
+            base.calculosDePosicion();
+            //Actualizar valores de la linea de movimiento
+         //   directionArrow.PStart = this.getMesh().Position;
+            //directionArrow.PEnd = this.getMesh().Position + Vector3.Multiply(this.getMesh().Position, 50);
+           // directionArrow.updateValues();
+
+            //Actualizar valores de normal de colision
+       /*     if (this.env.GetManejadorDeColision().Manager().Collision)
+            {
+                collisionNormalArrow.PStart = this.env.GetManejadorDeColision().Manager().LastCollisionPoint;
+                collisionNormalArrow.PEnd = this.env.GetManejadorDeColision().Manager().LastCollisionPoint +
+                                            Vector3.Multiply(this.env.GetManejadorDeColision().Manager().LastCollisionNormal, 80);
+
+                collisionNormalArrow.updateValues();
+
+
+                collisionPoint.Position = this.env.GetManejadorDeColision().Manager().LastCollisionPoint;
+                collisionPoint.render();
+            }*/
+        }
+        public virtual void Render()
+        {
+            base.getMesh().render();
+            base.getBoxDeColision().render();
+            directionArrow.render();
+         //   collisionNormalArrow.render();
+          //  collisionPoint.render();
+
+        }
+        public void dispose()
+        {
+            base.getMesh().dispose();
+            directionArrow.dispose();
+        }
+
     }
 }

@@ -1,9 +1,10 @@
 ﻿using Microsoft.DirectX;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
+using TGC.Core.BoundingVolumes;
+using TGC.Core.Geometry;
+using TGC.Core.SceneLoader;
+using TGC.Core.Utils;
 
 namespace TGC.Group.Model
 {
@@ -11,25 +12,77 @@ namespace TGC.Group.Model
     {
         //Movimiento Horizontal
         private float VelocidadX = 0;
-        private float const_aceleracionX = 0.4f;
+        private float const_aceleracionX = 15f;
         private float friccion = 0.2f;
         private float velocidad_maxima = 0;
         private float velocidad_minima = 0;
+        public float orientacion = 270 * (float)Math.PI / 180;
+        private float velocidadRotacion = 1f;
         //Movimiento Vertical
         private float VelocidadY = 0; //Para cuando Salta.
         private float const_aceleracionY = 0.5f;
         private float alturaMax = 0f;
         private float alturaActual = 5f;
         private float alturaInicial = 5f;
-        private float gravedad = 0.3f; //Para cuando Salta.
+        private float gravedad = 0.3f; //Para cuando cae.
         private bool subiendo = false;
+        TwistedMetal env;
+        public Matrix matrixRotacion;
+        public float anguloFinal = 0;
+        //Mesh
+        private TgcMesh mesh;
+        private TgcBoundingOrientedBox boxDeColision;
+        private float largoDelMesh;
+        private float boxDeColisionY;
+        private bool collisionFound;
+        private bool chocoAdelante = false;
+        private Vector3 NuevaPosicion;
+        private Vector3 PosicionAnterior { get; set; }
+        private Vector3 RotacionAnterior { get; set; }
+      //  private TgcArrow collisionNormalArrow;
+       // private TgcBox collisionPoint;
+        public TgcArrow directionArrow;
+     
+        public ObjetoConMovimiento(TwistedMetal env)
+        {
+            this.env = env;
+        }
        
+        public void setMesh(TgcMesh Mesh)
+        {
+            this.mesh = Mesh;
+            initBoxColisionador();
+            this.updateTGCArrow(this.calcularRayoDePosicion());
+        }
+        public TgcMesh getMesh()
+        {
+            return this.mesh;
+        }
 
-        private float velocidadRotacion = 2f;
-        public float ElapsedTime { get; set; }
-        private Vector3 posicion;
+        private void initBoxColisionador()
+        {
+            this.getMesh().AutoTransformEnable = false;
+            this.getMesh().AutoUpdateBoundingBox = false;
+            boxDeColision = TgcBoundingOrientedBox.computeFromAABB(this.getMesh().BoundingBox);
+            var yMin = this.getMesh().BoundingBox.PMin.Y;
+            var yMax = this.getMesh().BoundingBox.PMax.Y;
+            boxDeColision.Extents = new Vector3(boxDeColision.Extents.X, boxDeColision.Extents.Y, boxDeColision.Extents.Z * -1);
 
-
+            largoDelMesh = boxDeColision.Extents.Z;
+            boxDeColisionY = (yMax + yMin) / 2 + yMin;
+        }
+        protected TgcBoundingOrientedBox getBoxDeColision()
+        {
+            return this.boxDeColision;
+        }
+        protected void setRotacionAnterior(Vector3 v)
+        {
+            this.RotacionAnterior = v;
+        }
+        protected void setPosicionAnterior(Vector3 v)
+        {
+            this.PosicionAnterior = v;
+        }
         public float getAlturaActual()
         {
             return this.alturaActual;
@@ -37,10 +90,6 @@ namespace TGC.Group.Model
         public void setAlturaActual(float alt)
         {
             this.alturaActual= alt;
-        }
-        public void setPosicion(Vector3 posicion)
-        {
-            this.posicion = posicion;
         }
         public void setVelocidadX(float NuevaVelocidadX)
         {
@@ -112,8 +161,12 @@ namespace TGC.Group.Model
         }
         public float accelerarX(int direccion,float aceleracion)
         {
-            this.setVelocidadX(this.VelocidadX + (direccion * aceleracion));
-  
+
+            if(direccion<0)
+                this.setVelocidadX(this.VelocidadX + (direccion * (aceleracion*2)));
+            else
+              this.setVelocidadX(this.VelocidadX + (direccion * aceleracion));
+
             if (this.getVelocidadX() >= this.getVelocidadMaxima())
                 this.setVelocidadX(this.getVelocidadMaxima());
 
@@ -122,6 +175,7 @@ namespace TGC.Group.Model
 
             return this.getVelocidadX();
         }
+       
         public float accelerarY(int direccion)
         {
 
@@ -159,9 +213,7 @@ namespace TGC.Group.Model
             float rotate = 0;
             var movingX = false;
             var movingY = false;
-            var rotating = false;
-            ElapsedTime = 1;
-
+          
             movingY = ProcesarMovimientoEnY();
             if (!movingY)
             {
@@ -170,127 +222,32 @@ namespace TGC.Group.Model
             }
              //Rota solo si hay movimiento en X y no hay movimiento en Y
             if (rotate!=0 && movingX && !movingY)
+                     this.doblar(rotate);
+
+            //Si hubo rotacion y no movimiento mover las ruedas unicamente
+            if (rotate != 0 && !movingX)
             {
-
-                //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
-                //   var rotAngle = Geometry.DegreeToRadian(rotate * ElapsedTime);
-                var rotAngle = (float)(System.Math.PI * (rotate * ElapsedTime) / 180.0f);
-                this.rotar(rotAngle);
-
-                //Si hubo rotacion y no movimiento mover las ruedas unicamente
-                if (rotating && !movingX)
-                {
-                }
             }
-           
 
             //Si hubo desplazamiento
             if (movingX || movingY)
-            {
-                this.mover();
+                   this.mover();
              
-                //Detectar colisiones
-                /*  var collide = false;
-                  //Guardamos los objetos colicionados para luego resolver la respuesta. (para este ejemplo simple es solo 1 caja)
-                  TgcBox collider = null;
-                  foreach (var obstaculo in obstaculos)
-                  {
-                      if (TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, obstaculo.BoundingBox))
-                      {
-                          collide = true;
-                          collider = obstaculo;
-                          break;
-                      }
-                  }
-                  */
-                //Si hubo colision, restaurar la posicion anterior, CUIDADO!!!!!
-                //Hay que tener cuidado con este tipo de respuesta a colision, puede darse el caso que el objeto este parcialmente dentro en este y en el frame anterior.
-                //para solucionar el problema que tiene hacer este tipo de respuesta a colisiones y que los elementos no queden pegados hay varios algoritmos y hacks.
-                //almacenar la posicion anterior no es lo mejor para responder a una colision.
-                //Una primera aproximacion para evitar que haya inconsistencia es realizar sliding
-                /*  if (collide)
-                  {
-                      //si no esta activo el sliding es la solucion anterior de este ejemplo.
-                      if (!(bool)Modifiers["activateSliding"])
-                      {
-                          personaje.Position = lastPos; //Por como esta el framework actualmente esto actualiza el BoundingBox.
-                          text = "";
-                      }
-                      else
-                      {
-                          //La idea del slinding es simplificar el problema, sabemos que estamos moviendo bounding box alineadas a los ejes.
-                          //Significa que si estoy colisionando con alguna de las caras de un AABB los planos siempre son los ejes coordenados.
-                          //Entones creamos un rayo de movimiento, esto dado por la posicion anterior y la posicion actual.
-                          var movementRay = lastPos - personaje.Position;
-                          //Luego debemos clasificar sobre que plano estamos chocando y la direccion de movimiento
-                          //Para todos los casos podemos deducir que la normal del plano cancela el movimiento en dicho plano.
-                          //Esto quiere decir que podemos cancelar el movimiento en el plano y movernos en el otros.
-                          var t = "";
-                          var rs = Vector3.Empty;
-                          if (((personaje.BoundingBox.PMax.X > collider.BoundingBox.PMax.X && movementRay.X > 0) ||
-                              (personaje.BoundingBox.PMin.X < collider.BoundingBox.PMin.X && movementRay.X < 0)) &&
-                              ((personaje.BoundingBox.PMax.Z > collider.BoundingBox.PMax.Z && movementRay.Z > 0) ||
-                              (personaje.BoundingBox.PMin.Z < collider.BoundingBox.PMin.Z && movementRay.Z < 0)))
-                          {
-                              //Este primero es un caso particularse dan las dos condiciones simultaneamente entonces para saber de que lado moverse hay que hacer algunos calculos mas.
-                              //por el momento solo se esta verificando que la posicion actual este dentro de un bounding para moverlo en ese plano.
-                              t += "Coso conjunto!\n" +
-                                  "PMin X: " + personaje.BoundingBox.PMin.X + " - " + collider.BoundingBox.PMin.X + "\n" +
-                                  "PMax X: " + personaje.BoundingBox.PMax.X + " - " + collider.BoundingBox.PMax.X + "\n" +
-                                  "PMin Z: " + personaje.BoundingBox.PMin.Z + " - " + collider.BoundingBox.PMin.Z + "\n" +
-                                  "PMax Z: " + personaje.BoundingBox.PMax.Z + " - " + collider.BoundingBox.PMax.Z + "\n" +
-                                  "Last X: " + (lastPos.X - rs.X) + " - Z: " + (lastPos.Z - rs.Z) + "\n" +
-                                  "Actual X: " + (personaje.Position.X) + " - Z: " + (personaje.Position.Z) + "\n" +
-                                  "move X: " + (movementRay.X) + " - Z: " + (movementRay.Z);
-                              if (personaje.Position.X > collider.BoundingBox.PMin.X &&
-                                  personaje.Position.X < collider.BoundingBox.PMax.X)
-                              {
-                                  //El personaje esta contenido en el bounding X
-                                  t += "\n Sliding Z Dentro de X";
-                                  rs = new Vector3(movementRay.X, movementRay.Y, 0);
-                              }
-                              if (personaje.Position.Z > collider.BoundingBox.PMin.Z &&
-                                  personaje.Position.Z < collider.BoundingBox.PMax.Z)
-                              {
-                                  //El personaje esta contenido en el bounding Z
-                                  t += "\n Sliding X Dentro de Z";
-                                  rs = new Vector3(0, movementRay.Y, movementRay.Z);
-                              }
-
-                              //Seria ideal sacar el punto mas proximo al bounding que colisiona y chequear con eso, en ves que con la posicion.
-
-                          }
-                          else
-                          {
-                              if ((personaje.BoundingBox.PMax.X > collider.BoundingBox.PMax.X && movementRay.X > 0) ||
-                                  (personaje.BoundingBox.PMin.X < collider.BoundingBox.PMin.X && movementRay.X < 0))
-                              {
-                                  t += "Sliding X";
-                                  rs = new Vector3(0, movementRay.Y, movementRay.Z);
-                              }
-                              if ((personaje.BoundingBox.PMax.Z > collider.BoundingBox.PMax.Z && movementRay.Z > 0) ||
-                                  (personaje.BoundingBox.PMin.Z < collider.BoundingBox.PMin.Z && movementRay.Z < 0))
-                              {
-                                  t += "Sliding Z";
-                                  rs = new Vector3(movementRay.X, movementRay.Y, 0);
-                              }
-                          }
-                          text = t;
-                          personaje.Position = lastPos - rs;
-                          //Este ejemplo solo se mueve en X y Z con lo cual realizar el test en el plano Y no tiene sentido.
-
-                      }
-                  }
-                  */
-
-
-            }
-
             //Si no se esta moviendo, activar animacion de Parado
             else
             {
                 //  mesh.playAnimation("Parado", true);
             }
+        }
+        protected void doblar(float sentido)
+        {
+            sentido = sentido * this.getVelocidadRotacion();
+            orientacion += sentido * 1f * this.env.ElapsedTime;
+
+            anguloFinal = anguloFinal - sentido * 1f * this.env.ElapsedTime;
+            matrixRotacion = Matrix.RotationY(anguloFinal);
+            this.rotar(new Vector3(0, -sentido * 1f * this.env.ElapsedTime, 0), matrixRotacion, -sentido * 1f * this.env.ElapsedTime);
+            
         }
         private bool ProcesarMovimientoEnY()
         {
@@ -342,7 +299,7 @@ namespace TGC.Group.Model
             if (this.moverAdelante())
             {
                 // moveForward = -velocidadCaminar;
-                this.accelerarX(-1, this.getConstanteDeAsceleracionX());
+                this.accelerarX(1, this.getConstanteDeAsceleracionX());
                 movingX = true;
             }
 
@@ -350,7 +307,7 @@ namespace TGC.Group.Model
             if (this.moverAtras())
             {
                 // moveForward = velocidadCaminar;
-                this.accelerarX(1, this.getConstanteDeAsceleracionX());
+                this.accelerarX(-1, this.getConstanteDeAsceleracionX());
                 movingX = true;
             }
             //Si -1 < velocidad > 1 entonces está frenado.
@@ -363,7 +320,7 @@ namespace TGC.Group.Model
                 this.accelerarX(-1, this.getFriccion());
                 movingX = true;
             }
-            if (this.getVelocidadX() < 0 && !movingX)
+           if (this.getVelocidadX() < 0 && !movingX)
             {
                 this.accelerarX(1, this.getFriccion());
                 movingX = true;
@@ -374,13 +331,176 @@ namespace TGC.Group.Model
         {
             //Derecha
             if (this.moverADerecha())
-            return this.getVelocidadRotacion();
-          
+                //   return this.getVelocidadRotacion();
+                return -1;
+
             //Izquierda
             if (this.moverAIzquierda())
-              return -this.getVelocidadRotacion();
+                //  return -this.getVelocidadRotacion();
+                return 1;
          
             return 0;
+        }
+
+        public virtual void rotar(Vector3 v,Matrix m,float rotaCamara)
+        {
+            this.getMesh().Transform = m;
+            this.boxDeColision.rotate(v);
+           
+        }
+        //mueve el objeto.
+        public virtual void mover()
+        {
+            NuevaPosicion = this.calcularProximaPosicion();
+            this.boxDeColision.Center = calcularCentroDelBox();
+
+            Vector3 scale3 = new Vector3(1f, 1f, 1f);
+            var m = Matrix.Scaling(scale3) * this.matrixRotacion * Matrix.Translation(NuevaPosicion);
+
+            this.getMesh().Transform = m;
+            this.getMesh().Position = NuevaPosicion;
+
+            ProcesarColisiones();
+
+        }
+        //Calcula la próxima posicion del objeto en base a los datos de velocidad.
+        protected Vector3 calcularProximaPosicion()
+        {
+            return new Vector3(this.getMesh().Position.X + this.getVelocidadX() * (float)System.Math.Cos(this.orientacion),
+                                                  this.getMesh().Position.Y + this.getVelocidadY(),
+                                                  this.getMesh().Position.Z + this.getVelocidadX() * (float)System.Math.Sin(this.orientacion));
+
+        }
+        //Calcula el centro de rotación del box de colisiones
+        protected Vector3 calcularCentroDelBox()
+        {
+            return new Vector3(this.getMesh().Position.X + this.getVelocidadX() * (float)System.Math.Cos(this.orientacion),
+              boxDeColisionY + this.getVelocidadY(), this.getMesh().Position.Z + this.getVelocidadX() * (float)System.Math.Sin(this.orientacion));
+        }
+        private void ProcesarColisiones()
+        {
+            collisionFound = false;
+            chocoAdelante = false;
+            var ray = calcularRayoDePosicion();
+       
+            foreach (var mesh in this.env.GetManejadorDeColision().MeshesColicionables)
+            {
+                var escenaAABB = mesh.BoundingBox;
+
+                /*Si choca sale del bucle*/
+                if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB))
+                {
+                    collisionFound = true;
+                    float t;
+                    Vector3 p;
+                    chocoAdelante = (intersectRayAABB(ray, escenaAABB, out t, out p) || t > 1.0f);
+
+                    break;
+                }
+            }
+            /*Si choca se pone el box de choque en DarkRed*/
+            if (collisionFound)
+            {
+                if (this.getMesh().Position.Y == 5 || this.getMesh().Position.Y >= 25)
+                {
+                    this.boxDeColision.setRenderColor(Color.DarkRed);
+                    VolverAPosicionAnterior();
+                }
+            }
+            else
+            {
+                this.boxDeColision.setRenderColor(Color.Yellow);
+            }
+
+            if (this.getMesh().Position.Y == 5)
+            {
+                ManejarColisionCamara();
+            }
+      }
+        private TgcRay.RayStruct calcularRayoDePosicion()
+        {
+            var ray = new TgcRay.RayStruct();
+            var x1 = -this.largoDelMesh * FastMath.Sin(anguloFinal);
+            var z1 = -this.largoDelMesh * FastMath.Cos(anguloFinal);
+
+            var x2 = x1 * 1.2;
+            var z2 = z1 * 1.2;
+
+            ray.origin = new Vector3(
+                this.getMesh().Position.X + x1,
+                this.getMesh().Position.Y,
+                this.getMesh().Position.Z + z1);
+
+            ray.direction = new Vector3(NuevaPosicion.X + (float)x2,
+                NuevaPosicion.Y,
+                NuevaPosicion.Z + (float)z2
+                );
+            return ray;
+        }
+
+        private void updateTGCArrow(TgcRay.RayStruct rayo)
+        {
+            directionArrow = new TgcArrow();
+            directionArrow.Thickness = 5;
+            directionArrow.BodyColor = Color.Red;
+            directionArrow.HeadColor = Color.Green;
+            directionArrow.HeadSize = new Vector2(10, 10);
+
+            directionArrow.PStart = rayo.origin;
+            directionArrow.PEnd = rayo.direction;
+            directionArrow.updateValues();
+        }
+
+
+        public void VolverAPosicionAnterior()
+        {
+            this.getMesh().Position = PosicionAnterior;
+            this.getMesh().Rotation = RotacionAnterior;
+            this.setVelocidadX(-1 * this.getVelocidadX() * 0.5f);
+        }
+        public bool intersectRayAABB(TgcRay.RayStruct ray, TgcBoundingAxisAlignBox aabb, out float tmin,
+          out Vector3 q)
+        //, out float tmin, out Vector3 q)
+        {
+            var aabbMin = TgcCollisionUtils.toArray(aabb.PMin);
+            var aabbMax = TgcCollisionUtils.toArray(aabb.PMax);
+            var p = TgcCollisionUtils.toArray(ray.origin);
+            var d = TgcCollisionUtils.toArray(ray.direction);
+
+            tmin = 0.0f; // set to -FLT_MAX to get first hit on line
+            var tmax = float.MaxValue; // set to max distance ray can travel (for segment)
+            q = Vector3.Empty;
+
+            // For all three slabs
+            for (var i = 0; i < 3; i++)
+            {
+                if (FastMath.Abs(d[i]) < float.Epsilon)
+                {
+                    // Ray is parallel to slab. No hit if origin not within slab
+                    if (p[i] < aabbMin[i] || p[i] > aabbMax[i]) return false;
+                }
+                else
+                {
+                    // Compute intersection t value of ray with near and far plane of slab
+                    var ood = 1.0f / d[i];
+                    var t1 = (aabbMin[i] - p[i]) * ood;
+                    var t2 = (aabbMax[i] - p[i]) * ood;
+                    // Make t1 be intersection with near plane, t2 with far plane
+                    if (t1 > t2) TgcCollisionUtils.swap(ref t1, ref t2);
+                    // Compute the intersection of slab intersection intervals
+                    tmin = TgcCollisionUtils.max(tmin, t1);
+                    tmax = TgcCollisionUtils.min(tmax, t2);
+                    // Exit with no collision as soon as slab intersection becomes empty
+                    if (tmin > tmax) return false;
+                }
+            }
+            // Ray intersects all 3 slabs. Return point (q) and intersection t value (tmin)
+            q = ray.origin + ray.direction * tmin;
+            return true;
+        }
+        public virtual void ManejarColisionCamara()
+        {
+
         }
         public virtual bool moverAdelante()
         {
@@ -397,14 +517,6 @@ namespace TGC.Group.Model
         public virtual bool moverAIzquierda()
         {
             return false;
-        }
-        public virtual void rotar(float rotacion)
-        {
-
-        }
-        public virtual void mover()
-        {
-
         }
         public virtual bool moverArriba()
         {

@@ -24,13 +24,13 @@ namespace TGC.Group.Model
         public void MostrarVelocidadPorPantalla(float Velocidad)
         {
             //Dibuja un texto por pantalla
-            this.env.DrawText.drawText("Velocidad: " + Velocidad, 0, 60, System.Drawing.Color.Red);
+            this.env.DrawText.drawText("Velocidad X: " + Math.Abs(Velocidad), 0, 60, System.Drawing.Color.Red);
  
         }
-        public void MostrarAlturaPorPantalla(float altura)
+        public void MostrarPosicioMeshPorPantalla(Vector3 vector)
         {
             //Dibuja un texto por pantalla
-            this.env.DrawText.drawText("Altura: " + altura, 0, 75, System.Drawing.Color.Red);
+            this.env.DrawText.drawText("Posición(" + vector.X + ";" + vector.Y + ";" + vector.Z + ")", 0, 75, System.Drawing.Color.Red);
 
         }
         public void MostrarVelocidadYPorPantalla(float altura)
@@ -43,9 +43,24 @@ namespace TGC.Group.Model
         {
             this.env.DrawText.drawText("Dirección ("+vector.X+";" + vector.Y+";" + vector.Z+")", 0, 105, System.Drawing.Color.Red);
         }
+        
         public void MostrarPuntoColisionVehiculoPrincipal(Vector3 vector)
         {
             this.env.DrawText.drawText("Colision en (" + vector.X + ";" + vector.Y + ";" + vector.Z + ")", 0, 120, System.Drawing.Color.Red);
+        }
+        public void MostrarTiempo()
+        {
+            this.env.DrawText.drawText("Time: " + env.ElapsedTime + ")", 0, 135, System.Drawing.Color.Red);
+        }
+        public void test(String text, Vector3[] vector)
+        {
+            for (int i = 0; i < vector.Length; i++)
+            {
+         //          this.env.DrawText.drawText(text+" (" + vector[i].X + ";" + vector[i].Y + ";" + vector[i].Z + ")", 0, (135+15*i), System.Drawing.Color.Red);
+       //        this.env.DrawText.drawText(text + " (" + vector[i].X + ";" + vector[i].Y + ";" + vector[i].Z + ")", Math.Abs((int)(vector[i].X))*2, (int)vector[i].Z, System.Drawing.Color.Red);
+
+
+            }
         }
     }
 }

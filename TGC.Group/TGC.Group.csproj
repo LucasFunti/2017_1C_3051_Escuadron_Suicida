@@ -88,6 +88,7 @@
     <Compile Include="Model\UtilsColisiones\BoundingBoxCollider.cs" />
     <Compile Include="Model\UtilsCamara\CamaraTerceraPersona.cs" />
     <Compile Include="Model\UtilsCiudad\Ciudad.cs" />
+    <Compile Include="Model\UtilsColisiones\TgcBoundingOrientedBox.cs" />
     <Compile Include="Model\UtilsColisiones\Colisionador.cs" />
     <Compile Include="Model\UtilsColisiones\ManejadorDeColisiones.cs" />
     <Compile Include="Model\UtilsVehiculos\ObjetoConMovimiento.cs" />
