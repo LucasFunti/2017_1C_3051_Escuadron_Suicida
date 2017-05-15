@@ -27,11 +27,8 @@ namespace TGC.Group.Model.UtilsVehiculos
         }
         public void crearEnemigo()
         {
-            autoPrincipal = new Enemigo(this.env);
+          //  autoPrincipal = new Enemigo(this.env);
         }
-        public VehiculoPrincipal getAutoPrincipal()
-        {
-            return autoPrincipal;
-        }
+        
     }
 }
