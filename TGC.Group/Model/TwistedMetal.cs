@@ -53,6 +53,7 @@ namespace TGC.Group.Model
             controladorDeVehiculos = new ControladorDeVehiculos(this);
             Ciudad = new Ciudad(this);
             controladorDeVehiculos.crearAutoPrincipal();
+            controladorDeVehiculos.crearEnemigo1();
             messages = new PrintMessageText(this);
            
 
@@ -83,7 +84,7 @@ namespace TGC.Group.Model
                     D3DDevice.Instance.ZFarPlaneDistance * 2f);
 
              Ciudad.Update();
-            controladorDeVehiculos.getAutoPrincipal().Update();
+            controladorDeVehiculos.update();
         }
 
         /// <summary>
@@ -104,11 +105,11 @@ namespace TGC.Group.Model
           //  messages.test("BoudningBox", this.autoPrincipal.getMesh().BoundingBox.computeCorners());
 
             Ciudad.Render();
-            controladorDeVehiculos.getAutoPrincipal().Render();
+            controladorDeVehiculos.render();
         //    messages.MostrarPuntoColisionVehiculoPrincipal(manejadorDeColiciones.Manager().LastCollisionPoint);
-            
-                //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
-                PostRender();
+
+            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
+            PostRender();
         }
 
         /// <summary>
@@ -119,7 +120,7 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             Ciudad.dispose();
-            controladorDeVehiculos.getAutoPrincipal().dispose();
+            controladorDeVehiculos.dispose();
         }
 
         

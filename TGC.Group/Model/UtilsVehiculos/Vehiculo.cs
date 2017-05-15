@@ -1,4 +1,5 @@
 ﻿using Microsoft.DirectX;
+using System;
 using TGC.Core.SceneLoader;
 
 
@@ -22,34 +23,38 @@ namespace TGC.Group.Model
             base.setAluraMaxima(100);
         //    direcionadores();
         }
-   /*     private void direcionadores()
+        public  virtual Boolean esAutoPrincipal()
         {
-            directionArrow = new TgcArrow();
-            directionArrow.BodyColor = Color.Red;
-            directionArrow.HeadColor = Color.Green;
-            directionArrow.Thickness = 0.4f;
-            directionArrow.HeadSize = new Vector2(5, 10);
-
-            //Linea para normal de colision
-            collisionNormalArrow = new TgcArrow();
-            collisionNormalArrow.BodyColor = Color.Blue;
-            collisionNormalArrow.HeadColor = Color.Yellow;
-            collisionNormalArrow.Thickness = 0.4f;
-            collisionNormalArrow.HeadSize = new Vector2(2, 5);
-
-            //Caja para marcar punto de colision
-            collisionPoint = TgcBox.fromSize(new Vector3(4, 4, 4), Color.Red);
-            collisionPoint.AutoTransformEnable = true;
-        }*/
-       
-     /*   public void setPEndDirectionArrow(Vector3 vector)
-        {
-            directionArrow.PEnd = vector;
+            return false;
         }
-        public Vector3 getPEndDirectionArrow(Vector3 vector)
-        {
-            return directionArrow.PEnd;
-        }*/
+        /*     private void direcionadores()
+             {
+                 directionArrow = new TgcArrow();
+                 directionArrow.BodyColor = Color.Red;
+                 directionArrow.HeadColor = Color.Green;
+                 directionArrow.Thickness = 0.4f;
+                 directionArrow.HeadSize = new Vector2(5, 10);
+
+                 //Linea para normal de colision
+                 collisionNormalArrow = new TgcArrow();
+                 collisionNormalArrow.BodyColor = Color.Blue;
+                 collisionNormalArrow.HeadColor = Color.Yellow;
+                 collisionNormalArrow.Thickness = 0.4f;
+                 collisionNormalArrow.HeadSize = new Vector2(2, 5);
+
+                 //Caja para marcar punto de colision
+                 collisionPoint = TgcBox.fromSize(new Vector3(4, 4, 4), Color.Red);
+                 collisionPoint.AutoTransformEnable = true;
+             }*/
+
+        /*   public void setPEndDirectionArrow(Vector3 vector)
+           {
+               directionArrow.PEnd = vector;
+           }
+           public Vector3 getPEndDirectionArrow(Vector3 vector)
+           {
+               return directionArrow.PEnd;
+           }*/
         //Rota el objeto y si tiene camara sobre el.
         public override void rotar(Vector3 v, Matrix m,float anguloCamara)
         {

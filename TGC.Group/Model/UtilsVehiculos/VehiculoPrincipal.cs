@@ -6,6 +6,7 @@ using TGC.Core.Geometry;
 using System.Drawing;
 using TGC.Group.Model.UtilsColisiones;
 using TGC.Core.Utils;
+using System;
 
 namespace TGC.Group.Model
 {
@@ -32,7 +33,10 @@ namespace TGC.Group.Model
              camaraManager();
 
         }
-      
+        public override Boolean esAutoPrincipal()
+        {
+            return true;
+        }
         private void camaraManager()
         {
             camaraInterna = new CamaraTerceraPersona(this.getMesh().Position, 100, 300);
