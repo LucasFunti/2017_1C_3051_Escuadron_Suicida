@@ -13,7 +13,7 @@ using TGC.Examples.Camara;
 using TGC.Core.Terrain;
 using TGC.Core.UserControls;
 using TGC.Core.UserControls.Modifier;
-
+using TGC.Group.Model.UtilsVehiculos;
 
 namespace TGC.Group.Model
 {
@@ -27,7 +27,7 @@ namespace TGC.Group.Model
     {
         private Ciudad Ciudad;
         private PrintMessageText messages;
-        private VehiculoPrincipal autoPrincipal;
+        private ControladorDeVehiculos controladorDeVehiculos;
         private ManejadorDeColisiones manejadorDeColiciones;
 
         public TwistedMetal(string mediaDir, string shadersDir)
@@ -50,15 +50,15 @@ namespace TGC.Group.Model
         {
             //Carga la estructura de la ciudad
             manejadorDeColiciones = new ManejadorDeColisiones();
-
+            controladorDeVehiculos = new ControladorDeVehiculos(this);
             Ciudad = new Ciudad(this);
-
+            controladorDeVehiculos.crearAutoPrincipal();
             messages = new PrintMessageText(this);
-            autoPrincipal = new VehiculoPrincipal(this);
+           
 
             manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getEdificios());
             manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getSemaforos());
-            manejadorDeColiciones.addBoundingBoxMeshColisionable(autoPrincipal.getMesh());
+            manejadorDeColiciones.addBoundingBoxMeshColisionable(controladorDeVehiculos.getAutoPrincipal().getMesh());
             manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getMeshParedes());
         }
         public ManejadorDeColisiones GetManejadorDeColision()
@@ -83,7 +83,7 @@ namespace TGC.Group.Model
                     D3DDevice.Instance.ZFarPlaneDistance * 2f);
 
              Ciudad.Update();
-            autoPrincipal.Update();
+            controladorDeVehiculos.getAutoPrincipal().Update();
         }
 
         /// <summary>
@@ -96,15 +96,15 @@ namespace TGC.Group.Model
             //Inicio el rende de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
             messages.MostrarComandosPorPantalla();
-            messages.MostrarVelocidadPorPantalla(this.autoPrincipal.getVelocidadX());
-            messages.MostrarPosicioMeshPorPantalla(this.autoPrincipal.getMesh().Position);
-            messages.MostrarVelocidadYPorPantalla(this.autoPrincipal.getVelocidadY());
-            messages.MostrarDireccionVehiculoPrincipal(this.autoPrincipal.getMesh().Position);
+            messages.MostrarVelocidadPorPantalla(controladorDeVehiculos.getAutoPrincipal().getVelocidadX());
+            messages.MostrarPosicioMeshPorPantalla(controladorDeVehiculos.getAutoPrincipal().getMesh().Position);
+            messages.MostrarVelocidadYPorPantalla(controladorDeVehiculos.getAutoPrincipal().getVelocidadY());
+            messages.MostrarDireccionVehiculoPrincipal(controladorDeVehiculos.getAutoPrincipal().getMesh().Position);
             messages.MostrarTiempo();
           //  messages.test("BoudningBox", this.autoPrincipal.getMesh().BoundingBox.computeCorners());
 
             Ciudad.Render();
-            autoPrincipal.Render();
+            controladorDeVehiculos.getAutoPrincipal().Render();
         //    messages.MostrarPuntoColisionVehiculoPrincipal(manejadorDeColiciones.Manager().LastCollisionPoint);
             
                 //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
@@ -119,7 +119,7 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             Ciudad.dispose();
-            autoPrincipal.dispose();
+            controladorDeVehiculos.getAutoPrincipal().dispose();
         }
 
         

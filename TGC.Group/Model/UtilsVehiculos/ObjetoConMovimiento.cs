@@ -26,7 +26,7 @@ namespace TGC.Group.Model
         private float alturaInicial = 5f;
         private float gravedad = 0.3f; //Para cuando cae.
         private bool subiendo = false;
-        TwistedMetal env;
+        public TwistedMetal env;
         public Matrix matrixRotacion;
         public float anguloFinal = 0;
         //Mesh

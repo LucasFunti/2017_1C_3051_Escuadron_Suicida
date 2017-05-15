@@ -14,16 +14,14 @@ namespace TGC.Group.Model
         
         private TgcSceneLoader loader;
         private CamaraTerceraPersona camaraInterna;
-        private TwistedMetal env;
         public static float camaraOffsetDefaulForward = 300f;
 
         public VehiculoPrincipal(TwistedMetal env) : base(env)
         {
             loader = new TgcSceneLoader();
-            this.env = env;
             var sceneHummer = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
             TgcMesh mesh = sceneHummer.Meshes[0];
-            mesh.AutoTransformEnable = true;
+          //  mesh.AutoTransformEnable = true;
             mesh.move(0, 5, 0);
             this.setMesh(mesh);
             this.setVelocidadMaxima(70);

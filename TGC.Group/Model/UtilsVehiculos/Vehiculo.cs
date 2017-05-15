@@ -6,13 +6,10 @@ namespace TGC.Group.Model
 {
     class Vehiculo : ObjetoConMovimiento
     {
-        
-        TwistedMetal env;
        
 
         public Vehiculo(TgcMesh Mesh, Vector3 pos, TwistedMetal env) : base(env)
         {
-            this.env = env;
             base.setMesh(Mesh);
             base.getMesh().move(pos);
             base.setVelocidadY(0);
@@ -21,7 +18,6 @@ namespace TGC.Group.Model
         }
         public Vehiculo(TwistedMetal env) : base(env)
         {
-            this.env = env;
             this.setVelocidadY(0);
             base.setAluraMaxima(100);
         //    direcionadores();

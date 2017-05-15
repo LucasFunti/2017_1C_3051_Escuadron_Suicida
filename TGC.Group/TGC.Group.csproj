@@ -91,6 +91,8 @@
     <Compile Include="Model\UtilsColisiones\TgcBoundingOrientedBox.cs" />
     <Compile Include="Model\UtilsColisiones\Colisionador.cs" />
     <Compile Include="Model\UtilsColisiones\ManejadorDeColisiones.cs" />
+    <Compile Include="Model\UtilsVehiculos\ControladorDeVehiculos.cs" />
+    <Compile Include="Model\UtilsVehiculos\Enemigo.cs" />
     <Compile Include="Model\UtilsVehiculos\ObjetoConMovimiento.cs" />
     <Compile Include="Model\UtilsColisiones\PrintMessageText.cs" />
     <Compile Include="Model\UtilsColisiones\SphereTriangleCollisionManager.cs" />

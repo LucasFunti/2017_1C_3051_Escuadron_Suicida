@@ -25,7 +25,6 @@ namespace TGC.Group.Model
     /// </summary>
     public class Ciudad 
     {
-        private readonly List<Colisionador> objetosColisionables = new List<Colisionador>();
         private string MediaDir;
         private TgcPlane suelo;
         private TgcMesh edificio;
@@ -44,23 +43,23 @@ namespace TGC.Group.Model
         private TwistedMetal env;
         List<int> ListaRandom = new List<int>(7);
         private TgcMesh semaforo;
-        private TgcMesh auto;
+      /*  private TgcMesh auto;
         private TgcMesh camion;
         private TgcMesh hummer;
         private TgcMesh buggy;
         private TgcMesh patrullero;
-
+        */
         private TgcMesh posteDeLuz;
 
         //  colicion
-        private TgcArrow collisionNormalArrow;
+      /*  private TgcArrow collisionNormalArrow;
         private TgcBox collisionPoint;
         private TgcArrow directionArrow;
         private TgcBoundingSphere characterSphere;
         private SphereTriangleCollisionManager collisionManager;
 
         //Autos
-        private List<Vehiculo> vehiculos;
+        private List<Vehiculo> vehiculos;*/
 
         public Ciudad(TwistedMetal env)
         {
@@ -89,7 +88,7 @@ namespace TGC.Group.Model
             meshes.AddRange(edificios);
             crearVeredas();
             crearParedes();
-            crearAuto();
+         //   crearAuto();
             crearSemaforos();
             meshes.AddRange(semaforos);
             crearPlantas(1);
@@ -319,7 +318,7 @@ namespace TGC.Group.Model
 
        
 
-        private void crearAuto()
+     /*   private void crearAuto()
         {
             vehiculos = new List<Vehiculo>();
 
@@ -347,7 +346,7 @@ namespace TGC.Group.Model
             vehiculo.getMesh().rotateY(FastMath.PI);
             vehiculo.getMesh().Scale = new Vector3(1, 1, 1);
             vehiculos.Add(vehiculo);
-            /*
+            
                         var sceneHummer = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
                         hummer = sceneHummer.Meshes[0];
                         hummer.AutoTransformEnable = true;
@@ -383,10 +382,10 @@ namespace TGC.Group.Model
                         patrullero.rotateY(FastMath.PI);
                         patrullero.Scale = new Vector3(1, 1, 1);
                         meshes.Add(patrullero);
-                        */
-        }
+                        
+        }*/
 
-
+    
 
         private void crearSemaforos()
         {
@@ -584,10 +583,10 @@ namespace TGC.Group.Model
             {
                 c.render();
             }
-            foreach (var vehiculo in vehiculos)
+         /*   foreach (var vehiculo in vehiculos)
             {
                 vehiculo.getMesh().render();
-            }
+            }*/
 
             mostrarBounding();
           
@@ -605,10 +604,10 @@ namespace TGC.Group.Model
               buggy.dispose();
               patrullero.dispose();
               */
-            foreach (var vehiculo in vehiculos)
+          /*  foreach (var vehiculo in vehiculos)
             {
                 vehiculo.getMesh().dispose();
-            }
+            }*/
             //disposeListas();
 
             //Liberar recursos del SkyBox
@@ -659,10 +658,7 @@ namespace TGC.Group.Model
             {
                 mesh.BoundingBox.render();
             }
-            foreach (var vehiculo in vehiculos)
-            {
-                vehiculo.getMesh().BoundingBox.render();
-            }
+           
         }
         private void iniciarCielo()
         {
@@ -704,63 +700,6 @@ namespace TGC.Group.Model
             }
             return meshDeParedes;
         }
-        private void iniciarColisionador()
-        {
-            //Almacenar volumenes de colision del escenario
-            objetosColisionables.Clear();
-            //Renderizar instancias
-            foreach (var mesh in meshes)
-            {
-               // objetosColisionables.Add(TriangleMeshCollider.fromMesh(mesh));
-                //Los objetos del layer "TriangleCollision" son colisiones a nivel de triangulo
-                /*   if (mesh.Layer == "TriangleCollision")
-                   {
-                       objetosColisionables.Add(TriangleMeshCollider.fromMesh(mesh));
-                   }
-                   //El resto de los objetos son colisiones de BoundingBox
-                   else
-                   {
-                       objetosColisionables.Add(BoundingBoxCollider.fromBoundingBox(mesh.BoundingBox));
-                   }*/
-            }
-
-            //Crear linea para mostrar la direccion del movimiento del personaje
-            directionArrow = new TgcArrow();
-            directionArrow.BodyColor = Color.Red;
-            directionArrow.HeadColor = Color.Green;
-            directionArrow.Thickness = 0.4f;
-            directionArrow.HeadSize = new Vector2(5, 10);
-
-            //Linea para normal de colision
-            collisionNormalArrow = new TgcArrow();
-            collisionNormalArrow.BodyColor = Color.Blue;
-            collisionNormalArrow.HeadColor = Color.Yellow;
-            collisionNormalArrow.Thickness = 0.4f;
-            collisionNormalArrow.HeadSize = new Vector2(2, 5);
-
-            //Caja para marcar punto de colision
-            collisionPoint = TgcBox.fromSize(new Vector3(4, 4, 4), Color.Red);
-            collisionPoint.AutoTransformEnable = true;
-
-            //Crear manejador de colisiones
-            collisionManager = new SphereTriangleCollisionManager();
-            collisionManager.GravityEnabled = true;
-
-
-
-            /*  foreach (var mesh in escenario.Meshes)
-              {
-                  //Los objetos del layer "TriangleCollision" son colisiones a nivel de triangulo
-                  if (mesh.Layer == "TriangleCollision")
-                  {
-                      objetosColisionables.Add(TriangleMeshCollider.fromMesh(mesh));
-                  }
-                  //El resto de los objetos son colisiones de BoundingBox
-                  else
-                  {
-                      objetosColisionables.Add(BoundingBoxCollider.fromBoundingBox(mesh.BoundingBox));
-                  }
-              }*/
-        }
+      
     }
 }
