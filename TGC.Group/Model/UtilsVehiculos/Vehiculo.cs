@@ -9,10 +9,10 @@ namespace TGC.Group.Model
     {
        
 
-        public Vehiculo(TgcMesh Mesh, Vector3 pos, TwistedMetal env) : base(env)
+        public Vehiculo(TgcMesh Mesh, TwistedMetal env) : base(env)
         {
             base.setMesh(Mesh);
-            base.getMesh().move(pos);
+          //  base.getMesh().(pos);
             base.setVelocidadY(0);
             base.setAluraMaxima(20);
       //      direcionadores();
@@ -27,6 +27,9 @@ namespace TGC.Group.Model
         {
             return false;
         }
+
+       
+
         /*     private void direcionadores()
              {
                  directionArrow = new TgcArrow();
@@ -239,7 +242,7 @@ namespace TGC.Group.Model
         {
             base.getMesh().render();
             base.getBoxDeColision().render();
-            directionArrow.render();
+           // directionArrow.render();
          //   collisionNormalArrow.render();
           //  collisionPoint.render();
 
@@ -247,7 +250,7 @@ namespace TGC.Group.Model
         public void dispose()
         {
             base.getMesh().dispose();
-            directionArrow.dispose();
+            //directionArrow.dispose();
         }
 
     }

@@ -14,6 +14,7 @@ namespace TGC.Group.Model.UtilsVehiculos
         private VehiculoPrincipal autoPrincipal;
         private TwistedMetal env;
         private readonly List<Vehiculo> listaDeVehiculos = new List<Vehiculo>();
+        private readonly List<Vehiculo> listaDeEnemigos = new List<Vehiculo>();
         private TgcSceneLoader loader;
 
         public ControladorDeVehiculos(TwistedMetal env)
@@ -21,36 +22,48 @@ namespace TGC.Group.Model.UtilsVehiculos
             this.env = env;
             loader = new TgcSceneLoader();
         }
-
+        public List<Vehiculo> getListaDeAutos()
+        {
+            return listaDeVehiculos;
+        }
         public void crearAutoPrincipal()
         {
             autoPrincipal = new VehiculoPrincipal(this.env);
+       //     listaDeVehiculos.Add(autoPrincipal);
         }
         public VehiculoPrincipal getAutoPrincipal()
         {
             return autoPrincipal;
         }
-        public void crearEnemigo1()
-        {
-            TgcMesh auto;
-            var sceneAuto = loader.loadSceneFromFile(this.env.MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
-            auto = sceneAuto.Meshes[0];
-            //     auto.AutoTransformEnable = true;
-            //   auto.move(25, 5, 50);
-            auto.Scale = new Vector3(1, 1, 1);
-
-            Enemigo enemigo = new Enemigo(this.env, new Vector3(25, 5, 50), sceneAuto.Meshes[0]);
-            enemigo.getMesh().Scale = new Vector3(1, 1, 1);
-            enemigo.getMesh().rotateY(FastMath.PI_HALF);
-            this.listaDeVehiculos.Add(enemigo);
-        }
-        public void update()
+        public void addToColisionador(ManejadorDeColisiones manejadorDeColisiones)
         {
             foreach (var vehiculo in this.listaDeVehiculos)
             {
-                if (!vehiculo.esAutoPrincipal())
-                      vehiculo.Update();
+              if (!vehiculo.esAutoPrincipal())
+                  manejadorDeColisiones.addBoundingBoxMeshColisionable(vehiculo.getMesh());
             }
+                 
+            
+        }
+        public void crearEnemigo1()
+        {
+
+           var sceneAuto = loader.loadSceneFromFile(this.env.MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
+          
+            Enemigo enemigo = new Enemigo(this.env,  sceneAuto.Meshes[0]);
+         
+            enemigo.setPosicionInicial(new Vector3(-100, 5, 3000));
+            enemigo.setVelocidadMaxima(40);
+            enemigo.setVelocidadMinima(-5);
+            enemigo.setConstanteDeAsceleracionX(0.5f);
+            this.listaDeVehiculos.Add(enemigo);
+            this.listaDeEnemigos.Add(enemigo);
+        }
+        public void update()
+        {
+            foreach (var enemigo in this.listaDeEnemigos)
+                enemigo.Update();
+            
             this.autoPrincipal.Update();
         }
         public void render()

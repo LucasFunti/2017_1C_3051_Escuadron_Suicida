@@ -23,43 +23,41 @@ namespace TGC.Group.Model
     ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
     ///     line 97.
     /// </summary>
-    public class Ciudad 
+    public class Ciudad
     {
         private string MediaDir;
-        private TgcPlane suelo;
-        private TgcMesh edificio;
+       
         private List<TgcPlane> veredas;
         private List<TgcPlane> cordones;
         private List<TgcPlane> paredes;
         private List<TgcPlane> calles;
         private List<TgcMesh> edificios;
         private List<TgcMesh> semaforos;
+        private List<TgcMesh> arboles;
+        private List<TgcMesh> LpostesDeLuz;
         private List<TgcMesh> meshes;
+
         private TgcSceneLoader loader;
         private TgcSkyBox skyBox;
-         private TgcTexture cordonTexture;
-        private TgcTexture veredaTexture;
-        private TgcTexture paredTexture;
+       
         private TwistedMetal env;
         List<int> ListaRandom = new List<int>(7);
         private TgcMesh semaforo;
-      /*  private TgcMesh auto;
-        private TgcMesh camion;
-        private TgcMesh hummer;
-        private TgcMesh buggy;
-        private TgcMesh patrullero;
-        */
         private TgcMesh posteDeLuz;
-
+        private TgcPlane suelo;
+        private TgcMesh edificio;
+        private TgcTexture cordonTexture;
+        private TgcTexture veredaTexture;
+        private TgcTexture paredTexture;
         //  colicion
-      /*  private TgcArrow collisionNormalArrow;
-        private TgcBox collisionPoint;
-        private TgcArrow directionArrow;
-        private TgcBoundingSphere characterSphere;
-        private SphereTriangleCollisionManager collisionManager;
+        /*  private TgcArrow collisionNormalArrow;
+          private TgcBox collisionPoint;
+          private TgcArrow directionArrow;
+          private TgcBoundingSphere characterSphere;
+          private SphereTriangleCollisionManager collisionManager;
 
-        //Autos
-        private List<Vehiculo> vehiculos;*/
+          //Autos
+          private List<Vehiculo> vehiculos;*/
 
         public Ciudad(TwistedMetal env)
         {
@@ -82,6 +80,8 @@ namespace TGC.Group.Model
             cordones = new System.Collections.Generic.List<TgcPlane>();
             paredes = new System.Collections.Generic.List<TgcPlane>();
             calles = new System.Collections.Generic.List<TgcPlane>();
+            arboles = new System.Collections.Generic.List<TgcMesh>();
+            LpostesDeLuz = new System.Collections.Generic.List<TgcMesh>();
 
             crearPisoDeFondo();
             crearEdificios();
@@ -256,9 +256,11 @@ namespace TGC.Group.Model
                 posteDeLuz.AutoTransformEnable = true;
                 posteDeLuz.Position = new Vector3(-455 + (i * (5900 / 30)), 5, -450);
                 posteDeLuz.rotateY(FastMath.PI_HALF);
-                posteDeLuz.Scale = new Vector3(1, 1, 1);
+                posteDeLuz.Scale = new Vector3(1, 3, 1);
                 posteDeLuz.move(0, 50, 0);
+                posteDeLuz.BoundingBox.transform(Matrix.Scaling(new Vector3(0.1f, 3, 0.1f)) * Matrix.Translation(new Vector3(posteDeLuz.Position.X, posteDeLuz.Position.Y, posteDeLuz.Position.Z-33)));
                 meshes.Add(posteDeLuz);
+                LpostesDeLuz.Add(posteDeLuz);
             }
             cordones.Add(new TgcPlane(new Vector3(-450, 5, -445), new Vector3(5, 0, 5890), TgcPlane.Orientations.XZplane, cordonTexture, 1, 40));
             cordones.Add(new TgcPlane(new Vector3(-445, 0, -445), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
@@ -270,9 +272,11 @@ namespace TGC.Group.Model
                 posteDeLuz.AutoTransformEnable = true;
                 posteDeLuz.Position = new Vector3(-455 , 5, -450 + (i * (5900 / 30)));
                 posteDeLuz.rotateY(FastMath.PI);
-                posteDeLuz.Scale = new Vector3(1, 1, 1);
+                posteDeLuz.Scale = new Vector3(1, 3, 1);
                 posteDeLuz.move(0, 50, 0);
+                posteDeLuz.BoundingBox.transform(Matrix.Scaling(new Vector3(0.1f, 3, 0.1f)) * Matrix.Translation(new Vector3(posteDeLuz.Position.X-33, posteDeLuz.Position.Y, posteDeLuz.Position.Z )));
                 meshes.Add(posteDeLuz);
+                LpostesDeLuz.Add(posteDeLuz);
             }
             cordones.Add(new TgcPlane(new Vector3(-450, 5, 5445), new Vector3(5900, 0, 5), TgcPlane.Orientations.XZplane, cordonTexture, 40, 1));
             cordones.Add(new TgcPlane(new Vector3(-450, 0, 5445), new Vector3(5900, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
@@ -284,9 +288,11 @@ namespace TGC.Group.Model
                 posteDeLuz.AutoTransformEnable = true;
                 posteDeLuz.Position = new Vector3(-455 + (i * (5900 / 30)), 5, 5445);
                 posteDeLuz.rotateY(FastMath.PI + FastMath.PI_HALF);
-                posteDeLuz.Scale = new Vector3(1, 1, 1);
+                posteDeLuz.Scale = new Vector3(1, 3, 1);
                 posteDeLuz.move(0, 50, 0);
+                posteDeLuz.BoundingBox.transform(Matrix.Scaling(new Vector3(0.1f, 3, 0.1f)) * Matrix.Translation(new Vector3(posteDeLuz.Position.X , posteDeLuz.Position.Y, posteDeLuz.Position.Z+33)));
                 meshes.Add(posteDeLuz);
+                LpostesDeLuz.Add(posteDeLuz);
             }
             cordones.Add(new TgcPlane(new Vector3(5445, 5, -445), new Vector3(5, 0, 5890), TgcPlane.Orientations.XZplane, cordonTexture, 1, 40));
             cordones.Add(new TgcPlane(new Vector3(5445, 0, -445), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
@@ -298,9 +304,11 @@ namespace TGC.Group.Model
                 posteDeLuz.AutoTransformEnable = true;
                 posteDeLuz.Position = new Vector3(5445 , 5, -450 + (i * (5900 / 30)));
                 posteDeLuz.rotateY(FastMath.TWO_PI);
-                posteDeLuz.Scale = new Vector3(1, 1, 1);
+                posteDeLuz.Scale = new Vector3(1, 3, 1);
                 posteDeLuz.move(0, 50, 0);
+                posteDeLuz.BoundingBox.transform(Matrix.Scaling(new Vector3(0.1f, 3, 0.1f)) * Matrix.Translation(new Vector3(posteDeLuz.Position.X+33, posteDeLuz.Position.Y, posteDeLuz.Position.Z)));
                 meshes.Add(posteDeLuz);
+                LpostesDeLuz.Add(posteDeLuz);
             }
         }
 
@@ -398,20 +406,24 @@ namespace TGC.Group.Model
             {
 
                 var instanciaIda = semaforo.createMeshInstance(semaforo.Name + i);
+                instanciaIda.Scale = new Vector3(2, 3, 2);
                 instanciaIda.AutoTransformEnable = true;
                 var posicionX = (veredas[i].Position.X) + (veredas[i].Size.X) - 20;
                 var posicionY = 40;
                 var posicionZ = veredas[i].Position.Z + 20;
                 instanciaIda.move(posicionX, posicionY, posicionZ);
+                instanciaIda.BoundingBox.transform(Matrix.Scaling(new Vector3(0.1f, 3, 0.1f)) * Matrix.Translation(instanciaIda.Position));
                 semaforos.Add(instanciaIda);
 
                 var instanciaVuelta = semaforo.createMeshInstance(semaforo.Name + i);
                 instanciaVuelta.AutoTransformEnable = true;
+                instanciaVuelta.Scale = new Vector3(2, 3, 2);
                 var posicionX2 = (veredas[i].Position.X) + 20;
                 var posicionY2 = 40;
                 var posicionZ2 = veredas[i].Position.Z + (veredas[i].Size.Z) - 20;
                 instanciaVuelta.move(posicionX2, posicionY2, posicionZ2);
                 instanciaVuelta.rotateY(FastMath.PI);
+                instanciaVuelta.BoundingBox.transform(Matrix.Scaling(new Vector3(0.1f, 3, 0.1f)) * Matrix.Translation(instanciaVuelta.Position));
                 semaforos.Add(instanciaVuelta);
 
 
@@ -424,23 +436,29 @@ namespace TGC.Group.Model
         private void crearUnaPlanta(TgcScene unaScene, int i, Vector3 vectorPosicion, int n)
         {
             Planta = unaScene.Meshes[0];
+      //      Planta.Scale = new Vector3(1, 3, 1);
             var instancia = Planta.createMeshInstance(Planta.Name + i);
             instancia.AutoTransformEnable = true;
             instancia.AlphaBlendEnable = true;
             instancia.move(vectorPosicion.X, vectorPosicion.Y, vectorPosicion.Z);
-
+            
+     
             var scenePasto = loader.loadSceneFromFile(MediaDir + "Pasto\\Pasto-TgcScene.xml");
             var pasto = scenePasto.Meshes[0];
             pasto.AutoTransformEnable = true;
             pasto.AlphaBlendEnable = true;
             pasto.move(vectorPosicion.X, vectorPosicion.Y, vectorPosicion.Z);
-
+           
             if (n == 3)
             {
                 instancia.Scale = new Vector3((float)0.5, (float)0.5, (float)0.5);
                 pasto.Scale = new Vector3(1,1,1);
             }
-            
+            instancia.BoundingBox.transform(Matrix.Scaling(new Vector3(0.1f, 3, 0.1f)) * Matrix.Translation(instancia.Position));
+            //     instancia.BoundingBox.scaleTranslate
+            arboles.Add(instancia);
+            pasto.BoundingBox.transform(Matrix.Scaling(new Vector3(0.2f, 1, 0.2f)) * Matrix.Translation(pasto.Position));
+            arboles.Add(pasto);
             meshes.Add(instancia);
             meshes.Add(pasto);
         }
@@ -554,23 +572,19 @@ namespace TGC.Group.Model
 
             //Renderizar instancias
             foreach (var mesh in meshes)
-            {
-                mesh.render();
-         //       mesh.BoundingBox.render();
-            }
+                  mesh.render();
+      
           
 
             //Renderizado de cordones
             foreach (var cordon in cordones)
-            {
                 cordon.render();
-            }
+ 
 
             //Renderizado de veredas
             foreach (var v in veredas)
-            {
-                v.render();
-            }
+                 v.render();
+ 
 
             //Renderizado de paredes
             foreach (var p in paredes)
@@ -651,14 +665,14 @@ namespace TGC.Group.Model
         private void mostrarBounding()
         {
             foreach (var mesh in edificios)
-            {
                 mesh.BoundingBox.render();
-            }
             foreach (var mesh in semaforos)
-            {
                 mesh.BoundingBox.render();
-            }
-           
+            foreach (var mesh in arboles)
+                mesh.BoundingBox.render();
+            foreach (var mesh in LpostesDeLuz)
+                mesh.BoundingBox.render();
+            
         }
         private void iniciarCielo()
         {
@@ -691,6 +705,15 @@ namespace TGC.Group.Model
         {
             return this.semaforos;
         }
+        public List<TgcMesh> getArboles()
+        {
+            return this.arboles;
+        }
+        public List<TgcMesh> getPostesDeLuz()
+        {
+            return this.LpostesDeLuz;
+        }
+        
         public List<TgcMesh> getMeshParedes()
         {
             List<TgcMesh> meshDeParedes = new System.Collections.Generic.List<TgcMesh>();

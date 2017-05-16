@@ -22,16 +22,15 @@ namespace TGC.Group.Model
             loader = new TgcSceneLoader();
             var sceneHummer = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
             TgcMesh mesh = sceneHummer.Meshes[0];
-          //  mesh.AutoTransformEnable = true;
-            mesh.move(0, 5, 0);
+       
             this.setMesh(mesh);
             this.setVelocidadMaxima(70);
             this.setVelocidadMinima(-5);
-            this.setConstanteDeAsceleracionX(0.1f);
+            this.setConstanteDeAsceleracionX(0.7f);
       //      base.setPEndDirectionArrow(new Vector3(this.getMesh().Position.X, this.getMesh().Position.Y, -500));
             //   this.setAlturaInicial(this.getMesh().Position.Y);
              camaraManager();
-
+            this.doblar(0.001f);//Inicializa las matrices de rotación, no tocar!!
         }
         public override Boolean esAutoPrincipal()
         {
@@ -39,7 +38,7 @@ namespace TGC.Group.Model
         }
         private void camaraManager()
         {
-            camaraInterna = new CamaraTerceraPersona(this.getMesh().Position, 100, 300);
+            camaraInterna = new CamaraTerceraPersona(this.getMesh().Position, 100, 300f);
             this.env.Camara = camaraInterna;
         }
 
@@ -60,7 +59,7 @@ namespace TGC.Group.Model
             foreach (var obstaculo in this.env.GetManejadorDeColision().MeshesColicionables)
             {
                 //Hay colision del segmento camara-personaje y el objeto
-                if (TgcCollisionUtils.intersectSegmentAABB(target, position, obstaculo.BoundingBox, out q))
+                if (TgcCollisionUtils.intersectSegmentAABB(target, position, obstaculo.BoundingBox, out q) && obstaculo!=this.getMesh())
                 {
                     //Si hay colision, guardar la que tenga menor distancia
                     var distSq = Vector3.Subtract(q, target).LengthSq();

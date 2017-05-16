@@ -12,7 +12,7 @@ namespace TGC.Group.Model
     {
         //Movimiento Horizontal
         private float VelocidadX = 0;
-        private float const_aceleracionX = 15f;
+        private float const_aceleracionX = 1f;
         private float friccion = 0.2f;
         private float velocidad_maxima = 0;
         private float velocidad_minima = 0;
@@ -20,11 +20,11 @@ namespace TGC.Group.Model
         private float velocidadRotacion = 1f;
         //Movimiento Vertical
         private float VelocidadY = 0; //Para cuando Salta.
-        private float const_aceleracionY = 0.5f;
+        private float const_aceleracionY = 1f;
         private float alturaMax = 0f;
         private float alturaActual = 5f;
         private float alturaInicial = 5f;
-        private float gravedad = 0.3f; //Para cuando cae.
+        private float gravedad = 2f; //Para cuando cae.
         private bool subiendo = false;
         public TwistedMetal env;
         public Matrix matrixRotacion;
@@ -42,17 +42,17 @@ namespace TGC.Group.Model
       //  private TgcArrow collisionNormalArrow;
        // private TgcBox collisionPoint;
         public TgcArrow directionArrow;
-     
+
         public ObjetoConMovimiento(TwistedMetal env)
         {
-            this.env = env;
+            this.env = env;          
         }
        
         public void setMesh(TgcMesh Mesh)
         {
             this.mesh = Mesh;
             initBoxColisionador();
-            this.updateTGCArrow(this.calcularRayoDePosicion());
+            //  this.updateTGCArrow(this.calcularRayoDePosicion());
         }
         public TgcMesh getMesh()
         {
@@ -70,6 +70,11 @@ namespace TGC.Group.Model
 
             largoDelMesh = boxDeColision.Extents.Z;
             boxDeColisionY = (yMax + yMin) / 2 + yMin;
+        }
+        public void setPosicionInicial(Vector3 vect)
+        {
+            this.getMesh().Position = vect;
+            this.mover();
         }
         protected TgcBoundingOrientedBox getBoxDeColision()
         {
@@ -241,6 +246,10 @@ namespace TGC.Group.Model
         }
         protected void doblar(float sentido)
         {
+
+            if (this.getVelocidadX() < 0)
+                sentido *= -1;
+
             sentido = sentido * this.getVelocidadRotacion();
             orientacion += sentido * 1f * this.env.ElapsedTime;
 
@@ -360,7 +369,7 @@ namespace TGC.Group.Model
             this.getMesh().Transform = m;
             this.getMesh().Position = NuevaPosicion;
 
-            ProcesarColisiones();
+            ProcesarChoques();
 
         }
         //Calcula la próxima posicion del objeto en base a los datos de velocidad.
@@ -377,7 +386,7 @@ namespace TGC.Group.Model
             return new Vector3(this.getMesh().Position.X + this.getVelocidadX() * (float)System.Math.Cos(this.orientacion),
               boxDeColisionY + this.getVelocidadY(), this.getMesh().Position.Z + this.getVelocidadX() * (float)System.Math.Sin(this.orientacion));
         }
-        private void ProcesarColisiones()
+        private void ProcesarChoques()
         {
             collisionFound = false;
             chocoAdelante = false;
@@ -387,8 +396,11 @@ namespace TGC.Group.Model
             {
                 var escenaAABB = mesh.BoundingBox;
 
+                if (mesh == this.getMesh())
+                    break;
+
                 /*Si choca sale del bucle*/
-                if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB))
+                if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB) )
                 {
                     collisionFound = true;
                     float t;

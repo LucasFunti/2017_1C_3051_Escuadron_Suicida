@@ -56,12 +56,14 @@ namespace TGC.Group.Model
             controladorDeVehiculos.crearEnemigo1();
             messages = new PrintMessageText(this);
            
-
+            //Agrega objetos colisionables
             manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getEdificios());
-            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getSemaforos());
-            manejadorDeColiciones.addBoundingBoxMeshColisionable(controladorDeVehiculos.getAutoPrincipal().getMesh());
+           manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getSemaforos());
+            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getArboles());
+            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getPostesDeLuz());
+            //    controladorDeVehiculos.addToColisionador(manejadorDeColiciones);//por ahora los autos no colisionan
             manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getMeshParedes());
-        }
+         }
         public ManejadorDeColisiones GetManejadorDeColision()
         {
             return this.manejadorDeColiciones;
