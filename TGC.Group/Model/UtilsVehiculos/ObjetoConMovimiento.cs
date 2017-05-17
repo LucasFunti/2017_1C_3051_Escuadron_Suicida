@@ -66,7 +66,8 @@ namespace TGC.Group.Model
             boxDeColision = TgcBoundingOrientedBox.computeFromAABB(this.getMesh().BoundingBox);
             var yMin = this.getMesh().BoundingBox.PMin.Y;
             var yMax = this.getMesh().BoundingBox.PMax.Y;
-            boxDeColision.Extents = new Vector3(boxDeColision.Extents.X, boxDeColision.Extents.Y, boxDeColision.Extents.Z * -1);
+            //            boxDeColision.Extents = new Vector3(boxDeColision.Extents.X, boxDeColision.Extents.Y, boxDeColision.Extents.Z * -1);
+            boxDeColision.Extents = new Vector3(boxDeColision.Extents.X, boxDeColision.Extents.Y, boxDeColision.Extents.Z);
 
             largoDelMesh = boxDeColision.Extents.Z;
             boxDeColisionY = (yMax + yMin) / 2 + yMin;
@@ -398,6 +399,8 @@ namespace TGC.Group.Model
 
                 if (mesh == this.getMesh())
                     break;
+
+               
 
                 /*Si choca sale del bucle*/
                 if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB) )

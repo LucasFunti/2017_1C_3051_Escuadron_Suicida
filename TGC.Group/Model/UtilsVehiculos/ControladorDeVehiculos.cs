@@ -51,8 +51,9 @@ namespace TGC.Group.Model.UtilsVehiculos
            var sceneAuto = loader.loadSceneFromFile(this.env.MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
           
             Enemigo enemigo = new Enemigo(this.env,  sceneAuto.Meshes[0]);
-         
-            enemigo.setPosicionInicial(new Vector3(-100, 5, 3000));
+
+            //   enemigo.setPosicionInicial(new Vector3(-100, 5, 3000));
+            enemigo.setPosicionInicial(new Vector3(-100, 5, -200));
             enemigo.setVelocidadMaxima(40);
             enemigo.setVelocidadMinima(-5);
             enemigo.setConstanteDeAsceleracionX(0.5f);

@@ -52,18 +52,21 @@ namespace TGC.Group.Model
             manejadorDeColiciones = new ManejadorDeColisiones();
             controladorDeVehiculos = new ControladorDeVehiculos(this);
             Ciudad = new Ciudad(this);
-            controladorDeVehiculos.crearAutoPrincipal();
-            controladorDeVehiculos.crearEnemigo1();
+            
             messages = new PrintMessageText(this);
            
             //Agrega objetos colisionables
-            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getEdificios());
+           manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getEdificios());
            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getSemaforos());
-            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getArboles());
-            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getPostesDeLuz());
-            //    controladorDeVehiculos.addToColisionador(manejadorDeColiciones);//por ahora los autos no colisionan
+           manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getArboles());
+           manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getPostesDeLuz());
+              
             manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getMeshParedes());
-         }
+
+            controladorDeVehiculos.crearAutoPrincipal();
+            controladorDeVehiculos.crearEnemigo1();
+       //     controladorDeVehiculos.addToColisionador(manejadorDeColiciones);//por ahora los autos no colisionan
+        }
         public ManejadorDeColisiones GetManejadorDeColision()
         {
             return this.manejadorDeColiciones;

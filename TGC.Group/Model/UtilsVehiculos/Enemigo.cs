@@ -26,9 +26,7 @@ namespace TGC.Group.Model.UtilsVehiculos
                 contadorDeCiclos = 0;
                 adelante = true;
             }
-
-
-
+            
             base.Update();
             contadorDeCiclos++;
             adelante = false;

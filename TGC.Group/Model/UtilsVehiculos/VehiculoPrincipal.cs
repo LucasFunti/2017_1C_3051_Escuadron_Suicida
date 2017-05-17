@@ -20,10 +20,8 @@ namespace TGC.Group.Model
         public VehiculoPrincipal(TwistedMetal env) : base(env)
         {
             loader = new TgcSceneLoader();
-            var sceneHummer = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
-            TgcMesh mesh = sceneHummer.Meshes[0];
-       
-            this.setMesh(mesh);
+                var sceneHummer = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
+             this.setMesh(sceneHummer.Meshes[0]);
             this.setVelocidadMaxima(70);
             this.setVelocidadMinima(-5);
             this.setConstanteDeAsceleracionX(0.7f);
@@ -99,7 +97,7 @@ namespace TGC.Group.Model
         }
         public override bool moverAdelante()
         {
-            return this.env.Input.keyDown(Key.W);
+               return this.env.Input.keyDown(Key.W);
         }
         public override bool moverAtras()
         {
