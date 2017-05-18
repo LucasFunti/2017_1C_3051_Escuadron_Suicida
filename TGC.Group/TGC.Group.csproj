@@ -85,6 +85,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\UtilsCamara\TgcRotationalCamera.cs" />
     <Compile Include="Model\UtilsColisiones\BoundingBoxCollider.cs" />
     <Compile Include="Model\UtilsCamara\CamaraTerceraPersona.cs" />
     <Compile Include="Model\UtilsCiudad\Ciudad.cs" />

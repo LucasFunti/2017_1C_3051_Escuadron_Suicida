@@ -6,6 +6,7 @@ using TGC.Core.Geometry;
 using System.Drawing;
 using TGC.Group.Model.UtilsColisiones;
 using TGC.Core.Utils;
+using TGC.Core.Input;
 using System;
 
 namespace TGC.Group.Model
@@ -15,6 +16,7 @@ namespace TGC.Group.Model
         
         private TgcSceneLoader loader;
         private CamaraTerceraPersona camaraInterna;
+        private TgcRotationalCamera camaraRotante;
         public static float camaraOffsetDefaulForward = 300f;
 
         public VehiculoPrincipal(TwistedMetal env) : base(env)
@@ -37,6 +39,8 @@ namespace TGC.Group.Model
         private void camaraManager()
         {
             camaraInterna = new CamaraTerceraPersona(this.getMesh().Position, 100, 300f);
+            camaraRotante = new TgcRotationalCamera(
+                new Vector3(this.getMesh().Position.X,100, this.getMesh().Position.Z), 300, 0.15f, 50f, this.env.Input);
             this.env.Camara = camaraInterna;
         }
 
@@ -128,26 +132,46 @@ namespace TGC.Group.Model
             camaraInterna.rotateY(rotAngle);
          //   base.updateDirectionArrowWithAngle(rotAngle);
         }
-        public override void Update()
+
+        int tipoCamara = 0;
+        private void alternaCamara()
         {
-            base.Update();
-            if (cambiarCamara())
+            var height = camaraInterna.OffsetHeight;
+            var forward = camaraInterna.OffsetForward;
+
+            //Alterna la cámara
+            tipoCamara++;
+            switch (tipoCamara)
             {
-                var height = camaraInterna.OffsetHeight;
-                var forward = camaraInterna.OffsetForward;
-                if (height == 100)
-                {
+                case 1:
                     height = 200;
                     forward = 500;
-                }
-                else
-                {
+                    break;
+                case 2:
+                    this.env.Camara = camaraRotante;
+                    break;
+                default:
+                    this.env.Camara = camaraInterna;
                     height = 100;
                     forward = 300;
-                }
-                ProcesarMovimientoDeCamara(height, forward);
+                    tipoCamara = 0;
+                    break;
             }
+            ProcesarMovimientoDeCamara(height, forward);
+
+        }
+
+        public override void Update()
+        {
+            
+            if (cambiarCamara())
+            {
+                alternaCamara();
+            }
+            base.Update();
             camaraInterna.Target = this.getMesh().Position;
+            camaraRotante.SetCamera( new Vector3( camaraInterna.Position.X, 150, camaraInterna.Position.Z),
+                                     new Vector3(camaraInterna.Target.X, 100, camaraInterna.Target.Z));
         }
         public override void Render()
         {
