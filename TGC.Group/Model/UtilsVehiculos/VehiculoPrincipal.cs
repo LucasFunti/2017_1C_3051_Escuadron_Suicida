@@ -41,7 +41,7 @@ namespace TGC.Group.Model.UtilsVehiculos
             base.setSonidoArma(env.MediaDir + "MySounds\\IceLaunch.wav");
             base.setSonidoColision(env.MediaDir + "MySounds\\Crash4.wav");
             base.setSonidoItem(env.MediaDir + "MySounds\\PickUp2.wav");
-            base.setSonidoSalto(env.MediaDir + "Sound\\portazo.wav");
+            base.setSonidoSalto(env.MediaDir + "MySounds\\portazo.wav");
 
             //Creo las ruedas
             //listaDeRuedas = new System.Collections.Generic.List<Rueda[]>();
