@@ -2,6 +2,7 @@
 using Microsoft.DirectX.Direct3D;
 using TGC.Core.SceneLoader;
 using Microsoft.DirectX.DirectInput;
+using System.Collections.Generic;
 using TGC.Core.Geometry;
 using System.Drawing;
 using TGC.Group.Model.UtilsColisiones;
@@ -9,14 +10,17 @@ using TGC.Core.Utils;
 using TGC.Core.Input;
 using System;
 
-namespace TGC.Group.Model
+namespace TGC.Group.Model.UtilsVehiculos
 {
     class VehiculoPrincipal : Vehiculo
     {
         
         private TgcSceneLoader loader;
         private CamaraTerceraPersona camaraInterna;
+        private CamaraTerceraPersona camaraInterna2;
         private TgcRotationalCamera camaraRotante;
+        //private Rueda[] ruedas;
+        //private List<Rueda[]> listaDeRuedas;
         public static float camaraOffsetDefaulForward = 300f;
 
         public VehiculoPrincipal(TwistedMetal env) : base(env)
@@ -31,6 +35,62 @@ namespace TGC.Group.Model
             //   this.setAlturaInicial(this.getMesh().Position.Y);
              camaraManager();
             this.doblar(0.001f);//Inicializa las matrices de rotación, no tocar!!
+
+            base.setSonido(env.MediaDir + "MySounds\\MachineGun.wav");
+            base.setSonidoMotor(env.MediaDir + "MySounds\\Engine2.wav");
+            base.setSonidoArma(env.MediaDir + "MySounds\\IceLaunch.wav");
+            base.setSonidoColision(env.MediaDir + "MySounds\\Crash4.wav");
+            base.setSonidoItem(env.MediaDir + "MySounds\\PickUp2.wav");
+            base.setSonidoSalto(env.MediaDir + "Sound\\portazo.wav");
+
+            //Creo las ruedas
+            //listaDeRuedas = new System.Collections.Generic.List<Rueda[]>();
+            /*ruedas = new Rueda[3];
+            Vector3 vectorPos = new Vector3(this.getMesh().Position.X - 100, this.getMesh().Position.Y, this.getMesh().Position.Z - 100);
+            var sceneRueda = loader.loadSceneFromFile(env.MediaDir + "ModelosTgc\\Robot\\Robot-TgcScene.xml");
+
+            Vector3 scale3 = new Vector3(0.01f, 0.01f, 0.01f);
+            var m = Matrix.Scaling(scale3) * this.matrixRotacion * Matrix.Translation(vectorPos);
+
+            /*var rueda1_p1 = sceneRueda.Meshes[0];
+            rueda1_p1.move(vectorPos);
+            rueda1_p1.AutoTransformEnable = true;
+            rueda1_p1.Position = vectorPos;
+            rueda1_p1.Transform = m;
+            rueda1_p1.Scale = new Vector3(1f, 1f, 1f);
+            //rueda1_p1.rotateY(FastMath.PI);
+            ruedas[0] = new Rueda(this.env, rueda1_p1, true);
+            //var instance1 = ruedas[0].getMesh().createMeshInstance("rueda1_1");
+            //instance1.rotateY(1f);
+            //instance1.Scale = new Vector3(-1000, -1000, -1000);
+            //ruedas[0].Instancia = instance1;
+
+            /*var rueda1_p2 = sceneRueda.Meshes[1];
+            rueda1_p2.move(vectorPos);
+            rueda1_p2.AutoTransformEnable = true;
+            rueda1_p2.Position = vectorPos;
+            rueda1_p2.Transform = m;
+            rueda1_p2.Scale = new Vector3(0.1f, 0.1f, 0.1f);
+            rueda1_p2.updateBoundingBox();
+            //rueda1_p2.rotateY(FastMath.PI);
+            ruedas[1] = new Rueda(this.env, rueda1_p2, true);
+
+
+            var rueda1_p3 = sceneRueda.Meshes[2];
+            rueda1_p3.move(vectorPos);
+            rueda1_p3.AlphaBlendEnable = true;
+            rueda1_p3.AutoTransformEnable = true;
+            rueda1_p3.Position = vectorPos;
+            rueda1_p3.Transform = m;
+            rueda1_p3.Scale = new Vector3(0.1f, 0.1f, 0.1f);
+            //rueda1_p3.rotateY(FastMath.PI);
+            ruedas[2] = new Rueda(this.env, rueda1_p3, true);*/
+
+            //listaDeRuedas.Add(ruedas);
+            //ruedaDelantera2 = rueda.Meshes[0];
+            //ruedaTrasera1 = rueda.Meshes[0];
+            //ruedaTrasera2 = rueda.Meshes[0];
+
         }
         public override Boolean esAutoPrincipal()
         {
@@ -39,6 +99,7 @@ namespace TGC.Group.Model
         private void camaraManager()
         {
             camaraInterna = new CamaraTerceraPersona(this.getMesh().Position, 100, 300f);
+            camaraInterna2 = new CamaraTerceraPersona(this.getMesh().Position, 200, 400f);
             camaraRotante = new TgcRotationalCamera(
                 new Vector3(this.getMesh().Position.X,100, this.getMesh().Position.Z), 300, 0.15f, 50f, this.env.Input);
             this.env.Camara = camaraInterna;
@@ -101,7 +162,7 @@ namespace TGC.Group.Model
         }
         public override bool moverAdelante()
         {
-               return this.env.Input.keyDown(Key.W);
+            return this.env.Input.keyDown(Key.W);
         }
         public override bool moverAtras()
         {
@@ -125,7 +186,19 @@ namespace TGC.Group.Model
         }
         public override bool cambiarCamara()
         {
-            return this.env.Input.keyDown(Key.C);
+            return this.env.Input.keyUp(Key.C);
+        }
+        public override bool cambiarMusica()
+        {
+            return this.env.Input.keyUp(Key.M);
+        }
+        public override bool disparar()
+        {
+            return this.env.Input.keyDown(Key.RightControl);
+        }
+        public override bool disparaEspecial()
+        {
+            return this.env.Input.keyUp(Key.Space);
         }
         public override void rotarCamara(float rotAngle)
         {
@@ -161,21 +234,55 @@ namespace TGC.Group.Model
 
         }
 
+        int contadorAlPrincipio = 0;
         public override void Update()
         {
-            
+
+            TwistedMetal tm = TwistedMetal.getInstance();
+
             if (cambiarCamara())
-            {
                 alternaCamara();
-            }
+
+            if (cambiarMusica())
+                tm.cambiarMusica();
+
+            if (disparar())
+                base.startDisparo();
+
+            if (moverArriba())
+                base.startSalto();
+
+            if (disparaEspecial())
+                base.startArma();
+
+            contadorAlPrincipio++;
+            if (contadorAlPrincipio > 380)
+                tm.sonidos.soundControl();
+
             base.Update();
             camaraInterna.Target = this.getMesh().Position;
             camaraRotante.SetCamera( new Vector3( camaraInterna.Position.X, 150, camaraInterna.Position.Z),
                                      new Vector3(camaraInterna.Target.X, 100, camaraInterna.Target.Z));
+
+            /*foreach (var rueda in this.listaDeRuedas)
+            {
+                rueda[0].Update();
+                //rueda[1].Update();
+                //rueda[2].Update();
+            }*/
         }
         public override void Render()
         {
             base.Render();
+            /*foreach (var rueda in this.listaDeRuedas)
+            {
+                rueda[0].Render();
+                //rueda[0].Render();
+                //rueda[1].Render();
+                //rueda[1].Render();
+                //rueda[2].Render();
+               // rueda[2].Render();
+            }*/
 
         }
     }

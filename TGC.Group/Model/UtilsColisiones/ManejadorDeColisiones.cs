@@ -13,14 +13,21 @@ namespace TGC.Group.Model
     {
      //   private readonly List<Colisionador> objetosColisionables = new List<Colisionador>();
         public readonly List<TgcMesh> MeshesColicionables = new List<TgcMesh>();
-     //   private SphereTriangleCollisionManager collisionManager;
-      //  private bool Collision = false;
-       // TwistedMetal env;
-      
+        public readonly List<TgcMesh> MeshesItemColicionables = new List<TgcMesh>();
+        //   private SphereTriangleCollisionManager collisionManager;
+        //  private bool Collision = false;
+        // TwistedMetal env;
+
         public ManejadorDeColisiones()
         {
-         //   collisionManager = new SphereTriangleCollisionManager();
+            //   collisionManager = new SphereTriangleCollisionManager();
             //     collisionManager.GravityEnabled = true;
+        }
+
+        public void addListOfBoundingBoxItemMeshColisionable(List<TgcMesh> lista)
+        {
+            MeshesItemColicionables.AddRange(lista);
+            // objetosColisionables.Add(BoundingBoxCollider.fromBoundingBox(mesh.BoundingBox));
         }
 
         public void addBoundingBoxMeshColisionable(TgcMesh mesh)

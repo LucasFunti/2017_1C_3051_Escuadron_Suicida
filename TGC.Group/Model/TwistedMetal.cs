@@ -14,6 +14,7 @@ using TGC.Core.Terrain;
 using TGC.Core.UserControls;
 using TGC.Core.UserControls.Modifier;
 using TGC.Group.Model.UtilsVehiculos;
+using TGC.Core.Sound;
 
 namespace TGC.Group.Model
 {
@@ -26,9 +27,17 @@ namespace TGC.Group.Model
     public class TwistedMetal : TgcExample
     {
         private Ciudad Ciudad;
+        public Musica sonidos;
+        //private Sonido sonido;
         private PrintMessageText messages;
         private ControladorDeVehiculos controladorDeVehiculos;
         private ManejadorDeColisiones manejadorDeColiciones;
+        private static TwistedMetal myInstance;
+
+        public static TwistedMetal getInstance()
+        {
+            return myInstance;
+        }
 
         public TwistedMetal(string mediaDir, string shadersDir)
             : base(mediaDir, shadersDir)
@@ -36,9 +45,18 @@ namespace TGC.Group.Model
             Category = Game.Default.Category;
             Name = Game.Default.Name;
             Description = Game.Default.Description;
+            myInstance = this;
+            sonidos = new Musica(this);
+            
+            sonidos.startGame();
         }
 
+        public void cambiarMusica()
+        {
+            sonidos.nextSound();
+        }
 
+        private TgcD3dInput Input { get; set; }
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -62,6 +80,7 @@ namespace TGC.Group.Model
            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getPostesDeLuz());
               
             manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getMeshParedes());
+            manejadorDeColiciones.addListOfBoundingBoxItemMeshColisionable(Ciudad.getItems());
 
             controladorDeVehiculos.crearAutoPrincipal();
             controladorDeVehiculos.crearEnemigo1();
@@ -89,6 +108,7 @@ namespace TGC.Group.Model
                     D3DDevice.Instance.ZFarPlaneDistance * 2f);
 
              Ciudad.Update();
+            //sonido.Update();
             controladorDeVehiculos.update();
         }
 
@@ -111,10 +131,10 @@ namespace TGC.Group.Model
 
             Ciudad.Render();
             controladorDeVehiculos.render();
-        //    messages.MostrarPuntoColisionVehiculoPrincipal(manejadorDeColiciones.Manager().LastCollisionPoint);
+            //    messages.MostrarPuntoColisionVehiculoPrincipal(manejadorDeColiciones.Manager().LastCollisionPoint);
 
-            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
-            PostRender();
+                //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
+                PostRender();
         }
 
         /// <summary>

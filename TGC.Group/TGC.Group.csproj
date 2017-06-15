@@ -65,6 +65,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.DirectInput.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DirectX.DirectSound, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="Microsoft.VisualC" />
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
@@ -85,14 +86,19 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\GameMenu.cs" />
     <Compile Include="Model\UtilsCamara\TgcRotationalCamera.cs" />
+    <Compile Include="Model\UtilsCiudad\Item.cs" />
     <Compile Include="Model\UtilsColisiones\BoundingBoxCollider.cs" />
     <Compile Include="Model\UtilsCamara\CamaraTerceraPersona.cs" />
     <Compile Include="Model\UtilsCiudad\Ciudad.cs" />
     <Compile Include="Model\UtilsColisiones\TgcBoundingOrientedBox.cs" />
     <Compile Include="Model\UtilsColisiones\Colisionador.cs" />
     <Compile Include="Model\UtilsColisiones\ManejadorDeColisiones.cs" />
+    <Compile Include="Model\UtilsSounds\Musica.cs" />
+    <Compile Include="Model\UtilsSounds\Sonido.cs" />
     <Compile Include="Model\UtilsVehiculos\ControladorDeVehiculos.cs" />
+    <Compile Include="Model\UtilsVehiculos\Rueda.cs" />
     <Compile Include="Model\UtilsVehiculos\Enemigo.cs" />
     <Compile Include="Model\UtilsVehiculos\ObjetoConMovimiento.cs" />
     <Compile Include="Model\UtilsColisiones\PrintMessageText.cs" />

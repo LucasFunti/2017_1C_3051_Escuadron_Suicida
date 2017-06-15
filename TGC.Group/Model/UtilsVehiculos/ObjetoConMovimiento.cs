@@ -20,11 +20,11 @@ namespace TGC.Group.Model
         private float velocidadRotacion = 1f;
         //Movimiento Vertical
         private float VelocidadY = 0; //Para cuando Salta.
-        private float const_aceleracionY = 1f;
+        private float const_aceleracionY = 2f;
         private float alturaMax = 0f;
         private float alturaActual = 5f;
         private float alturaInicial = 5f;
-        private float gravedad = 2f; //Para cuando cae.
+        private float gravedad = 3f; //Para cuando cae.
         private bool subiendo = false;
         public TwistedMetal env;
         public Matrix matrixRotacion;
@@ -42,10 +42,69 @@ namespace TGC.Group.Model
       //  private TgcArrow collisionNormalArrow;
        // private TgcBox collisionPoint;
         public TgcArrow directionArrow;
+        private bool esRueda = false;
+        private bool esRuedaDelantera = false;
+        private Sonido sonido;
+        private Sonido sonidoMotor;
+        private Sonido sonidoArma;
+        private Sonido sonidoColision;
+        private Sonido sonidoItem;
+        private Sonido sonidoSalto;
+
+        public void setSonido(String fileName)
+        {
+            Vector3 vecDisparo = new Vector3(this.getMesh().Position.X - 100,
+                                                 this.getMesh().Position.Y,
+                                                 this.getMesh().Position.Z - 100);
+            this.sonido.playSound(fileName, vecDisparo);
+        }
+        public void setSonidoColision(String fileName)
+        {
+            Vector3 vecDisparo = new Vector3(this.getMesh().Position.X - 100,
+                                                 this.getMesh().Position.Y,
+                                                 this.getMesh().Position.Z - 100);
+            this.sonidoColision.playSound(fileName, vecDisparo);
+        }
+        public void setSonidoSalto(String fileName)
+        {
+            Vector3 vecDisparo = new Vector3(this.getMesh().Position.X - 100,
+                                                 this.getMesh().Position.Y,
+                                                 this.getMesh().Position.Z - 100);
+            this.sonidoSalto.playSound(fileName, vecDisparo);
+        }
+        public void setSonidoItem(String fileName)
+        {
+            Vector3 vecDisparo = new Vector3(this.getMesh().Position.X - 100,
+                                                 this.getMesh().Position.Y,
+                                                 this.getMesh().Position.Z - 100);
+            this.sonidoItem.playSound(fileName, vecDisparo);
+        }
+
+        public void setSonidoMotor(String fileName)
+        {
+            Vector3 vecDisparo = new Vector3(this.getMesh().Position.X - 100,
+                                                 this.getMesh().Position.Y,
+                                                 this.getMesh().Position.Z - 100);
+            this.sonidoMotor.playSound(fileName, vecDisparo);
+        }
+
+        public void setSonidoArma(String fileName)
+        {
+            Vector3 vecDisparo = new Vector3(this.getMesh().Position.X - 100,
+                                                 this.getMesh().Position.Y,
+                                                 this.getMesh().Position.Z - 100);
+            this.sonidoArma.playSound(fileName, vecDisparo);
+        }
 
         public ObjetoConMovimiento(TwistedMetal env)
         {
-            this.env = env;          
+            this.env = env;
+            sonido = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+            sonidoMotor = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+            sonidoArma = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+            sonidoColision = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+            sonidoItem = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+            sonidoSalto = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
         }
        
         public void setMesh(TgcMesh Mesh)
@@ -57,6 +116,26 @@ namespace TGC.Group.Model
         public TgcMesh getMesh()
         {
             return this.mesh;
+        }
+
+        public void setEsRueda(bool valor)
+        {
+            this.esRueda = valor;
+        }
+
+        public void setEsRuedaDelantera(bool valor)
+        {
+            this.esRuedaDelantera = valor;
+        }
+
+        public bool getEsRueda()
+        {
+            return this.esRueda;
+        }
+
+        public bool getEsRuedaDelantera()
+        {
+            return this.esRuedaDelantera;
         }
 
         private void initBoxColisionador()
@@ -226,9 +305,12 @@ namespace TGC.Group.Model
                 movingX = ProcesarMovimientoEnX();
                 rotate = ProcesarRotacion();
             }
-             //Rota solo si hay movimiento en X y no hay movimiento en Y
-            if (rotate!=0 && movingX && !movingY)
-                     this.doblar(rotate);
+            //Rota solo si hay movimiento en X y no hay movimiento en Y
+            if (rotate != 0 && movingX && !movingY)
+            {
+                this.doblar(rotate);
+                sonidoMotor.startSound();
+            }
 
             //Si hubo rotacion y no movimiento mover las ruedas unicamente
             if (rotate != 0 && !movingX)
@@ -237,14 +319,39 @@ namespace TGC.Group.Model
 
             //Si hubo desplazamiento
             if (movingX || movingY)
-                   this.mover();
-             
+            {
+                this.mover();
+                
+            }
+
             //Si no se esta moviendo, activar animacion de Parado
             else
             {
+                sonidoMotor.stopSound();
                 //  mesh.playAnimation("Parado", true);
             }
         }
+
+        public void startDisparo()
+        {
+            sonido.startSound();
+        }
+
+        public void stopDisparo()
+        {
+            sonido.stopSound();
+        }
+
+        public void startSalto()
+        {
+            sonidoSalto.startSound();
+        }
+
+        public void startArma()
+        {
+            sonidoArma.startSound();
+        }
+
         protected void doblar(float sentido)
         {
 
@@ -255,8 +362,19 @@ namespace TGC.Group.Model
             orientacion += sentido * 1f * this.env.ElapsedTime;
 
             anguloFinal = anguloFinal - sentido * 1f * this.env.ElapsedTime;
-            matrixRotacion = Matrix.RotationY(anguloFinal);
-            this.rotar(new Vector3(0, -sentido * 1f * this.env.ElapsedTime, 0), matrixRotacion, -sentido * 1f * this.env.ElapsedTime);
+
+            if (this.getEsRuedaDelantera())
+            {
+                var valor = sentido * 1f;
+                this.getMesh().rotateY(valor);
+                matrixRotacion = Matrix.RotationY(anguloFinal);
+                this.rotar(new Vector3(0, valor, 0), matrixRotacion, 0);
+            } else
+            {
+                matrixRotacion = Matrix.RotationY(anguloFinal);
+                this.rotar(new Vector3(0, -sentido * 1f * this.env.ElapsedTime, 0), matrixRotacion, -sentido * 1f * this.env.ElapsedTime);
+            }
+            
             
         }
         private bool ProcesarMovimientoEnY()
@@ -370,7 +488,11 @@ namespace TGC.Group.Model
             this.getMesh().Transform = m;
             this.getMesh().Position = NuevaPosicion;
 
-            ProcesarChoques();
+            if (!this.getEsRueda())
+            {
+                ProcesarChoques();
+            }
+            
 
         }
         //Calcula la próxima posicion del objeto en base a los datos de velocidad.
@@ -387,6 +509,7 @@ namespace TGC.Group.Model
             return new Vector3(this.getMesh().Position.X + this.getVelocidadX() * (float)System.Math.Cos(this.orientacion),
               boxDeColisionY + this.getVelocidadY(), this.getMesh().Position.Z + this.getVelocidadX() * (float)System.Math.Sin(this.orientacion));
         }
+
         private void ProcesarChoques()
         {
             collisionFound = false;
@@ -419,6 +542,7 @@ namespace TGC.Group.Model
                 if (this.getMesh().Position.Y == 5 || this.getMesh().Position.Y >= 25)
                 {
                     this.boxDeColision.setRenderColor(Color.DarkRed);
+                    sonidoColision.startSound();
                     VolverAPosicionAnterior();
                 }
             }
@@ -431,7 +555,43 @@ namespace TGC.Group.Model
             {
                 ManejarColisionCamara();
             }
-      }
+        }
+
+
+
+        private void ProcesarItems()
+        {
+            collisionFound = false;
+            chocoAdelante = false;
+            var ray = calcularRayoDePosicion();
+
+            int posicionItem = -1;
+            foreach (var mesh in this.env.GetManejadorDeColision().MeshesItemColicionables)
+            {
+                posicionItem++;
+                var escenaAABB = mesh.BoundingBox;
+
+                if (mesh == this.getMesh())
+                    break;
+
+
+
+                /*Si choca sale del bucle*/
+                if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB))
+                {
+                    collisionFound = true;
+
+                    break;
+                }
+            }
+            /*Si choca se pone el box de choque en DarkRed*/
+            if (collisionFound)
+            {
+                Ciudad.getInstance().setNotVisible(posicionItem);
+                sonidoItem.startSound();
+            }
+        }
+
         private TgcRay.RayStruct calcularRayoDePosicion()
         {
             var ray = new TgcRay.RayStruct();
@@ -542,6 +702,19 @@ namespace TGC.Group.Model
             return false;
         }
         public virtual bool cambiarCamara()
+        {
+            return false;
+        }
+        public virtual bool cambiarMusica()
+        {
+            return false;
+        }
+        public virtual bool disparar()
+        {
+            return false;
+        }
+        
+        public virtual bool disparaEspecial()
         {
             return false;
         }

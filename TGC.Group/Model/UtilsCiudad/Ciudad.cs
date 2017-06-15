@@ -36,6 +36,9 @@ namespace TGC.Group.Model
         private List<TgcMesh> arboles;
         private List<TgcMesh> LpostesDeLuz;
         private List<TgcMesh> meshes;
+        private List<TgcMesh> items;
+
+        private List<int> itemsTiempoInvisibilidad;
 
         private TgcSceneLoader loader;
         private TgcSkyBox skyBox;
@@ -49,6 +52,14 @@ namespace TGC.Group.Model
         private TgcTexture cordonTexture;
         private TgcTexture veredaTexture;
         private TgcTexture paredTexture;
+
+        //Constantes para velocidades de movimiento
+        private const float ROTATION_SPEED = 0.5f;
+        private const float MOVEMENT_SPEED = 5f;
+        private int TiempoRetardo = 3;
+        private int contadorDeCiclos = 0;
+        //Variable direccion de movimiento
+        private float currentMoveDir = 1f;
         //  colicion
         /*  private TgcArrow collisionNormalArrow;
           private TgcBox collisionPoint;
@@ -58,11 +69,18 @@ namespace TGC.Group.Model
 
           //Autos
           private List<Vehiculo> vehiculos;*/
+        private static Ciudad myInstance;
+
+        public static Ciudad getInstance()
+        {
+            return myInstance;
+        }
 
         public Ciudad(TwistedMetal env)
         {
             //Device de DirectX para crear primitivas.
             this.env = env;
+            myInstance = this;
             var d3dDevice = D3DDevice.Instance.Device;
             this.MediaDir = this.env.MediaDir;
          
@@ -81,6 +99,8 @@ namespace TGC.Group.Model
             paredes = new System.Collections.Generic.List<TgcPlane>();
             calles = new System.Collections.Generic.List<TgcPlane>();
             arboles = new System.Collections.Generic.List<TgcMesh>();
+            items = new System.Collections.Generic.List<TgcMesh>();
+            itemsTiempoInvisibilidad = new System.Collections.Generic.List<int>();
             LpostesDeLuz = new System.Collections.Generic.List<TgcMesh>();
 
             crearPisoDeFondo();
@@ -95,9 +115,10 @@ namespace TGC.Group.Model
             crearPlantas(70);
         //    crearRueda();
             iniciarCielo();
+            crearItems();
          //   iniciarColisionador();
 
-           
+
         }
 
 
@@ -322,78 +343,99 @@ namespace TGC.Group.Model
             paredes.Add(new TgcPlane(new Vector3(5500, 0, 5500), new Vector3(0, 100, -6000), TgcPlane.Orientations.YZplane, paredTexture, 60, 1));
             paredes.Add(new TgcPlane(new Vector3(-500, 0, 5500), new Vector3(6000, 100, 0), TgcPlane.Orientations.XYplane, paredTexture, 60, 1));
 
-       }
+        }
 
-       
-
-     /*   private void crearAuto()
+        private void crearItems()
         {
-            vehiculos = new List<Vehiculo>();
 
-            var sceneVehiculo = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\CamionCarga\\CamionCarga-TgcScene.xml");
-            vehiculos.Add(new Vehiculo(sceneVehiculo.Meshes[0],new Vector3(((suelo.Size.X) - 600), 5, 0),this.env));
+            var sceneCura = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Objetos\\Cura\\cura-TgcScene.xml");
+            TgcMesh meshCura = sceneCura.Meshes[0];
+            meshCura.AutoTransformEnable = true;
+            meshCura.Position = new Vector3(2730, 40, 2520);
+            meshCura.rotateX(FastMath.PI_HALF);
+            meshCura.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            meshCura.move(0, 50, 0);
+            //cura.BoundingBox.transform(Matrix.Scaling(new Vector3(0.1f, 3, 0.1f)) * Matrix.Translation(new Vector3(posteDeLuz.Position.X + 33, posteDeLuz.Position.Y, posteDeLuz.Position.Z)));
+            /*Item cura = new Item(this.env.MediaDir, this.env.ShadersDir);
+            cura.setMesh(meshCura);
+            cura.setFileNameSound(MediaDir + "MySounds\\PickUp2.wav");*/
 
-            sceneVehiculo = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
-            Vehiculo vehiculo =new Vehiculo(sceneVehiculo.Meshes[0], new Vector3(((suelo.Size.X) - 600), 5, 0), this.env);
-            vehiculo.getMesh().AutoTransformEnable = true;
-            vehiculo.getMesh().Scale = new Vector3(1, 1, 1);
-            vehiculo.getMesh().rotateY(FastMath.PI_HALF);
-            vehiculos.Add(vehiculo);
+            items.Add(meshCura);
+            itemsTiempoInvisibilidad.Add(380);
+            //meshes.Add(cura);
 
-            sceneVehiculo = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Buggy\\Buggy-TgcScene.xml");
-            vehiculo = new Vehiculo(sceneVehiculo.Meshes[0], new Vector3(((suelo.Size.X) - 4000), 5, (suelo.Size.Z) - 1600), this.env);
-            vehiculo.getMesh().AutoTransformEnable = true;
-            vehiculo.getMesh().rotateY(FastMath.PI_HALF);
-            vehiculo.getMesh().Scale = new Vector3(2, 2, 2);
-            vehiculos.Add(vehiculo);
+        }
 
 
-            sceneVehiculo = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Patrullero\\Patrullero-TgcScene.xml");
-            vehiculo = new Vehiculo(sceneVehiculo.Meshes[0], new Vector3(1000, 5, (suelo.Size.Z) - 2200), this.env);
-            vehiculo.getMesh().AutoTransformEnable = true;
-            vehiculo.getMesh().rotateY(FastMath.PI);
-            vehiculo.getMesh().Scale = new Vector3(1, 1, 1);
-            vehiculos.Add(vehiculo);
-            
-                        var sceneHummer = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
-                        hummer = sceneHummer.Meshes[0];
-                        hummer.AutoTransformEnable = true;
-                        hummer.move(0, 5, 0);
-                      //  meshes.Add(hummer);
 
-                        var sceneCamion = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\CamionCarga\\CamionCarga-TgcScene.xml");
-                        camion = sceneCamion.Meshes[0];
-                        camion.AutoTransformEnable = true;
-                        camion.move(((suelo.Size.X) - 600), 5, 0);
-                        meshes.Add(camion);
+        /*   private void crearAuto()
+           {
+               vehiculos = new List<Vehiculo>();
 
-                        var sceneAuto = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
-                        auto = sceneAuto.Meshes[0];
-                        auto.AutoTransformEnable = true;
-                        auto.move(((suelo.Size.X) - 2000), 5, (suelo.Size.Z) - 800);
-                        auto.Scale = new Vector3(1, 1, 1);
-                        auto.rotateY(FastMath.PI_HALF);
-                        meshes.Add(auto);
+               var sceneVehiculo = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\CamionCarga\\CamionCarga-TgcScene.xml");
+               vehiculos.Add(new Vehiculo(sceneVehiculo.Meshes[0],new Vector3(((suelo.Size.X) - 600), 5, 0),this.env));
 
-                        var sceneBuggy = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Buggy\\Buggy-TgcScene.xml");
-                        buggy = sceneBuggy.Meshes[0];
-                        buggy.AutoTransformEnable = true;
-                        buggy.move(((suelo.Size.X) - 4000), 5, (suelo.Size.Z) - 1600);
-                        buggy.rotateY(FastMath.PI_HALF);
-                        buggy.Scale = new Vector3(2, 2, 2);
-                        meshes.Add(buggy);
+               sceneVehiculo = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
+               Vehiculo vehiculo =new Vehiculo(sceneVehiculo.Meshes[0], new Vector3(((suelo.Size.X) - 600), 5, 0), this.env);
+               vehiculo.getMesh().AutoTransformEnable = true;
+               vehiculo.getMesh().Scale = new Vector3(1, 1, 1);
+               vehiculo.getMesh().rotateY(FastMath.PI_HALF);
+               vehiculos.Add(vehiculo);
 
-                        var scenePatrullero = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Patrullero\\Patrullero-TgcScene.xml");
-                        patrullero = scenePatrullero.Meshes[0];
-                        patrullero.AutoTransformEnable = true;
-                        patrullero.move(1000, 5, (suelo.Size.Z) - 2200);
-                        patrullero.rotateY(FastMath.PI);
-                        patrullero.Scale = new Vector3(1, 1, 1);
-                        meshes.Add(patrullero);
-                        
-        }*/
+               sceneVehiculo = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Buggy\\Buggy-TgcScene.xml");
+               vehiculo = new Vehiculo(sceneVehiculo.Meshes[0], new Vector3(((suelo.Size.X) - 4000), 5, (suelo.Size.Z) - 1600), this.env);
+               vehiculo.getMesh().AutoTransformEnable = true;
+               vehiculo.getMesh().rotateY(FastMath.PI_HALF);
+               vehiculo.getMesh().Scale = new Vector3(2, 2, 2);
+               vehiculos.Add(vehiculo);
 
-    
+
+               sceneVehiculo = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Patrullero\\Patrullero-TgcScene.xml");
+               vehiculo = new Vehiculo(sceneVehiculo.Meshes[0], new Vector3(1000, 5, (suelo.Size.Z) - 2200), this.env);
+               vehiculo.getMesh().AutoTransformEnable = true;
+               vehiculo.getMesh().rotateY(FastMath.PI);
+               vehiculo.getMesh().Scale = new Vector3(1, 1, 1);
+               vehiculos.Add(vehiculo);
+
+                           var sceneHummer = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
+                           hummer = sceneHummer.Meshes[0];
+                           hummer.AutoTransformEnable = true;
+                           hummer.move(0, 5, 0);
+                         //  meshes.Add(hummer);
+
+                           var sceneCamion = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\CamionCarga\\CamionCarga-TgcScene.xml");
+                           camion = sceneCamion.Meshes[0];
+                           camion.AutoTransformEnable = true;
+                           camion.move(((suelo.Size.X) - 600), 5, 0);
+                           meshes.Add(camion);
+
+                           var sceneAuto = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
+                           auto = sceneAuto.Meshes[0];
+                           auto.AutoTransformEnable = true;
+                           auto.move(((suelo.Size.X) - 2000), 5, (suelo.Size.Z) - 800);
+                           auto.Scale = new Vector3(1, 1, 1);
+                           auto.rotateY(FastMath.PI_HALF);
+                           meshes.Add(auto);
+
+                           var sceneBuggy = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Buggy\\Buggy-TgcScene.xml");
+                           buggy = sceneBuggy.Meshes[0];
+                           buggy.AutoTransformEnable = true;
+                           buggy.move(((suelo.Size.X) - 4000), 5, (suelo.Size.Z) - 1600);
+                           buggy.rotateY(FastMath.PI_HALF);
+                           buggy.Scale = new Vector3(2, 2, 2);
+                           meshes.Add(buggy);
+
+                           var scenePatrullero = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Patrullero\\Patrullero-TgcScene.xml");
+                           patrullero = scenePatrullero.Meshes[0];
+                           patrullero.AutoTransformEnable = true;
+                           patrullero.move(1000, 5, (suelo.Size.Z) - 2200);
+                           patrullero.rotateY(FastMath.PI);
+                           patrullero.Scale = new Vector3(1, 1, 1);
+                           meshes.Add(patrullero);
+
+           }*/
+
+
 
         private void crearSemaforos()
         {
@@ -559,7 +601,35 @@ namespace TGC.Group.Model
             //Se actualiza la posicion del skybox.
             skyBox.Center = this.env.Camara.Position;
 
+            contadorDeCiclos++;
+            if (contadorDeCiclos > TiempoRetardo)
+            {
+                contadorDeCiclos = 0;
+                foreach (var item in items)
+                {
+                    //TgcMesh mesh = item.getMesh();
+                    item.rotateY(ROTATION_SPEED);
+                    item.move(0, MOVEMENT_SPEED * currentMoveDir, 0);
+                    if (item.Position.Y > 60 || item.Position.Y < 30)
+                    {
+                        currentMoveDir *= -1;
+                    }
+                }
+            }
+            
         }
+
+        public void setNotVisible(int posicion)
+        {
+            //Renderizar items
+            int nroItem = 0;
+            foreach (var item in itemsTiempoInvisibilidad)
+            {
+                if (nroItem == posicion)
+                    itemsTiempoInvisibilidad.ToArray()[nroItem] = 0;
+            }
+        }
+
         public void Render()
         {
             //Renderizar suelo
@@ -573,8 +643,23 @@ namespace TGC.Group.Model
             //Renderizar instancias
             foreach (var mesh in meshes)
                   mesh.render();
-      
-          
+
+            //Renderizar items
+            int nroItem = 0;
+            foreach (var item in items)
+            {
+                if (itemsTiempoInvisibilidad.ToArray()[nroItem] < 380)
+                {
+                    item.Enabled = false;
+                    itemsTiempoInvisibilidad.ToArray()[nroItem] = itemsTiempoInvisibilidad.ToArray()[nroItem]++;
+                } else
+                {
+                    item.Enabled = true;
+                    item.render();
+                }
+                
+                nroItem++;
+            }
 
             //Renderizado de cordones
             foreach (var cordon in cordones)
@@ -713,7 +798,11 @@ namespace TGC.Group.Model
         {
             return this.LpostesDeLuz;
         }
-        
+        public List<TgcMesh> getItems()
+        {
+            return this.items;
+        }
+
         public List<TgcMesh> getMeshParedes()
         {
             List<TgcMesh> meshDeParedes = new System.Collections.Generic.List<TgcMesh>();

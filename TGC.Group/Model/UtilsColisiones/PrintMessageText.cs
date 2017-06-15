@@ -19,7 +19,7 @@ namespace TGC.Group.Model
         {
             //Dibuja un texto por pantalla
            //this.env.DrawText.drawText("Con clic izquierdo y el puntero movemos la camara [Actual]: " + Core.Utils.TgcParserUtils.printVector3(this.env.Camara.Position), 0, 30,System.Drawing.Color.OrangeRed);
-           this.env.DrawText.drawText("Con A,W,D,S nos desplazamos por el escenario. J = Salto, C = Cambia la cámara. ", 0, 45, System.Drawing.Color.OrangeRed);
+           this.env.DrawText.drawText("Con A,W,D,S nos desplazamos por el escenario. J = Salto, C = Cámara, Ctrl Der = Disparo, M = Música, Espacio = Especial. ", 0, 45, System.Drawing.Color.OrangeRed);
         }
         public void MostrarVelocidadPorPantalla(float Velocidad)
         {
