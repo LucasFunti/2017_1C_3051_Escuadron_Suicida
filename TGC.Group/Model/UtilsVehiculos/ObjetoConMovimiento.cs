@@ -1,10 +1,12 @@
 ﻿using Microsoft.DirectX;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Geometry;
 using TGC.Core.SceneLoader;
 using TGC.Core.Utils;
+using TGC.Group.Model.UtilsVehiculos;
 
 namespace TGC.Group.Model
 {
@@ -50,6 +52,12 @@ namespace TGC.Group.Model
         private Sonido sonidoColision;
         private Sonido sonidoItem;
         private Sonido sonidoSalto;
+        private List<ObjetoConMovimiento> listaDeArmas;
+
+        public void agregarArma(ObjetoConMovimiento arma)
+        {
+            this.listaDeArmas.Add(arma);
+        }
 
         public void setSonido(String fileName)
         {
@@ -105,6 +113,8 @@ namespace TGC.Group.Model
             sonidoColision = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
             sonidoItem = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
             sonidoSalto = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+
+            listaDeArmas = new System.Collections.Generic.List<ObjetoConMovimiento>();
         }
        
         public void setMesh(TgcMesh Mesh)
@@ -524,8 +534,6 @@ namespace TGC.Group.Model
                 if (mesh == this.getMesh())
                     break;
 
-               
-
                 /*Si choca sale del bucle*/
                 if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB) )
                 {
@@ -540,12 +548,32 @@ namespace TGC.Group.Model
             /*Si choca se pone el box de choque en DarkRed*/
             if (collisionFound)
             {
-                if (this.getMesh().Position.Y == 5 || this.getMesh().Position.Y >= 25)
+                bool esUnArma = false;
+                if (this.listaDeArmas != null)
                 {
-                    this.boxDeColision.setRenderColor(Color.DarkRed);
-                    sonidoColision.startSound();
-                    VolverAPosicionAnterior();
+                    foreach (var arma in this.listaDeArmas)
+                    {
+                        if (this.Equals(arma) )
+                            esUnArma = true;
+                    }
                 }
+                
+                if (!esUnArma) {
+
+                    if (this.getMesh().Position.Y == 5 || this.getMesh().Position.Y >= 25)
+                    {
+                        this.boxDeColision.setRenderColor(Color.DarkRed);
+                        sonidoColision.startSound();
+                        VolverAPosicionAnterior();
+                    }
+                } else {
+                    this.getMesh().Enabled = false;
+                    ControladorDeVehiculos.getInstance().deshabilitarObjeto(this.getMesh());
+                    this.getMesh().dispose();
+                }
+
+
+                
             }
             else
             {

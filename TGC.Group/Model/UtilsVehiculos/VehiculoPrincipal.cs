@@ -235,6 +235,40 @@ namespace TGC.Group.Model.UtilsVehiculos
 
         }
 
+        private void creaMisilV(Vector3 posicion)
+        {
+            string sonido = env.MediaDir + "MySounds\\Launch4.wav";
+            var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml");
+            TgcMesh mesh = scene.Meshes[0];
+            mesh.AutoTransformEnable = true;
+            mesh.AutoUpdateBoundingBox = true;
+            mesh.createBoundingBox();
+            mesh.Position = posicion;
+            mesh.rotateX(FastMath.PI);
+            mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            mesh.move(0, 20, 0); ;
+            Arma arma = new Arma(mesh, this.env, sonido, 20);
+            ControladorDeVehiculos.getInstance().agregarArma(arma);
+            base.agregarArma(arma);
+        }
+
+        private void creaDisparo(Vector3 posicion)
+        {
+            string sonido = env.MediaDir + "MySounds\\MachineGun.wav";
+            var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Vela\\Vela-TgcScene.xml");
+            TgcMesh mesh = scene.Meshes[0];
+            mesh.AutoTransformEnable = true;
+            mesh.AutoUpdateBoundingBox = true;
+            mesh.createBoundingBox();
+            mesh.Position = posicion;
+            mesh.rotateX(FastMath.PI);
+            mesh.Scale = new Vector3(0.1f, 0.1f, 0.1f);
+            mesh.move(0, 20, 0);
+            Arma arma = new Arma(mesh, this.env, sonido, 40);
+            ControladorDeVehiculos.getInstance().agregarArma(arma);
+            base.agregarArma(arma);
+        }
+
         int contadorAlPrincipio = 0;
         public override void Update()
         {
@@ -247,14 +281,18 @@ namespace TGC.Group.Model.UtilsVehiculos
             if (cambiarMusica())
                 tm.cambiarMusica();
 
-            if (disparar())
+            if (disparar()) {
                 base.startDisparo();
+                creaDisparo(this.getMesh().Position);
+            }
 
             if (moverArriba())
                 base.startSalto();
 
-            if (disparaEspecial())
+            if (disparaEspecial()) { 
                 base.startArma();
+                creaMisilV(this.getMesh().Position);
+            }
 
             contadorAlPrincipio++;
             if (contadorAlPrincipio > 380)

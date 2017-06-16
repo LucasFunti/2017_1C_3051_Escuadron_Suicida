@@ -99,6 +99,7 @@
     <Compile Include="Model\UtilsColisiones\ManejadorDeColisiones.cs" />
     <Compile Include="Model\UtilsSounds\Musica.cs" />
     <Compile Include="Model\UtilsSounds\Sonido.cs" />
+    <Compile Include="Model\UtilsVehiculos\Arma.cs" />
     <Compile Include="Model\UtilsVehiculos\Personaje.cs" />
     <Compile Include="Model\UtilsVehiculos\ControladorDeVehiculos.cs" />
     <Compile Include="Model\UtilsVehiculos\Rueda.cs" />

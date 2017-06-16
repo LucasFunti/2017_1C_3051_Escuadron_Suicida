@@ -354,7 +354,7 @@ namespace TGC.Group.Model
             meshCura.Position = posicion;
             meshCura.rotateX(rotacion);
             meshCura.Scale = new Vector3(0.5f, 0.5f, 0.5f);
-            meshCura.move(0, 50, 0);
+            meshCura.move(0, 20, 0);
             //cura.BoundingBox.transform(Matrix.Scaling(new Vector3(0.1f, 3, 0.1f)) * Matrix.Translation(new Vector3(posteDeLuz.Position.X + 33, posteDeLuz.Position.Y, posteDeLuz.Position.Z)));
             /*Item cura = new Item(this.env.MediaDir, this.env.ShadersDir);
             cura.setMesh(meshCura);
@@ -665,19 +665,12 @@ namespace TGC.Group.Model
                 if (itemsTiempoInvisibilidad[nroItem] < 380)
                 {
                     item.Enabled = false;
-                    posEncontrada = nroItem;
-                    if (itemsTiempoInvisibilidad[nroItem] > 370)
-                    {
-                        var ojito = itemsTiempoInvisibilidad[nroItem];
-                    }
+                    //posEncontrada = nroItem;
                     itemsTiempoInvisibilidad[nroItem] = itemsTiempoInvisibilidad[nroItem]++;
                 } else
                 {
                     item.Enabled = true;
-                    if (posEncontrada > 0 && posEncontrada== nroItem)
-                    {
-                        var ojito2 = posEncontrada;
-                    }
+                    
                 }
                 item.render();
 

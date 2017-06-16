@@ -15,11 +15,25 @@ namespace TGC.Group.Model.UtilsVehiculos
         private TwistedMetal env;
         private readonly List<Vehiculo> listaDeVehiculos = new List<Vehiculo>();
         private readonly List<Vehiculo> listaDeEnemigos = new List<Vehiculo>();
+        private readonly List<Vehiculo> listaDeArmas = new List<Vehiculo>();
         private TgcSceneLoader loader;
+        private static ControladorDeVehiculos myInstance;
 
+        public static ControladorDeVehiculos getInstance()
+        {
+            return myInstance;
+        }
+
+        public void agregarArma(Arma arma)
+        {
+            this.listaDeArmas.Add(arma);
+            this.listaDeVehiculos.Add(arma);
+        }
+        
         public ControladorDeVehiculos(TwistedMetal env)
         {
             this.env = env;
+            myInstance = this;
             loader = new TgcSceneLoader();
         }
         public List<Vehiculo> getListaDeAutos()
@@ -64,7 +78,10 @@ namespace TGC.Group.Model.UtilsVehiculos
         {
             foreach (var enemigo in this.listaDeEnemigos)
                 enemigo.Update();
-            
+
+            foreach (var arma in this.listaDeArmas)
+                arma.Update();
+
             this.autoPrincipal.Update();
         }
         public void render()
@@ -76,6 +93,16 @@ namespace TGC.Group.Model.UtilsVehiculos
             }
             this.autoPrincipal.Render();
         }
+
+        public void deshabilitarObjeto(TgcMesh arma)
+        {
+            foreach (var vehiculo in this.listaDeVehiculos)
+            {
+                if (vehiculo.getMesh() == arma)
+                    vehiculo.getMesh().Enabled = false;
+            }
+        }
+
         public void dispose()
         {
             foreach (var vehiculo in this.listaDeVehiculos)
