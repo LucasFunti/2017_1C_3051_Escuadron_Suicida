@@ -491,6 +491,7 @@ namespace TGC.Group.Model
             if (!this.getEsRueda())
             {
                 ProcesarChoques();
+                ProcesarItems();
             }
             
 
@@ -564,7 +565,7 @@ namespace TGC.Group.Model
             collisionFound = false;
             chocoAdelante = false;
             var ray = calcularRayoDePosicion();
-
+           
             int posicionItem = -1;
             foreach (var mesh in this.env.GetManejadorDeColision().MeshesItemColicionables)
             {
@@ -574,18 +575,21 @@ namespace TGC.Group.Model
                 if (mesh == this.getMesh())
                     break;
 
-
+                //Ejecutar algoritmo de detección de colisiones
+                var collisionResult = TgcCollisionUtils.classifyBoxBox(mesh.BoundingBox, this.getMesh().BoundingBox);
+                //collisionResult.
 
                 /*Si choca sale del bucle*/
-                if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB))
+                if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB) || (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera))
                 {
                     collisionFound = true;
 
                     break;
                 }
             }
-            /*Si choca se pone el box de choque en DarkRed*/
-            if (collisionFound)
+            
+            /*Si choca se oculta el item por un tiempo*/
+            if (collisionFound && Ciudad.getInstance().getVisible(posicionItem))
             {
                 Ciudad.getInstance().setNotVisible(posicionItem);
                 sonidoItem.startSound();

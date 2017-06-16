@@ -241,7 +241,7 @@ namespace TGC.Group.Model
         public virtual void Render()
         {
             base.getMesh().render();
-            base.getBoxDeColision().render();
+           // base.getBoxDeColision().render();
            // directionArrow.render();
          //   collisionNormalArrow.render();
           //  collisionPoint.render();

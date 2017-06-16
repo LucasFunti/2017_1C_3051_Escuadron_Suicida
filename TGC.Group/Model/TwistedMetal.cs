@@ -46,9 +46,9 @@ namespace TGC.Group.Model
             Name = Game.Default.Name;
             Description = Game.Default.Description;
             myInstance = this;
-            sonidos = new Musica(this);
+            sonidos = new Musica(mediaDir);
             
-            sonidos.startGame();
+            //sonidos.startGame();
         }
 
         public void cambiarMusica()
@@ -66,6 +66,7 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Init()
         {
+            sonidos.startGame();
             //Carga la estructura de la ciudad
             manejadorDeColiciones = new ManejadorDeColisiones();
             controladorDeVehiculos = new ControladorDeVehiculos(this);
@@ -80,6 +81,7 @@ namespace TGC.Group.Model
            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getPostesDeLuz());
               
             manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getMeshParedes());
+            //manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getItems());
             manejadorDeColiciones.addListOfBoundingBoxItemMeshColisionable(Ciudad.getItems());
 
             controladorDeVehiculos.crearAutoPrincipal();

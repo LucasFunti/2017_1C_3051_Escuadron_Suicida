@@ -25,23 +25,24 @@ namespace TGC.Group.Model.UtilsVehiculos
 
         public VehiculoPrincipal(TwistedMetal env) : base(env)
         {
+            Personaje personaje = Personaje.getInstance();
             loader = new TgcSceneLoader();
-                var sceneHummer = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
-             this.setMesh(sceneHummer.Meshes[0]);
-            this.setVelocidadMaxima(70);
-            this.setVelocidadMinima(-5);
-            this.setConstanteDeAsceleracionX(0.7f);
-      //      base.setPEndDirectionArrow(new Vector3(this.getMesh().Position.X, this.getMesh().Position.Y, -500));
+                var scene = loader.loadSceneFromFile(personaje.FileMesh);
+             this.setMesh(scene.Meshes[0]);
+            this.setVelocidadMaxima(personaje.VelocidadMax);
+            this.setVelocidadMinima(personaje.VelocidadMin);
+            this.setConstanteDeAsceleracionX(personaje.ConstanteAceleracion);
+            //      base.setPEndDirectionArrow(new Vector3(this.getMesh().Position.X, this.getMesh().Position.Y, -500));
             //   this.setAlturaInicial(this.getMesh().Position.Y);
-             camaraManager();
+            camaraManager();
             this.doblar(0.001f);//Inicializa las matrices de rotación, no tocar!!
-
-            base.setSonido(env.MediaDir + "MySounds\\MachineGun.wav");
-            base.setSonidoMotor(env.MediaDir + "MySounds\\Engine2.wav");
-            base.setSonidoArma(env.MediaDir + "MySounds\\IceLaunch.wav");
-            base.setSonidoColision(env.MediaDir + "MySounds\\Crash4.wav");
-            base.setSonidoItem(env.MediaDir + "MySounds\\PickUp2.wav");
-            base.setSonidoSalto(env.MediaDir + "MySounds\\portazo.wav");
+            
+            base.setSonido(personaje.FileSonido);
+            base.setSonidoMotor(personaje.FileSonidoMotor);
+            base.setSonidoArma(personaje.FileSonidoArma);
+            base.setSonidoColision(personaje.FileSonidoColision);
+            base.setSonidoItem(personaje.FileSonidoItem);
+            base.setSonidoSalto(personaje.FileSonidoSalto);
 
             //Creo las ruedas
             //listaDeRuedas = new System.Collections.Generic.List<Rueda[]>();

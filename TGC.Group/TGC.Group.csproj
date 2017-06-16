@@ -51,6 +51,9 @@
   <PropertyGroup>
     <StartupObject>TGC.Group.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.DirectX, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
@@ -86,7 +89,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
-    <Compile Include="Model\GameMenu.cs" />
     <Compile Include="Model\UtilsCamara\TgcRotationalCamera.cs" />
     <Compile Include="Model\UtilsCiudad\Item.cs" />
     <Compile Include="Model\UtilsColisiones\BoundingBoxCollider.cs" />
@@ -97,6 +99,7 @@
     <Compile Include="Model\UtilsColisiones\ManejadorDeColisiones.cs" />
     <Compile Include="Model\UtilsSounds\Musica.cs" />
     <Compile Include="Model\UtilsSounds\Sonido.cs" />
+    <Compile Include="Model\UtilsVehiculos\Personaje.cs" />
     <Compile Include="Model\UtilsVehiculos\ControladorDeVehiculos.cs" />
     <Compile Include="Model\UtilsVehiculos\Rueda.cs" />
     <Compile Include="Model\UtilsVehiculos\Enemigo.cs" />
@@ -178,6 +181,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

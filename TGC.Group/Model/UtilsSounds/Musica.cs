@@ -27,9 +27,9 @@ namespace TGC.Group.Model
         private List<String> sonidos;
         private string MediaDir;
 
-        public Musica(TwistedMetal env)
+        public Musica(string mediaDir)
         {
-            MediaDir = env.MediaDir;
+            MediaDir = mediaDir;
             sonidos = new System.Collections.Generic.List<String>();
             sonidos.Add(MediaDir + "MySounds\\sound4.mp3");
             sonidos.Add(MediaDir + "MySounds\\sound1.mp3");
@@ -75,10 +75,25 @@ namespace TGC.Group.Model
             loadMp3(MediaDir + "MySounds\\intro.mp3");
         }
 
-        private void startSound()
+        public void startSound()
         {
-            mp3Player.play(true);
-            currentPlaying = mp3Player.FileName;
+            var currentState = mp3Player.getStatus();
+            if (currentState == TgcMp3Player.States.Playing)
+            {
+
+                if (currentFile != currentPlaying)
+                {
+                    //Parar y reproducir MP3
+                    mp3Player.closeFile();
+                    mp3Player.play(true);
+                    currentPlaying = mp3Player.FileName;
+                }
+            } else
+            {
+                mp3Player.play(true);
+                currentPlaying = mp3Player.FileName;
+            }
+           
         }
 
         public void soundControl()

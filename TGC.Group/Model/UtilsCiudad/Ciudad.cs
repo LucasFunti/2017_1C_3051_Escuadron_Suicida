@@ -38,7 +38,7 @@ namespace TGC.Group.Model
         private List<TgcMesh> meshes;
         private List<TgcMesh> items;
 
-        private List<int> itemsTiempoInvisibilidad;
+        private int[] itemsTiempoInvisibilidad;
 
         private TgcSceneLoader loader;
         private TgcSkyBox skyBox;
@@ -100,7 +100,6 @@ namespace TGC.Group.Model
             calles = new System.Collections.Generic.List<TgcPlane>();
             arboles = new System.Collections.Generic.List<TgcMesh>();
             items = new System.Collections.Generic.List<TgcMesh>();
-            itemsTiempoInvisibilidad = new System.Collections.Generic.List<int>();
             LpostesDeLuz = new System.Collections.Generic.List<TgcMesh>();
 
             crearPisoDeFondo();
@@ -345,14 +344,15 @@ namespace TGC.Group.Model
 
         }
 
-        private void crearItems()
+        private void creaUnItem( string fileMesh, Vector3 posicion, float rotacion)
         {
-
-            var sceneCura = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Objetos\\Cura\\cura-TgcScene.xml");
+            var sceneCura = loader.loadSceneFromFile(fileMesh);
             TgcMesh meshCura = sceneCura.Meshes[0];
             meshCura.AutoTransformEnable = true;
-            meshCura.Position = new Vector3(2730, 40, 2520);
-            meshCura.rotateX(FastMath.PI_HALF);
+            meshCura.AutoUpdateBoundingBox = true;
+            meshCura.createBoundingBox();
+            meshCura.Position = posicion;
+            meshCura.rotateX(rotacion);
             meshCura.Scale = new Vector3(0.5f, 0.5f, 0.5f);
             meshCura.move(0, 50, 0);
             //cura.BoundingBox.transform(Matrix.Scaling(new Vector3(0.1f, 3, 0.1f)) * Matrix.Translation(new Vector3(posteDeLuz.Position.X + 33, posteDeLuz.Position.Y, posteDeLuz.Position.Z)));
@@ -361,9 +361,23 @@ namespace TGC.Group.Model
             cura.setFileNameSound(MediaDir + "MySounds\\PickUp2.wav");*/
 
             items.Add(meshCura);
-            itemsTiempoInvisibilidad.Add(380);
-            //meshes.Add(cura);
+        }
 
+        private void crearItems()
+        {
+
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Cura\\cura-TgcScene.xml", new Vector3(2609, 15, 2450), FastMath.PI_HALF);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(5237, 10, -217), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(-75, 10, 5240), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(5295, 10, 5223), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(2728, 10, 5559), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(1676, 10, -211), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(2602, 10, 719), FastMath.PI);
+            itemsTiempoInvisibilidad = new int[7];
+            for ( var i = 0; i<7; i++)
+            {
+                itemsTiempoInvisibilidad[i] = 380;
+            }
         }
 
 
@@ -610,7 +624,7 @@ namespace TGC.Group.Model
                     //TgcMesh mesh = item.getMesh();
                     item.rotateY(ROTATION_SPEED);
                     item.move(0, MOVEMENT_SPEED * currentMoveDir, 0);
-                    if (item.Position.Y > 60 || item.Position.Y < 30)
+                    if (item.Position.Y > 30 || item.Position.Y < 0)
                     {
                         currentMoveDir *= -1;
                     }
@@ -621,15 +635,14 @@ namespace TGC.Group.Model
 
         public void setNotVisible(int posicion)
         {
-            //Renderizar items
-            int nroItem = 0;
-            foreach (var item in itemsTiempoInvisibilidad)
-            {
-                if (nroItem == posicion)
-                    itemsTiempoInvisibilidad.ToArray()[nroItem] = 0;
-            }
+            itemsTiempoInvisibilidad[posicion] = 0;
         }
 
+        public bool getVisible(int posicion)
+        {
+            return (itemsTiempoInvisibilidad[posicion] >= 380);
+        }
+        private int posEncontrada = -1;
         public void Render()
         {
             //Renderizar suelo
@@ -648,16 +661,27 @@ namespace TGC.Group.Model
             int nroItem = 0;
             foreach (var item in items)
             {
-                if (itemsTiempoInvisibilidad.ToArray()[nroItem] < 380)
+                
+                if (itemsTiempoInvisibilidad[nroItem] < 380)
                 {
                     item.Enabled = false;
-                    itemsTiempoInvisibilidad.ToArray()[nroItem] = itemsTiempoInvisibilidad.ToArray()[nroItem]++;
+                    posEncontrada = nroItem;
+                    if (itemsTiempoInvisibilidad[nroItem] > 370)
+                    {
+                        var ojito = itemsTiempoInvisibilidad[nroItem];
+                    }
+                    itemsTiempoInvisibilidad[nroItem] = itemsTiempoInvisibilidad[nroItem]++;
                 } else
                 {
                     item.Enabled = true;
-                    item.render();
+                    if (posEncontrada > 0 && posEncontrada== nroItem)
+                    {
+                        var ojito2 = posEncontrada;
+                    }
                 }
-                
+                item.render();
+
+
                 nroItem++;
             }
 
@@ -687,7 +711,7 @@ namespace TGC.Group.Model
                 vehiculo.getMesh().render();
             }*/
 
-            mostrarBounding();
+            //mostrarBounding();
           
         }
         public void dispose()
