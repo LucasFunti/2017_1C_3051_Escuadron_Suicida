@@ -34,9 +34,10 @@ namespace TGC.Group.Model
         //Mesh
         private TgcMesh mesh;
         private TgcBoundingOrientedBox boxDeColision;
-        private float largoDelMesh;
+        public float largoDelMesh;
         private float boxDeColisionY;
-        private bool collisionFound;
+        private bool collisionFound = false;
+        public bool colisionoAlgunaVez = false;
         private bool chocoAdelante = false;
         private Vector3 NuevaPosicion;
         private Vector3 PosicionAnterior { get; set; }
@@ -58,7 +59,16 @@ namespace TGC.Group.Model
         {
             this.listaDeArmas.Add(arma);
         }
-
+        public Boolean colisiono()
+        {
+            return this.collisionFound;
+        }
+       
+        public Boolean colisionoPorDelante()
+        {
+            return this.chocoAdelante;
+        }
+        
         public void setSonido(String fileName)
         {
             Vector3 vecDisparo = new Vector3(this.getMesh().Position.X - 100,
@@ -538,10 +548,11 @@ namespace TGC.Group.Model
                 if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB) )
                 {
                     collisionFound = true;
+                    
                     float t;
                     Vector3 p;
                     chocoAdelante = (intersectRayAABB(ray, escenaAABB, out t, out p) || t > 1.0f);
-
+                    colisionoAlgunaVez = chocoAdelante;
                     break;
                 }
             }

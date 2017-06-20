@@ -39,6 +39,7 @@ namespace TGC.Group.Model
             this.env.DrawText.drawText("Velocidad Y: " + altura, 0, 90, System.Drawing.Color.Red);
 
         }
+      
         public void MostrarDireccionVehiculoPrincipal(Vector3 vector)
         {
             this.env.DrawText.drawText("Dirección ("+vector.X+";" + vector.Y+";" + vector.Z+")", 0, 105, System.Drawing.Color.Red);
@@ -51,6 +52,12 @@ namespace TGC.Group.Model
         public void MostrarTiempo()
         {
             this.env.DrawText.drawText("Time: " + env.ElapsedTime + ")", 0, 135, System.Drawing.Color.Red);
+        }
+        public void MostrarPosicionCamaraPorPantalla(Vector3 vector)
+        {
+            //Dibuja un texto por pantalla
+            this.env.DrawText.drawText("Pos Camara (" + vector.X + ";" + vector.Y + ";" + vector.Z + ")", 0, 150, System.Drawing.Color.Red);
+
         }
         public void test(String text, Vector3[] vector)
         {

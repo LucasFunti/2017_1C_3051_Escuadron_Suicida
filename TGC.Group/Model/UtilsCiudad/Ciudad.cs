@@ -119,7 +119,10 @@ namespace TGC.Group.Model
 
 
         }
-
+        public List<TgcMesh> getAllMeshes()
+        {
+            return this.meshes;
+        }
 
 
         private void crearPisoDeFondo()
@@ -243,6 +246,7 @@ namespace TGC.Group.Model
             //No recomendamos utilizar AutoTransform, en juegos complejos se pierde el control. mejor utilizar Transformaciones con matrices.
             instance.AutoTransformEnable = true;
             //Desplazarlo
+            instance.Transform= Matrix.Translation(new Vector3(offset_row, offset_Y, offset_Col));
             instance.move(offset_row, offset_Y, offset_Col);
             if (nMesh == 0)
                 instance.Scale = new Vector3(0.70f, 1f, 1f);
@@ -645,6 +649,18 @@ namespace TGC.Group.Model
         private int posEncontrada = -1;
         public void Render()
         {
+
+
+            foreach (TgcMesh mesh in this.getAllMeshes())
+            {
+                //rendereo solo lo que esta dentro del frustrum
+                var c = TgcCollisionUtils.classifyFrustumAABB(this.env.Frustum, mesh.BoundingBox);
+                if (c != TgcCollisionUtils.FrustumResult.OUTSIDE)
+                {
+                    mesh.render();
+                }
+            }
+            
             //Renderizar suelo
             suelo.render();
             //calle.render();
@@ -654,8 +670,8 @@ namespace TGC.Group.Model
             skyBox.render();
 
             //Renderizar instancias
-            foreach (var mesh in meshes)
-                  mesh.render();
+        //  foreach (var mesh in meshes)
+          //        mesh.render();
 
             //Renderizar items
             int nroItem = 0;
@@ -775,6 +791,10 @@ namespace TGC.Group.Model
             foreach (var mesh in LpostesDeLuz)
                 mesh.BoundingBox.render();
             
+        }
+        public TgcSkyBox getSkyBox()
+        {
+            return this.skyBox;
         }
         private void iniciarCielo()
         {

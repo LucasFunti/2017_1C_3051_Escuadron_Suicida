@@ -15,6 +15,7 @@ using TGC.Core.UserControls;
 using TGC.Core.UserControls.Modifier;
 using TGC.Group.Model.UtilsVehiculos;
 using TGC.Core.Sound;
+using TGC.Group.Model.UtilsEfectos;
 
 namespace TGC.Group.Model
 {
@@ -26,8 +27,9 @@ namespace TGC.Group.Model
     /// </summary>
     public class TwistedMetal : TgcExample
     {
-        private Ciudad Ciudad;
+        public Ciudad Ciudad;
         public Musica sonidos;
+        public Niebla niebla;
         //private Sonido sonido;
         private PrintMessageText messages;
         private ControladorDeVehiculos controladorDeVehiculos;
@@ -84,9 +86,13 @@ namespace TGC.Group.Model
             //manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getItems());
             manejadorDeColiciones.addListOfBoundingBoxItemMeshColisionable(Ciudad.getItems());
 
+           
             controladorDeVehiculos.crearAutoPrincipal();
             controladorDeVehiculos.crearEnemigo1();
-       //     controladorDeVehiculos.addToColisionador(manejadorDeColiciones);//por ahora los autos no colisionan
+            niebla = new Niebla(this);
+            niebla.CargarCamara(controladorDeVehiculos.getAutoPrincipal().getCamara());
+          //  niebla
+            //     controladorDeVehiculos.addToColisionador(manejadorDeColiciones);//por ahora los autos no colisionan
         }
         public ManejadorDeColisiones GetManejadorDeColision()
         {
@@ -112,6 +118,7 @@ namespace TGC.Group.Model
              Ciudad.Update();
             //sonido.Update();
             controladorDeVehiculos.update();
+            niebla.Update(controladorDeVehiculos.getAutoPrincipal().getCamara());
         }
 
         /// <summary>
@@ -127,11 +134,15 @@ namespace TGC.Group.Model
             messages.MostrarVelocidadPorPantalla(controladorDeVehiculos.getAutoPrincipal().getVelocidadX());
             messages.MostrarPosicioMeshPorPantalla(controladorDeVehiculos.getAutoPrincipal().getMesh().Position);
             messages.MostrarVelocidadYPorPantalla(controladorDeVehiculos.getAutoPrincipal().getVelocidadY());
+            messages.MostrarPosicionCamaraPorPantalla(controladorDeVehiculos.getAutoPrincipal().getCamara().Position);
             messages.MostrarDireccionVehiculoPrincipal(controladorDeVehiculos.getAutoPrincipal().getMesh().Position);
             messages.MostrarTiempo();
-          //  messages.test("BoudningBox", this.autoPrincipal.getMesh().BoundingBox.computeCorners());
+            //  messages.test("BoudningBox", this.autoPrincipal.getMesh().BoundingBox.computeCorners());
 
             Ciudad.Render();
+
+           
+
             controladorDeVehiculos.render();
             //    messages.MostrarPuntoColisionVehiculoPrincipal(manejadorDeColiciones.Manager().LastCollisionPoint);
 

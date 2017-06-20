@@ -9,6 +9,10 @@ using TGC.Group.Model.UtilsColisiones;
 using TGC.Core.Utils;
 using TGC.Core.Input;
 using System;
+using TGC.Core.Textures;
+using TGC.Core.Interpolation;
+using TGC.Core.Direct3D;
+using TGC.Core.Shaders;
 
 namespace TGC.Group.Model.UtilsVehiculos
 {
@@ -23,8 +27,19 @@ namespace TGC.Group.Model.UtilsVehiculos
         //private List<Rueda[]> listaDeRuedas;
         public static float camaraOffsetDefaulForward = 300f;
 
+
+        //Shaders
+        public string TecnicaOriginal { get; private set; }
+        private Microsoft.DirectX.Direct3D.Effect efectoOriginal;
+        private Microsoft.DirectX.Direct3D.Effect efectoShaderChoque;
+        public float ChoqueDelantero = 0;
+        public float ChoqueTrasero = 0;
+
+
         public VehiculoPrincipal(TwistedMetal env) : base(env)
         {
+
+            
             Personaje personaje = Personaje.getInstance();
             loader = new TgcSceneLoader();
                 var scene = loader.loadSceneFromFile(personaje.FileMesh);
@@ -91,8 +106,18 @@ namespace TGC.Group.Model.UtilsVehiculos
             //ruedaDelantera2 = rueda.Meshes[0];
             //ruedaTrasera1 = rueda.Meshes[0];
             //ruedaTrasera2 = rueda.Meshes[0];
-
+            cargarShaders();
         }
+      
+        private void cargarShaders()
+        {
+            TecnicaOriginal = this.getMesh().Technique;
+            efectoOriginal = this.getMesh().Effect;
+              efectoShaderChoque = TgcShaders.loadEffect(this.env.ShadersDir + "EfectoChoque.fx");
+           // efectoShaderChoque = TgcShaders.loadEffect("D:\\UtnRepositorios\\Tgc\\TP\\2017_1C_3051_Escuadron_Suicida\\TGC.Group\\Shaders\\EfectoChoque.fx");
+            this.getMesh().Technique = "RenderScene";
+        }
+
         public override Boolean esAutoPrincipal()
         {
             return true;
@@ -103,9 +128,12 @@ namespace TGC.Group.Model.UtilsVehiculos
             camaraInterna2 = new CamaraTerceraPersona(this.getMesh().Position, 200, 400f);
             camaraRotante = new TgcRotationalCamera(
                 new Vector3(this.getMesh().Position.X,100, this.getMesh().Position.Z), 300, 0.15f, 50f, this.env.Input);
-            this.env.Camara = camaraInterna;
+              this.env.Camara = camaraInterna;
         }
-
+        public CamaraTerceraPersona getCamara()
+        {
+            return this.camaraInterna;
+        }
        
         public override void ManejarColisionCamara()
         {
@@ -312,7 +340,9 @@ namespace TGC.Group.Model.UtilsVehiculos
         }
         public override void Render()
         {
+            AplicarShader(); //aplica efecto;
             base.Render();
+            
             /*foreach (var rueda in this.listaDeRuedas)
             {
                 rueda[0].Render();
@@ -324,5 +354,29 @@ namespace TGC.Group.Model.UtilsVehiculos
             }*/
 
         }
+        private void AplicarShader()
+        {
+
+            /*  INICIO CHOQUE */
+            if (this.colisionoAlgunaVez && this.getMesh().Position.Y == 5)
+                         ChoqueDelantero = 1;
+            
+            if (this.colisiono() && this.getMesh().Position.Y == 5)
+                ChoqueDelantero = 1;
+         
+
+            if (this.colisiono() && !this.colisionoPorDelante() && this.getMesh().Position.Y == 5)
+               ChoqueTrasero = -1;
+           
+            efectoShaderChoque.SetValue("ChoqueAtras", ChoqueTrasero);
+            efectoShaderChoque.SetValue("ChoqueAdelante", ChoqueDelantero);
+            this.getMesh().Effect = efectoShaderChoque;
+            /*  FIN CHOQUE */
+
+
+
+        }
+
+
     }
 }
