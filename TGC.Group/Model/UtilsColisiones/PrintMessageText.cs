@@ -24,7 +24,7 @@ namespace TGC.Group.Model
         public void MostrarVelocidadPorPantalla(float Velocidad)
         {
             //Dibuja un texto por pantalla
-            this.env.DrawText.drawText("Velocidad X: " + Math.Abs(Velocidad), 0, 60, System.Drawing.Color.Red);
+            this.env.DrawText.drawText("Velocidad X: " + Velocidad, 0, 60, System.Drawing.Color.Red);
  
         }
         public void MostrarPosicioMeshPorPantalla(Vector3 vector)
@@ -57,6 +57,24 @@ namespace TGC.Group.Model
         {
             //Dibuja un texto por pantalla
             this.env.DrawText.drawText("Pos Camara (" + vector.X + ";" + vector.Y + ";" + vector.Z + ")", 0, 150, System.Drawing.Color.Red);
+
+        }
+        public void MostrarAnguloVehiculoPrincipal(float angulo)
+        {
+            this.env.DrawText.drawText("Angulo AutoP: " + angulo+ "Sin"+Math.Sin(angulo) + " Cos" + Math.Cos(angulo), 0, 165, System.Drawing.Color.Red);
+        }
+        public void MostrarAnguloVehiculoEnemigo(float angulo)
+        {
+            this.env.DrawText.drawText("Angulo Enem: " + angulo + "Sin" + Math.Sin(angulo) + " Cos" + Math.Cos(angulo), 0, 180, System.Drawing.Color.Red);
+        }
+        public void MostrarDireccionEnemigo(Vector3 vector)
+        {
+            this.env.DrawText.drawText("Dirección Enemigo (" + vector.X + ";" + vector.Y + ";" + vector.Z + ")", 0, 195, System.Drawing.Color.Red);
+        }
+        public void MostrarVelocidadEnemigoPorPantalla(float Velocidad)
+        {
+            //Dibuja un texto por pantalla
+            this.env.DrawText.drawText("Velocidad Enemigo X: " + Velocidad, 0, 210, System.Drawing.Color.Red);
 
         }
         public void test(String text, Vector3[] vector)

@@ -97,10 +97,15 @@
     <Compile Include="Model\UtilsColisiones\TgcBoundingOrientedBox.cs" />
     <Compile Include="Model\UtilsColisiones\Colisionador.cs" />
     <Compile Include="Model\UtilsColisiones\ManejadorDeColisiones.cs" />
+    <Compile Include="Model\UtilsEfectos\FixedLight.cs" />
     <Compile Include="Model\UtilsEfectos\Niebla.cs" />
+    <Compile Include="Model\UtilsEfectos\PuntoDeLuz.cs" />
     <Compile Include="Model\UtilsSounds\Musica.cs" />
     <Compile Include="Model\UtilsSounds\Sonido.cs" />
+    <Compile Include="Model\UtilsVehiculos\2DObjects\CustomSprite.cs" />
+    <Compile Include="Model\UtilsVehiculos\2DObjects\Drawer2D.cs" />
     <Compile Include="Model\UtilsVehiculos\Arma.cs" />
+    <Compile Include="Model\UtilsVehiculos\2DObjects\CustomBitmap.cs" />
     <Compile Include="Model\UtilsVehiculos\Personaje.cs" />
     <Compile Include="Model\UtilsVehiculos\ControladorDeVehiculos.cs" />
     <Compile Include="Model\UtilsVehiculos\Rueda.cs" />
@@ -115,6 +120,7 @@
     <Compile Include="Model\TwistedMetal.cs" />
     <Compile Include="Model\UtilsVehiculos\Vehiculo.cs" />
     <Compile Include="Model\UtilsVehiculos\VehiculoPrincipal.cs" />
+    <Compile Include="Model\UtilsVehiculos\2DObjects\Velocimetro.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">

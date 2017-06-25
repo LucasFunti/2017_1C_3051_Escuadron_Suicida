@@ -25,8 +25,8 @@ namespace TGC.Group.Model.UtilsEfectos
             effect = TgcShaders.loadEffect(env.ShadersDir + "TgcFogShader.fx");
             fog = new TgcFog();
             fog.Enabled = true;
-            fog.StartDistance = 3000;
-            fog.EndDistance = 4000f;
+            fog.StartDistance = 4000;
+            fog.EndDistance = 6000;
             fog.Density = 0.0005f;
             fog.Color = Color.Gray;
             fogShader = true;
@@ -54,6 +54,7 @@ namespace TGC.Group.Model.UtilsEfectos
         {
             var camaraPosition = camara.Position;
             effect.SetValue("CameraPos", TgcParserUtils.vector3ToFloat4Array(camaraPosition));
+          
         }
 
         private void ConfigurarDirectX(Vector3 camaraPosition)
