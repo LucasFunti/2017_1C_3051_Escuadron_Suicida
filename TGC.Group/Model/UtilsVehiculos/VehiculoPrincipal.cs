@@ -333,14 +333,14 @@ namespace TGC.Group.Model.UtilsVehiculos
                 //rueda[1].Update();
                 //rueda[2].Update();
             }*/
-            velocimetro.Update(this.getVelocidadX(), true);
+            this.velocimetro.Update(this.getVelocidadX(), true);
         }
         public override void Render()
         {
             AplicarShaderChoque(); //aplica efecto;
-            this.velocimetro.Render();
+          
             base.Render();
-
+            this.velocimetro.Render();
 
             /*foreach (var rueda in this.listaDeRuedas)
             {
