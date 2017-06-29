@@ -80,7 +80,7 @@ namespace TGC.Group.Model.UtilsVehiculos
                 enemigo.Update();
 
             foreach (var arma in this.listaDeArmas)
-                arma.Update();
+                if (arma.getMesh().Enabled ) arma.Update();
 
             this.autoPrincipal.Update();
         }

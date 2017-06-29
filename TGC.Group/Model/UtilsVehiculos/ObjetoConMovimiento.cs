@@ -45,6 +45,7 @@ namespace TGC.Group.Model
        // private TgcBox collisionPoint;
         public TgcArrow directionArrow;
         private bool esRueda = false;
+        private bool esArma = false;
         private bool esRuedaDelantera = false;
         private Sonido sonido;
         private Sonido sonidoMotor;
@@ -52,12 +53,6 @@ namespace TGC.Group.Model
         private Sonido sonidoColision;
         private Sonido sonidoItem;
         private Sonido sonidoSalto;
-        private List<ObjetoConMovimiento> listaDeArmas;
-
-        public void agregarArma(ObjetoConMovimiento arma)
-        {
-            this.listaDeArmas.Add(arma);
-        }
 
         public void setSonido(String fileName)
         {
@@ -113,8 +108,7 @@ namespace TGC.Group.Model
             sonidoColision = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
             sonidoItem = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
             sonidoSalto = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
-
-            listaDeArmas = new System.Collections.Generic.List<ObjetoConMovimiento>();
+            
         }
        
         public void setMesh(TgcMesh Mesh)
@@ -131,6 +125,11 @@ namespace TGC.Group.Model
         public void setEsRueda(bool valor)
         {
             this.esRueda = valor;
+        }
+
+        public void setEsArma(bool valor)
+        {
+            this.esArma = valor;
         }
 
         public void setEsRuedaDelantera(bool valor)
@@ -387,6 +386,7 @@ namespace TGC.Group.Model
             
             
         }
+
         private bool ProcesarMovimientoEnY()
         {
             bool movingY = false;
@@ -548,22 +548,14 @@ namespace TGC.Group.Model
             /*Si choca se pone el box de choque en DarkRed*/
             if (collisionFound)
             {
-                bool esUnArma = false;
-                if (this.listaDeArmas != null)
-                {
-                    foreach (var arma in this.listaDeArmas)
-                    {
-                        if (this.Equals(arma) )
-                            esUnArma = true;
-                    }
-                }
                 
-                if (!esUnArma) {
+                sonidoColision.startSound();
+                if (!this.esArma) {
 
                     if (this.getMesh().Position.Y == 5 || this.getMesh().Position.Y >= 25)
                     {
                         this.boxDeColision.setRenderColor(Color.DarkRed);
-                        sonidoColision.startSound();
+                        //sonidoColision.startSound();
                         VolverAPosicionAnterior();
                     }
                 } else {
@@ -577,7 +569,22 @@ namespace TGC.Group.Model
             }
             else
             {
-                this.boxDeColision.setRenderColor(Color.Yellow);
+
+                if (!this.esArma) {
+                    this.boxDeColision.setRenderColor(Color.Yellow);
+                } else {
+                    //Si el arma está fuera de los limites del mapa, que se deshabilite
+                    if ((this.getMesh().Position.X > 5500) ||
+                        (this.getMesh().Position.X < -500) ||
+                        (this.getMesh().Position.Z > 5500) ||
+                        (this.getMesh().Position.Z < -500))
+                    {
+                        this.getMesh().Enabled = false;
+                        ControladorDeVehiculos.getInstance().deshabilitarObjeto(this.getMesh());
+                        this.getMesh().dispose();
+                    }
+                }
+                    
             }
 
             if (this.getMesh().Position.Y == 5)

@@ -235,8 +235,10 @@ namespace TGC.Group.Model.UtilsVehiculos
 
         }
 
-        private void creaMisilV(Vector3 posicion)
+        private void creaMisilV()
         {
+            Vector3 posicion = this.getMesh().Position;
+            float orientacion = this.orientacion;
             string sonido = env.MediaDir + "MySounds\\Launch4.wav";
             var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml");
             TgcMesh mesh = scene.Meshes[0];
@@ -245,15 +247,28 @@ namespace TGC.Group.Model.UtilsVehiculos
             mesh.createBoundingBox();
             mesh.Position = posicion;
             mesh.rotateX(FastMath.PI);
-            mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
-            mesh.move(0, 20, 0); ;
-            Arma arma = new Arma(mesh, this.env, sonido, 20);
+            //mesh.Rotation = this.getMesh().Rotation;
+            mesh.Scale = new Vector3(0.3f, 0.3f, 0.3f);
+            mesh.move(0, 20, 0);
+            //matrixRotacion = this.getMesh().Transform;
+            //matrixRotacion = Matrix.RotationY(orientacion);
+            //mesh.rotateY(orientacion);
+            //this.rotar(new Vector3(0, valor, 0), matrixRotacion, 0);
+            //Matrix matrixTransform = Matrix.Multiply(mesh.Transform, this.getMesh().Transform);
+            //this.rotar(new Vector3(0, -sentido * 1f * this.env.ElapsedTime, 0), matrixRotacion, -sentido * 1f * this.env.ElapsedTime);
+            //mesh.Transform = Matrix.Multiply(this.getMesh().Transform, mesh.Transform);
+            mesh.Rotation = this.getMesh().Rotation;
+
+            var m = Matrix.Scaling(mesh.Scale) * matrixRotacion * Matrix.Translation(posicion);
+            Arma arma = new Arma(mesh, this.env, sonido, 20, orientacion, m);
             ControladorDeVehiculos.getInstance().agregarArma(arma);
-            base.agregarArma(arma);
+            //base.agregarArma(arma);
         }
 
-        private void creaDisparo(Vector3 posicion)
+        private void creaDisparo()
         {
+            Vector3 posicion = this.getMesh().Position;
+            float orientacion = this.orientacion;
             string sonido = env.MediaDir + "MySounds\\MachineGun.wav";
             var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Vela\\Vela-TgcScene.xml");
             TgcMesh mesh = scene.Meshes[0];
@@ -264,9 +279,12 @@ namespace TGC.Group.Model.UtilsVehiculos
             mesh.rotateX(FastMath.PI);
             mesh.Scale = new Vector3(0.1f, 0.1f, 0.1f);
             mesh.move(0, 20, 0);
-            Arma arma = new Arma(mesh, this.env, sonido, 40);
+            //matrixRotacion = this.getMesh().Transform;
+            //Matrix matrixTransform = Matrix.Multiply( mesh.Transform, this.getMesh().Transform);
+            var m = Matrix.Scaling(mesh.Scale) * matrixRotacion * Matrix.Translation(posicion);
+            Arma arma = new Arma(mesh, this.env, sonido, 40, orientacion, m);
             ControladorDeVehiculos.getInstance().agregarArma(arma);
-            base.agregarArma(arma);
+           // base.agregarArma(arma);
         }
 
         int contadorAlPrincipio = 0;
@@ -283,7 +301,7 @@ namespace TGC.Group.Model.UtilsVehiculos
 
             if (disparar()) {
                 base.startDisparo();
-                creaDisparo(this.getMesh().Position);
+                creaDisparo();
             }
 
             if (moverArriba())
@@ -291,7 +309,7 @@ namespace TGC.Group.Model.UtilsVehiculos
 
             if (disparaEspecial()) { 
                 base.startArma();
-                creaMisilV(this.getMesh().Position);
+                creaMisilV();
             }
 
             contadorAlPrincipio++;
