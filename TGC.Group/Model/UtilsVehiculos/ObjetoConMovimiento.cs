@@ -618,7 +618,16 @@ namespace TGC.Group.Model
                     {
                         this.getMesh().Enabled = false;
                         ControladorDeVehiculos.getInstance().deshabilitarObjeto(this.getMesh());
-                        this.getMesh().dispose();
+                        try
+                        {
+                            this.getMesh().dispose();
+                        }
+                        catch (System.NullReferenceException)
+                        {
+
+                        }
+
+                       // if (this.getMesh().NumberTriangles != null) this.getMesh().dispose();
                     }
                 }
                     
