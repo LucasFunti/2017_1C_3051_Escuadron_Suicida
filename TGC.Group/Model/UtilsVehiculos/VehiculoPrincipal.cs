@@ -9,12 +9,16 @@ using TGC.Group.Model.UtilsColisiones;
 using TGC.Core.Utils;
 using TGC.Core.Input;
 using System;
+using TGC.Core.Textures;
+using TGC.Core.Interpolation;
+using TGC.Core.Direct3D;
+using TGC.Core.Shaders;
 
 namespace TGC.Group.Model.UtilsVehiculos
 {
     class VehiculoPrincipal : Vehiculo
     {
-        
+        public Velocimetro velocimetro;
         private TgcSceneLoader loader;
         private CamaraTerceraPersona camaraInterna;
         private CamaraTerceraPersona camaraInterna2;
@@ -23,26 +27,52 @@ namespace TGC.Group.Model.UtilsVehiculos
         //private List<Rueda[]> listaDeRuedas;
         public static float camaraOffsetDefaulForward = 300f;
 
+
+        //Shaders
+        public string TecnicaOriginal { get; private set; }
+        private Microsoft.DirectX.Direct3D.Effect efectoOriginal;
+        private Microsoft.DirectX.Direct3D.Effect efectoShaderChoque;
+
+        public float ChoqueDelantero = 0;
+        public float ChoqueTrasero = 0;
+
+
+
         public VehiculoPrincipal(TwistedMetal env) : base(env)
         {
+            velocimetro = new Velocimetro(env);
+
             Personaje personaje = Personaje.getInstance();
             loader = new TgcSceneLoader();
-                var scene = loader.loadSceneFromFile(personaje.FileMesh);
-             this.setMesh(scene.Meshes[0]);
+            var scene = loader.loadSceneFromFile(personaje.FileMesh);
+
+            this.setMesh(scene.Meshes[0]);
+            this.getMesh().Position = new Vector3(100, 5, 3000);
+            camaraManager();
             this.setVelocidadMaxima(personaje.VelocidadMax);
             this.setVelocidadMinima(personaje.VelocidadMin);
             this.setConstanteDeAsceleracionX(personaje.ConstanteAceleracion);
             //      base.setPEndDirectionArrow(new Vector3(this.getMesh().Position.X, this.getMesh().Position.Y, -500));
             //   this.setAlturaInicial(this.getMesh().Position.Y);
-            camaraManager();
+
             this.doblar(0.001f);//Inicializa las matrices de rotación, no tocar!!
-            
+
             base.setSonido(personaje.FileSonido);
             base.setSonidoMotor(personaje.FileSonidoMotor);
             base.setSonidoArma(personaje.FileSonidoArma);
             base.setSonidoColision(personaje.FileSonidoColision);
             base.setSonidoItem(personaje.FileSonidoItem);
             base.setSonidoSalto(personaje.FileSonidoSalto);
+
+            //Seteo posicion Inicial
+            //  Vector3 scale3 = new Vector3(1f, 1f, 1f);
+            // var m = Matrix.Scaling(scale3) * this.matrixRotacion * Matrix.Translation(new Vector3(100, 5, 3000));
+            //  var m = Matrix.Scaling(scale3) * Matrix.RotationY(1f) * Matrix.Translation(new Vector3(100, 5, 3000)) ;
+
+            //   this.getMesh().Transform = m;
+            this.cargarShaders();
+            this.mover();
+
 
             //Creo las ruedas
             //listaDeRuedas = new System.Collections.Generic.List<Rueda[]>();
@@ -91,8 +121,17 @@ namespace TGC.Group.Model.UtilsVehiculos
             //ruedaDelantera2 = rueda.Meshes[0];
             //ruedaTrasera1 = rueda.Meshes[0];
             //ruedaTrasera2 = rueda.Meshes[0];
-
+            cargarShaders();
         }
+
+        private void cargarShaders()
+        {
+            TecnicaOriginal = this.getMesh().Technique;
+            efectoOriginal = this.getMesh().Effect;
+            efectoShaderChoque = TgcShaders.loadEffect(this.env.ShadersDir + "EfectoMetal_ConChoque.fx");
+            this.getMesh().Technique = "RenderScene";
+        }
+
         public override Boolean esAutoPrincipal()
         {
             return true;
@@ -102,11 +141,14 @@ namespace TGC.Group.Model.UtilsVehiculos
             camaraInterna = new CamaraTerceraPersona(this.getMesh().Position, 100, 300f);
             camaraInterna2 = new CamaraTerceraPersona(this.getMesh().Position, 200, 400f);
             camaraRotante = new TgcRotationalCamera(
-                new Vector3(this.getMesh().Position.X,100, this.getMesh().Position.Z), 300, 0.15f, 50f, this.env.Input);
+                new Vector3(this.getMesh().Position.X, 100, this.getMesh().Position.Z), 300, 0.15f, 50f, this.env.Input);
             this.env.Camara = camaraInterna;
         }
+        public CamaraTerceraPersona getCamara()
+        {
+            return this.camaraInterna;
+        }
 
-       
         public override void ManejarColisionCamara()
         {
             //Actualizar valores de camara segun modifiers
@@ -123,7 +165,7 @@ namespace TGC.Group.Model.UtilsVehiculos
             foreach (var obstaculo in this.env.GetManejadorDeColision().MeshesColicionables)
             {
                 //Hay colision del segmento camara-personaje y el objeto
-                if (TgcCollisionUtils.intersectSegmentAABB(target, position, obstaculo.BoundingBox, out q) && obstaculo!=this.getMesh())
+                if (TgcCollisionUtils.intersectSegmentAABB(target, position, obstaculo.BoundingBox, out q) && obstaculo != this.getMesh())
                 {
                     //Si hay colision, guardar la que tenga menor distancia
                     var distSq = Vector3.Subtract(q, target).LengthSq();
@@ -149,14 +191,15 @@ namespace TGC.Group.Model.UtilsVehiculos
             {
                 camaraInterna.OffsetForward = -newOffsetForward;
             }
-           //Asignar la ViewMatrix haciendo un LookAt desde la posicion final anterior al centro de la camara
+            //Asignar la ViewMatrix haciendo un LookAt desde la posicion final anterior al centro de la camara
             camaraInterna.CalculatePositionTarget(out position, out target);
             camaraInterna.SetCamera(position, target);
 
         }
+
         public override void ProcesarMovimientoDeCamara(float offsetHeight, float offsetForward)
         {
-            
+
             camaraInterna.OffsetHeight = offsetHeight;
             camaraInterna.OffsetForward = offsetForward;
 
@@ -204,7 +247,7 @@ namespace TGC.Group.Model.UtilsVehiculos
         public override void rotarCamara(float rotAngle)
         {
             camaraInterna.rotateY(rotAngle);
-         //   base.updateDirectionArrowWithAngle(rotAngle);
+            //   base.updateDirectionArrowWithAngle(rotAngle);
         }
 
         int tipoCamara = 0;
@@ -260,7 +303,7 @@ namespace TGC.Group.Model.UtilsVehiculos
             mesh.Rotation = this.getMesh().Rotation;
 
             var m = Matrix.Scaling(mesh.Scale) * matrixRotacion * Matrix.Translation(posicion);
-            Arma arma = new Arma(mesh, this.env, sonido, 20, orientacion, m);
+            Arma arma = new Arma(mesh, this.env, sonido, 20, orientacion, base.directionArrow.PEnd);
             ControladorDeVehiculos.getInstance().agregarArma(arma);
             //base.agregarArma(arma);
         }
@@ -282,12 +325,12 @@ namespace TGC.Group.Model.UtilsVehiculos
             //matrixRotacion = this.getMesh().Transform;
             //Matrix matrixTransform = Matrix.Multiply( mesh.Transform, this.getMesh().Transform);
             var m = Matrix.Scaling(mesh.Scale) * matrixRotacion * Matrix.Translation(posicion);
-            Arma arma = new Arma(mesh, this.env, sonido, 40, orientacion, m);
+
+            Arma arma = new Arma(mesh, this.env, sonido, 40, orientacion, base.directionArrow.PEnd);
             ControladorDeVehiculos.getInstance().agregarArma(arma);
            // base.agregarArma(arma);
         }
 
-        int contadorAlPrincipio = 0;
         public override void Update()
         {
 
@@ -312,13 +355,10 @@ namespace TGC.Group.Model.UtilsVehiculos
                 creaMisilV();
             }
 
-            contadorAlPrincipio++;
-            if (contadorAlPrincipio > 380)
-                tm.sonidos.soundControl();
 
             base.Update();
             camaraInterna.Target = this.getMesh().Position;
-            camaraRotante.SetCamera( new Vector3( camaraInterna.Position.X, 150, camaraInterna.Position.Z),
+            camaraRotante.SetCamera(new Vector3(camaraInterna.Position.X, 150, camaraInterna.Position.Z),
                                      new Vector3(camaraInterna.Target.X, 100, camaraInterna.Target.Z));
 
             /*foreach (var rueda in this.listaDeRuedas)
@@ -327,10 +367,15 @@ namespace TGC.Group.Model.UtilsVehiculos
                 //rueda[1].Update();
                 //rueda[2].Update();
             }*/
+            this.velocimetro.Update(this.getVelocidadX(), true);
         }
         public override void Render()
         {
+            AplicarShaderChoque(); //aplica efecto;
+          
             base.Render();
+            this.velocimetro.Render();
+
             /*foreach (var rueda in this.listaDeRuedas)
             {
                 rueda[0].Render();
@@ -342,5 +387,31 @@ namespace TGC.Group.Model.UtilsVehiculos
             }*/
 
         }
+        private void AplicarShaderChoque()
+        {
+
+            /*  INICIO CHOQUE */
+            if (this.colisionoAlgunaVez && this.getMesh().Position.Y == 5)
+                ChoqueDelantero = 1;
+
+            if (this.colisiono() && this.getMesh().Position.Y == 5)
+                ChoqueDelantero = 1;
+
+
+            if (this.colisiono() && !this.colisionoPorDelante() && this.getMesh().Position.Y == 5)
+                ChoqueTrasero = -1;
+
+            efectoShaderChoque.SetValue("ChoqueAtras", ChoqueTrasero);
+            efectoShaderChoque.SetValue("ChoqueAdelante", ChoqueDelantero);
+            efectoShaderChoque.SetValue("fvLightPosition", new Vector4(0, 100, 0, 0));
+            efectoShaderChoque.SetValue("fvEyePosition", TgcParserUtils.vector3ToFloat3Array(this.getCamara().Position));
+            this.getMesh().Effect = efectoShaderChoque;
+
+
+
+
+
+        }
+        
     }
 }

@@ -18,7 +18,7 @@ namespace TGC.Group.Model.UtilsVehiculos
         private readonly List<Vehiculo> listaDeArmas = new List<Vehiculo>();
         private TgcSceneLoader loader;
         private static ControladorDeVehiculos myInstance;
-
+        Enemigo enemigo1aux;
         public static ControladorDeVehiculos getInstance()
         {
             return myInstance;
@@ -43,7 +43,8 @@ namespace TGC.Group.Model.UtilsVehiculos
         public void crearAutoPrincipal()
         {
             autoPrincipal = new VehiculoPrincipal(this.env);
-       //     listaDeVehiculos.Add(autoPrincipal);
+           
+            //     listaDeVehiculos.Add(autoPrincipal);
         }
         public VehiculoPrincipal getAutoPrincipal()
         {
@@ -65,14 +66,21 @@ namespace TGC.Group.Model.UtilsVehiculos
            var sceneAuto = loader.loadSceneFromFile(this.env.MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
           
             Enemigo enemigo = new Enemigo(this.env,  sceneAuto.Meshes[0]);
-
+            enemigo.setAutoTarget(this.getAutoPrincipal());
             //   enemigo.setPosicionInicial(new Vector3(-100, 5, 3000));
-            enemigo.setPosicionInicial(new Vector3(-100, 5, -200));
-            enemigo.setVelocidadMaxima(40);
+
+
+            enemigo.setPosicionInicial(new Vector3(200, 5, 4000));
+            enemigo.setVelocidadMaxima(10);
             enemigo.setVelocidadMinima(-5);
             enemigo.setConstanteDeAsceleracionX(0.5f);
+            enemigo1aux = enemigo;
             this.listaDeVehiculos.Add(enemigo);
             this.listaDeEnemigos.Add(enemigo);
+        }
+        public Enemigo getEnemigo()
+        {
+            return enemigo1aux;
         }
         public void update()
         {
@@ -87,9 +95,16 @@ namespace TGC.Group.Model.UtilsVehiculos
         public void render()
         {
             foreach (var vehiculo in this.listaDeVehiculos)
-            {
+            { 
                 if (!vehiculo.esAutoPrincipal())
-                    vehiculo.Render();
+                {
+                    //rendereo solo lo que esta dentro del frustrum
+                    var c = TgcCollisionUtils.classifyFrustumAABB(this.env.Frustum, vehiculo.getMesh().BoundingBox);
+                    if (c != TgcCollisionUtils.FrustumResult.OUTSIDE)
+                    {
+                        vehiculo.getMesh().render();
+                    }
+                }
             }
             this.autoPrincipal.Render();
         }
@@ -97,18 +112,14 @@ namespace TGC.Group.Model.UtilsVehiculos
         public void deshabilitarObjeto(TgcMesh arma)
         {
             foreach (var vehiculo in this.listaDeVehiculos)
-            {
                 if (vehiculo.getMesh() == arma)
-                    vehiculo.getMesh().Enabled = false;
-            }
+                    vehiculo.dispose();
         }
 
         public void dispose()
         {
             foreach (var vehiculo in this.listaDeVehiculos)
-            {
                 vehiculo.dispose();
-            }
         }
     }
 }

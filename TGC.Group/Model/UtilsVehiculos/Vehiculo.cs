@@ -1,7 +1,9 @@
 ﻿using Microsoft.DirectX;
 using System;
+using System.Collections.Generic;
 using TGC.Core.SceneLoader;
-
+using TGC.Core.Utils;
+using TGC.Group.Model.UtilsVehiculos;
 
 namespace TGC.Group.Model
 {
@@ -15,7 +17,8 @@ namespace TGC.Group.Model
           //  base.getMesh().(pos);
             base.setVelocidadY(0);
             base.setAluraMaxima(20);
-      //      direcionadores();
+            //      direcionadores();
+            updateTGCArrow();
         }
         public Vehiculo(TwistedMetal env) : base(env)
         {
@@ -211,38 +214,95 @@ namespace TGC.Group.Model
         {
 
         }
-       
+        private void creaDisparo(Vector3 posicion)
+        {
+            string sonido = env.MediaDir + "MySounds\\MachineGun.wav";
+            var loader = new TgcSceneLoader();
+            var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Vela\\Vela-TgcScene.xml");
+            TgcMesh mesh = scene.Meshes[0];
+            mesh.AutoTransformEnable = false;
+            mesh.AutoUpdateBoundingBox = true;
+            mesh.createBoundingBox();
+           // var m = Matrix.Scaling(new Vector3(0.1f, 0.1f, 0.1f)) * Matrix.RotationY(0.001f) * Matrix.Translation(posicion);
+          //  mesh.Transform = m;
+            mesh.Position = posicion;
+          //  mesh.rotateX(FastMath.PI);
+          //  mesh.Scale = new Vector3(0.1f, 0.1f, 0.1f);
+          //  mesh.move(0, 20, 0);
+          
+            Arma arma = new Arma(mesh, this.env, sonido, 40, this.orientacion, base.directionArrow.PEnd); 
+            arma.mover();
+            ControladorDeVehiculos.getInstance().agregarArma(arma);
+            base.agregarArma(arma);
+        }
+        private void creaMisilV(Vector3 posicion)
+        {
+            string sonido = env.MediaDir + "MySounds\\Launch4.wav";
+            var loader = new TgcSceneLoader();
+            var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml");
+            TgcMesh mesh = scene.Meshes[0];
+            mesh.AutoTransformEnable = false;
+            mesh.AutoUpdateBoundingBox = true;
+            mesh.createBoundingBox();
+         //   var m = Matrix.Scaling(new Vector3(0.5f, 0.5f, 0.5f)) * Matrix.RotationY(0.001f) * Matrix.Translation(posicion);
+     //       mesh.Transform = m;
+        //    mesh.Position = posicion;
+            mesh.Position = posicion;
+        //    mesh.rotateX(FastMath.PI);
+         //   mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+          //  mesh.move(0, 20, 0); ;
+            Arma arma = new Arma(mesh, this.env, sonido, 20, this.orientacion, base.directionArrow.PEnd);
+            ControladorDeVehiculos.getInstance().agregarArma(arma);
+            base.agregarArma(arma);
+        }
        
         public virtual void Update()
         {
+           // base.CalcularMeshesCercanos();
             base.setPosicionAnterior(base.getMesh().Position);
             base.setRotacionAnterior(base.getMesh().Rotation);
             base.setAlturaActual(base.getMesh().Position.Y);
             base.calculosDePosicion();
+            base.updateTGCArrow();
+
+           
+
+            if (disparar())
+            {
+                base.startDisparo();
+                creaDisparo(this.getMesh().Position);
+            }
+            if (disparaEspecial()) { 
+                  base.startArma();
+               creaMisilV(this.getMesh().Position);
+             }
+
             //Actualizar valores de la linea de movimiento
-         //   directionArrow.PStart = this.getMesh().Position;
+            //   directionArrow.PStart = this.getMesh().Position;
             //directionArrow.PEnd = this.getMesh().Position + Vector3.Multiply(this.getMesh().Position, 50);
-           // directionArrow.updateValues();
+            // directionArrow.updateValues();
 
             //Actualizar valores de normal de colision
-       /*     if (this.env.GetManejadorDeColision().Manager().Collision)
-            {
-                collisionNormalArrow.PStart = this.env.GetManejadorDeColision().Manager().LastCollisionPoint;
-                collisionNormalArrow.PEnd = this.env.GetManejadorDeColision().Manager().LastCollisionPoint +
-                                            Vector3.Multiply(this.env.GetManejadorDeColision().Manager().LastCollisionNormal, 80);
+            /*     if (this.env.GetManejadorDeColision().Manager().Collision)
+                 {
+                     collisionNormalArrow.PStart = this.env.GetManejadorDeColision().Manager().LastCollisionPoint;
+                     collisionNormalArrow.PEnd = this.env.GetManejadorDeColision().Manager().LastCollisionPoint +
+                                                 Vector3.Multiply(this.env.GetManejadorDeColision().Manager().LastCollisionNormal, 80);
 
-                collisionNormalArrow.updateValues();
+                     collisionNormalArrow.updateValues();
 
 
-                collisionPoint.Position = this.env.GetManejadorDeColision().Manager().LastCollisionPoint;
-                collisionPoint.render();
-            }*/
+                     collisionPoint.Position = this.env.GetManejadorDeColision().Manager().LastCollisionPoint;
+                     collisionPoint.render();
+                 }*/
         }
         public virtual void Render()
         {
+            
             base.getMesh().render();
+       //     base.getBoxDeColision().render();
            // base.getBoxDeColision().render();
-           // directionArrow.render();
+         //   directionArrow.render();
          //   collisionNormalArrow.render();
           //  collisionPoint.render();
 
@@ -250,7 +310,7 @@ namespace TGC.Group.Model
         public void dispose()
         {
             base.getMesh().dispose();
-            //directionArrow.dispose();
+            directionArrow.dispose();
         }
 
     }

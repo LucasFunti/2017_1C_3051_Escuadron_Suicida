@@ -34,9 +34,10 @@ namespace TGC.Group.Model
         //Mesh
         private TgcMesh mesh;
         private TgcBoundingOrientedBox boxDeColision;
-        private float largoDelMesh;
+        public float largoDelMesh;
         private float boxDeColisionY;
-        private bool collisionFound;
+        private bool collisionFound = false;
+        public bool colisionoAlgunaVez = false;
         private bool chocoAdelante = false;
         private Vector3 NuevaPosicion;
         private Vector3 PosicionAnterior { get; set; }
@@ -54,6 +55,42 @@ namespace TGC.Group.Model
         private Sonido sonidoItem;
         private Sonido sonidoSalto;
 
+        public List<Arma> listaDeArmas;
+        //Lisa de meshes proximos
+        private List<TgcMesh> MeshesCeranos;
+
+        public ObjetoConMovimiento(TwistedMetal env)
+        {
+            this.env = env;
+            sonido = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+            sonidoMotor = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+            sonidoArma = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+            sonidoColision = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+            sonidoItem = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+            sonidoSalto = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+
+            listaDeArmas = new List<Arma> ();
+            this.MeshesCeranos = new List<TgcMesh>();
+        }
+
+        public Vector3 getNuevaPosicion()
+        {
+            return this.NuevaPosicion;
+        }
+        public void agregarArma(Arma arma)
+        {
+            this.listaDeArmas.Add(arma);
+        }
+        public Boolean colisiono()
+        {
+            return this.collisionFound;
+        }
+       
+        public Boolean colisionoPorDelante()
+        {
+            return this.chocoAdelante;
+        }
+        
         public void setSonido(String fileName)
         {
             Vector3 vecDisparo = new Vector3(this.getMesh().Position.X - 100,
@@ -99,23 +136,15 @@ namespace TGC.Group.Model
             this.sonidoArma.playSound(fileName, vecDisparo);
         }
 
-        public ObjetoConMovimiento(TwistedMetal env)
-        {
-            this.env = env;
-            sonido = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
-            sonidoMotor = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
-            sonidoArma = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
-            sonidoColision = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
-            sonidoItem = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
-            sonidoSalto = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
-            
-        }
-       
         public void setMesh(TgcMesh Mesh)
         {
             this.mesh = Mesh;
             initBoxColisionador();
-            //  this.updateTGCArrow(this.calcularRayoDePosicion());
+            
+        }
+        public void updateTGCArrow()
+        {
+            this.updateTGCArrow(this.calcularRayoDePosicion());
         }
         public TgcMesh getMesh()
         {
@@ -146,6 +175,10 @@ namespace TGC.Group.Model
         {
             return this.esRuedaDelantera;
         }
+        public TgcBoundingOrientedBox getBoxDeColision()
+        {
+            return this.boxDeColision;
+        }
 
         private void initBoxColisionador()
         {
@@ -160,15 +193,13 @@ namespace TGC.Group.Model
             largoDelMesh = boxDeColision.Extents.Z;
             boxDeColisionY = (yMax + yMin) / 2 + yMin;
         }
-        public void setPosicionInicial(Vector3 vect)
+        public virtual void setPosicionInicial(Vector3 vect)
         {
+
             this.getMesh().Position = vect;
             this.mover();
         }
-        protected TgcBoundingOrientedBox getBoxDeColision()
-        {
-            return this.boxDeColision;
-        }
+        
         protected void setRotacionAnterior(Vector3 v)
         {
             this.RotacionAnterior = v;
@@ -360,8 +391,11 @@ namespace TGC.Group.Model
         {
             sonidoArma.startSound();
         }
-
-        protected void doblar(float sentido)
+        public void setAnguloFinal(float ang)
+        {
+            this.anguloFinal = ang;
+        }
+        protected virtual void doblar(float sentido)
         {
 
             if (this.getVelocidadX() < 0)
@@ -507,7 +541,7 @@ namespace TGC.Group.Model
 
         }
         //Calcula la próxima posicion del objeto en base a los datos de velocidad.
-        protected Vector3 calcularProximaPosicion()
+        protected virtual Vector3 calcularProximaPosicion()
         {
             return new Vector3(this.getMesh().Position.X + this.getVelocidadX() * (float)System.Math.Cos(this.orientacion),
                                                   this.getMesh().Position.Y + this.getVelocidadY(),
@@ -515,19 +549,20 @@ namespace TGC.Group.Model
 
         }
         //Calcula el centro de rotación del box de colisiones
-        protected Vector3 calcularCentroDelBox()
+        protected virtual Vector3 calcularCentroDelBox()
         {
             return new Vector3(this.getMesh().Position.X + this.getVelocidadX() * (float)System.Math.Cos(this.orientacion),
               boxDeColisionY + this.getVelocidadY(), this.getMesh().Position.Z + this.getVelocidadX() * (float)System.Math.Sin(this.orientacion));
         }
 
-        private void ProcesarChoques()
+        public virtual void ProcesarChoques()
         {
             collisionFound = false;
             chocoAdelante = false;
             var ray = calcularRayoDePosicion();
-       
-            foreach (var mesh in this.env.GetManejadorDeColision().MeshesColicionables)
+
+             foreach (var mesh in this.env.GetManejadorDeColision().MeshesColicionables)
+          //  foreach (var mesh in this.MeshesCeranos)
             {
                 var escenaAABB = mesh.BoundingBox;
 
@@ -538,17 +573,18 @@ namespace TGC.Group.Model
                 if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB) )
                 {
                     collisionFound = true;
+                    
                     float t;
                     Vector3 p;
                     chocoAdelante = (intersectRayAABB(ray, escenaAABB, out t, out p) || t > 1.0f);
-
+                    colisionoAlgunaVez = chocoAdelante;
                     break;
                 }
             }
             /*Si choca se pone el box de choque en DarkRed*/
             if (collisionFound)
             {
-                
+  
                 sonidoColision.startSound();
                 if (!this.esArma) {
 
@@ -558,10 +594,11 @@ namespace TGC.Group.Model
                         //sonidoColision.startSound();
                         VolverAPosicionAnterior();
                     }
-                } else {
+                }
+                else {
                     this.getMesh().Enabled = false;
-                    ControladorDeVehiculos.getInstance().deshabilitarObjeto(this.getMesh());
-                    this.getMesh().dispose();
+                   // ControladorDeVehiculos.getInstance().deshabilitarObjeto(this.getMesh());
+                   // this.getMesh().dispose();
                 }
 
 
@@ -637,8 +674,8 @@ namespace TGC.Group.Model
             var x1 = -this.largoDelMesh * FastMath.Sin(anguloFinal);
             var z1 = -this.largoDelMesh * FastMath.Cos(anguloFinal);
 
-            var x2 = x1 * 1.2;
-            var z2 = z1 * 1.2;
+            var x2 = x1 * 10;
+            var z2 = z1 * 10;
 
             ray.origin = new Vector3(
                 this.getMesh().Position.X + x1,
@@ -659,12 +696,28 @@ namespace TGC.Group.Model
             directionArrow.BodyColor = Color.Red;
             directionArrow.HeadColor = Color.Green;
             directionArrow.HeadSize = new Vector2(10, 10);
-
+        
             directionArrow.PStart = rayo.origin;
             directionArrow.PEnd = rayo.direction;
             directionArrow.updateValues();
         }
+        public void CalcularMeshesCercanos()
+        {
+            //para la ciudad
+            this.MeshesCeranos.Clear();
+            foreach (var sceneMesh in this.env.GetManejadorDeColision().MeshesColicionables)
+            {
+                if (esMeshCercano(sceneMesh.Position, sceneMesh, 1000))
+                    this.MeshesCeranos.Add(sceneMesh);
+            }
+        }
+        public bool esMeshCercano(Vector3 pos, TgcMesh sceneMesh, float distanciaDefault)
+        {
+            float d = TgcCollisionUtils.sqDistPointAABB(pos, sceneMesh.BoundingBox);
 
+            if (d < distanciaDefault) return true;
+            else return false;
+        }
 
         public void VolverAPosicionAnterior()
         {

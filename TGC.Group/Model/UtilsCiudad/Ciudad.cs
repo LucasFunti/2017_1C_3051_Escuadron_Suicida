@@ -53,6 +53,10 @@ namespace TGC.Group.Model
         private TgcTexture veredaTexture;
         private TgcTexture paredTexture;
 
+        //float fix_pos
+        float fix_posZ = 500;
+        float fix_posX = 500;
+
         //Constantes para velocidades de movimiento
         private const float ROTATION_SPEED = 0.5f;
         private const float MOVEMENT_SPEED = 5f;
@@ -119,14 +123,17 @@ namespace TGC.Group.Model
 
 
         }
-
+        public List<TgcMesh> getAllMeshes()
+        {
+            return this.meshes;
+        }
 
 
         private void crearPisoDeFondo()
         {
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\calles.jpg");
            
-            suelo = new TgcPlane(new Vector3(-500, 0, -500), new Vector3(6000, 0, 6000), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
+            suelo = new TgcPlane(new Vector3(0, 0, 0), new Vector3(6000, 0, 6000), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
 
         }
         //private void crearRueda()
@@ -241,15 +248,30 @@ namespace TGC.Group.Model
             edificio = scene.Meshes[nMesh];
             var instance = edificio.createMeshInstance(edificio.Name + i + "_" + j);
             //No recomendamos utilizar AutoTransform, en juegos complejos se pierde el control. mejor utilizar Transformaciones con matrices.
-            instance.AutoTransformEnable = true;
-            //Desplazarlo
-            instance.move(offset_row, offset_Y, offset_Col);
+            instance.AutoTransformEnable = true; //AS
+                                                  //Desplazarlo
+                                                  //  Vector3 scale3 = new Vector3(1f, 1f, 1f);
+                                                  // var m = Matrix.Scaling(scale3) * Matrix.RotationY(0.001f) * Matrix.Translation(new Vector3(100, 5, 3000));
+
+            //  instance.Transform = m;
+            // instance.Position = new Vector3(100, 5, 3000);
+
+            //Matrix m=new Matrix();
+            //Vector3 pos = new Vector3(offset_row + fix_posX, offset_Y, offset_Col + fix_posZ);
+            instance.move(offset_row+ fix_posX, offset_Y, offset_Col+ fix_posZ); 
+            //m = Matrix.Scaling(new Vector3(1f, 1f, 1f)) * Matrix.RotationY(0.001f) * Matrix.Translation(pos);
             if (nMesh == 0)
-                instance.Scale = new Vector3(0.70f, 1f, 1f);
-
+            {
+                  instance.Scale = new Vector3(0.70f, 1f, 1f);  
+                //m = Matrix.Scaling(new Vector3(0.70f, 1f, 1f)) * Matrix.RotationY(0.0001f) * Matrix.Translation(pos);
+            }
             if (nMesh == 4)
-                instance.Scale = new Vector3(0.40f, 1f, 1f);
-
+            {
+                 instance.Scale = new Vector3(0.40f, 1f, 1f); 
+              //  m = Matrix.Scaling(new Vector3(0.40f, 1f, 1f)) * Matrix.RotationY(0.001f) * Matrix.Translation(pos);
+            }
+          //  instance.Transform = m;
+           // instance.Position = pos;
             edificios.Add(instance);
             
             var posicionX = instance.BoundingBox.calculateBoxCenter().X - (550 / 2);
@@ -257,24 +279,24 @@ namespace TGC.Group.Model
             var posicion = new Vector3(posicionX, 5, posicionZ);
             veredas.Add(new TgcPlane(posicion, new Vector3(550, 0, 550), TgcPlane.Orientations.XZplane, veredaTexture, 60, 60));
             cordones.Add(new TgcPlane(new Vector3(posicion.X, 0, posicion.Z), new Vector3(550, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
-            cordones.Add(new TgcPlane(new Vector3(posicion.X + 550, 0, posicion.Z), new Vector3(0, 5, 550), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
-            cordones.Add(new TgcPlane(new Vector3(posicion.X, 0, posicion.Z + 550), new Vector3(550, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
-            cordones.Add(new TgcPlane(new Vector3(posicion.X, 0, posicion.Z), new Vector3(0, 5, 550), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
+            cordones.Add(new TgcPlane(new Vector3(posicion.X + 550, 0, posicion.Z ), new Vector3(0, 5, 550), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
+            cordones.Add(new TgcPlane(new Vector3(posicion.X , 0, posicion.Z + 550), new Vector3(550, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
+            cordones.Add(new TgcPlane(new Vector3(posicion.X, 0, posicion.Z ), new Vector3(0, 5, 550), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
 
             return true;
         }
 
         private void crearVeredas()
         {
-            cordones.Add(new TgcPlane(new Vector3(-450, 5, -450), new Vector3(5900, 0, 5), TgcPlane.Orientations.XZplane, cordonTexture, 40, 1));
-            cordones.Add(new TgcPlane(new Vector3(-450, 0, -445), new Vector3(5895, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
-            cordones.Add(new TgcPlane(new Vector3(-500, 5, -500), new Vector3(6000, 0, 50), TgcPlane.Orientations.XZplane, veredaTexture, 60, 1));
+            cordones.Add(new TgcPlane(new Vector3(-450 + fix_posX, 5, -450 + fix_posZ), new Vector3(5900, 0, 5), TgcPlane.Orientations.XZplane, cordonTexture, 40, 1));
+            cordones.Add(new TgcPlane(new Vector3(-450 + fix_posX, 0, -445 + fix_posZ), new Vector3(5895, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
+            cordones.Add(new TgcPlane(new Vector3(-500 + fix_posX, 5, -500 + fix_posZ), new Vector3(6000, 0, 50), TgcPlane.Orientations.XZplane, veredaTexture, 60, 1));
             for(int i = 0; i < 30; i++)
             {
                 var sceneRueda = loader.loadSceneFromFile(MediaDir + "PosteDeLuz\\Poste de luz-TgcScene.xml");
                 posteDeLuz = sceneRueda.Meshes[0];
                 posteDeLuz.AutoTransformEnable = true;
-                posteDeLuz.Position = new Vector3(-455 + (i * (5900 / 30)), 5, -450);
+                posteDeLuz.Position = new Vector3(-455 + (i * (5900 / 30))+ fix_posX, 5, -450+ fix_posZ);
                 posteDeLuz.rotateY(FastMath.PI_HALF);
                 posteDeLuz.Scale = new Vector3(1, 3, 1);
                 posteDeLuz.move(0, 50, 0);
@@ -282,15 +304,15 @@ namespace TGC.Group.Model
                 meshes.Add(posteDeLuz);
                 LpostesDeLuz.Add(posteDeLuz);
             }
-            cordones.Add(new TgcPlane(new Vector3(-450, 5, -445), new Vector3(5, 0, 5890), TgcPlane.Orientations.XZplane, cordonTexture, 1, 40));
-            cordones.Add(new TgcPlane(new Vector3(-445, 0, -445), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
-            cordones.Add(new TgcPlane(new Vector3(-500, 5, -450), new Vector3(50, 0, 5950), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
+            cordones.Add(new TgcPlane(new Vector3(-450 + fix_posX, 5, -445 + fix_posZ), new Vector3(5, 0, 5890), TgcPlane.Orientations.XZplane, cordonTexture, 1, 40));
+            cordones.Add(new TgcPlane(new Vector3(-445 + fix_posX, 0, -445 + fix_posZ), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
+            cordones.Add(new TgcPlane(new Vector3(-500 + fix_posX, 5, -450 + fix_posZ), new Vector3(50, 0, 5950), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
             for (int i = 0; i < 30; i++)
             {
                 var sceneRueda = loader.loadSceneFromFile(MediaDir + "PosteDeLuz\\Poste de luz-TgcScene.xml");
                 posteDeLuz = sceneRueda.Meshes[0];
                 posteDeLuz.AutoTransformEnable = true;
-                posteDeLuz.Position = new Vector3(-455 , 5, -450 + (i * (5900 / 30)));
+                posteDeLuz.Position = new Vector3(-455 + fix_posX, 5, -450 + (i * (5900 / 30)) + fix_posZ);
                 posteDeLuz.rotateY(FastMath.PI);
                 posteDeLuz.Scale = new Vector3(1, 3, 1);
                 posteDeLuz.move(0, 50, 0);
@@ -298,15 +320,15 @@ namespace TGC.Group.Model
                 meshes.Add(posteDeLuz);
                 LpostesDeLuz.Add(posteDeLuz);
             }
-            cordones.Add(new TgcPlane(new Vector3(-450, 5, 5445), new Vector3(5900, 0, 5), TgcPlane.Orientations.XZplane, cordonTexture, 40, 1));
-            cordones.Add(new TgcPlane(new Vector3(-450, 0, 5445), new Vector3(5900, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
-            cordones.Add(new TgcPlane(new Vector3(-450, 5, 5500), new Vector3(5950, 0, -50), TgcPlane.Orientations.XZplane, veredaTexture, 60, 1));
+            cordones.Add(new TgcPlane(new Vector3(-450+ fix_posX, 5, 5445 + fix_posZ), new Vector3(5900, 0, 5), TgcPlane.Orientations.XZplane, cordonTexture, 40, 1));
+            cordones.Add(new TgcPlane(new Vector3(-450 + fix_posX, 0, 5445 + fix_posZ), new Vector3(5900, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
+            cordones.Add(new TgcPlane(new Vector3(-450 + fix_posX, 5, 5500 + fix_posZ), new Vector3(5950, 0, -50), TgcPlane.Orientations.XZplane, veredaTexture, 60, 1));
             for (int i = 0; i < 30; i++)
             {
                 var sceneRueda = loader.loadSceneFromFile(MediaDir + "PosteDeLuz\\Poste de luz-TgcScene.xml");
                 posteDeLuz = sceneRueda.Meshes[0];
                 posteDeLuz.AutoTransformEnable = true;
-                posteDeLuz.Position = new Vector3(-455 + (i * (5900 / 30)), 5, 5445);
+                posteDeLuz.Position = new Vector3(-455 + (i * (5900 / 30)) + fix_posX, 5, 5445 + fix_posZ);
                 posteDeLuz.rotateY(FastMath.PI + FastMath.PI_HALF);
                 posteDeLuz.Scale = new Vector3(1, 3, 1);
                 posteDeLuz.move(0, 50, 0);
@@ -314,15 +336,15 @@ namespace TGC.Group.Model
                 meshes.Add(posteDeLuz);
                 LpostesDeLuz.Add(posteDeLuz);
             }
-            cordones.Add(new TgcPlane(new Vector3(5445, 5, -445), new Vector3(5, 0, 5890), TgcPlane.Orientations.XZplane, cordonTexture, 1, 40));
-            cordones.Add(new TgcPlane(new Vector3(5445, 0, -445), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
-            cordones.Add(new TgcPlane(new Vector3(5450, 5, -450), new Vector3(50, 0, 5900), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
+            cordones.Add(new TgcPlane(new Vector3(5445 + fix_posX, 5, -445 + fix_posZ), new Vector3(5, 0, 5890), TgcPlane.Orientations.XZplane, cordonTexture, 1, 40));
+            cordones.Add(new TgcPlane(new Vector3(5445 + fix_posX, 0, -445 + fix_posZ), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
+            cordones.Add(new TgcPlane(new Vector3(5450 + fix_posX, 5, -450 + fix_posZ), new Vector3(50, 0, 5900), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
             for (int i = 0; i < 30; i++)
             {
                 var sceneRueda = loader.loadSceneFromFile(MediaDir + "PosteDeLuz\\Poste de luz-TgcScene.xml");
                 posteDeLuz = sceneRueda.Meshes[0];
                 posteDeLuz.AutoTransformEnable = true;
-                posteDeLuz.Position = new Vector3(5445 , 5, -450 + (i * (5900 / 30)));
+                posteDeLuz.Position = new Vector3(5445 + fix_posX, 5, -450 + (i * (5900 / 30)) + fix_posZ);
                 posteDeLuz.rotateY(FastMath.TWO_PI);
                 posteDeLuz.Scale = new Vector3(1, 3, 1);
                 posteDeLuz.move(0, 50, 0);
@@ -336,11 +358,11 @@ namespace TGC.Group.Model
         {
             paredTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Textures\\Ladrillo\\brick1_2.jpg");
 
-            paredes.Add(new TgcPlane(new Vector3(-500, 0, -500), new Vector3(0, 100, 6000), TgcPlane.Orientations.YZplane, paredTexture, 60, 1));
+            paredes.Add(new TgcPlane(new Vector3(0, 0, 0), new Vector3(0, 100, 6000), TgcPlane.Orientations.YZplane, paredTexture, 60, 1));
             
-            paredes.Add(new TgcPlane(new Vector3(-500, 0, -500), new Vector3(6000, 100, 0), TgcPlane.Orientations.XYplane, paredTexture, 60, 1));
-            paredes.Add(new TgcPlane(new Vector3(5500, 0, 5500), new Vector3(0, 100, -6000), TgcPlane.Orientations.YZplane, paredTexture, 60, 1));
-            paredes.Add(new TgcPlane(new Vector3(-500, 0, 5500), new Vector3(6000, 100, 0), TgcPlane.Orientations.XYplane, paredTexture, 60, 1));
+            paredes.Add(new TgcPlane(new Vector3(0, 0, 0), new Vector3(6000, 100, 0), TgcPlane.Orientations.XYplane, paredTexture, 60, 1));
+            paredes.Add(new TgcPlane(new Vector3(6000, 0, 6000), new Vector3(0, 100, -6000), TgcPlane.Orientations.YZplane, paredTexture, 60, 1));
+            paredes.Add(new TgcPlane(new Vector3(0, 0, 6000), new Vector3(6000, 100, 0), TgcPlane.Orientations.XYplane, paredTexture, 60, 1));
 
         }
 
@@ -367,11 +389,11 @@ namespace TGC.Group.Model
         {
 
             creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Cura\\cura-TgcScene.xml", new Vector3(2609, 15, 2450), FastMath.PI_HALF);
-            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(5237, 10, -217), FastMath.PI);
-            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(-75, 10, 5240), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(5237, 10, 50), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(50, 10, 5240), FastMath.PI);
             creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(5295, 10, 5223), FastMath.PI);
             creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(2728, 10, 5559), FastMath.PI);
-            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(1676, 10, -211), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(1676, 10, 60), FastMath.PI);
             creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(2602, 10, 719), FastMath.PI);
             itemsTiempoInvisibilidad = new int[7];
             for ( var i = 0; i<7; i++)
@@ -379,77 +401,6 @@ namespace TGC.Group.Model
                 itemsTiempoInvisibilidad[i] = 380;
             }
         }
-
-
-
-        /*   private void crearAuto()
-           {
-               vehiculos = new List<Vehiculo>();
-
-               var sceneVehiculo = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\CamionCarga\\CamionCarga-TgcScene.xml");
-               vehiculos.Add(new Vehiculo(sceneVehiculo.Meshes[0],new Vector3(((suelo.Size.X) - 600), 5, 0),this.env));
-
-               sceneVehiculo = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
-               Vehiculo vehiculo =new Vehiculo(sceneVehiculo.Meshes[0], new Vector3(((suelo.Size.X) - 600), 5, 0), this.env);
-               vehiculo.getMesh().AutoTransformEnable = true;
-               vehiculo.getMesh().Scale = new Vector3(1, 1, 1);
-               vehiculo.getMesh().rotateY(FastMath.PI_HALF);
-               vehiculos.Add(vehiculo);
-
-               sceneVehiculo = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Buggy\\Buggy-TgcScene.xml");
-               vehiculo = new Vehiculo(sceneVehiculo.Meshes[0], new Vector3(((suelo.Size.X) - 4000), 5, (suelo.Size.Z) - 1600), this.env);
-               vehiculo.getMesh().AutoTransformEnable = true;
-               vehiculo.getMesh().rotateY(FastMath.PI_HALF);
-               vehiculo.getMesh().Scale = new Vector3(2, 2, 2);
-               vehiculos.Add(vehiculo);
-
-
-               sceneVehiculo = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Patrullero\\Patrullero-TgcScene.xml");
-               vehiculo = new Vehiculo(sceneVehiculo.Meshes[0], new Vector3(1000, 5, (suelo.Size.Z) - 2200), this.env);
-               vehiculo.getMesh().AutoTransformEnable = true;
-               vehiculo.getMesh().rotateY(FastMath.PI);
-               vehiculo.getMesh().Scale = new Vector3(1, 1, 1);
-               vehiculos.Add(vehiculo);
-
-                           var sceneHummer = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
-                           hummer = sceneHummer.Meshes[0];
-                           hummer.AutoTransformEnable = true;
-                           hummer.move(0, 5, 0);
-                         //  meshes.Add(hummer);
-
-                           var sceneCamion = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\CamionCarga\\CamionCarga-TgcScene.xml");
-                           camion = sceneCamion.Meshes[0];
-                           camion.AutoTransformEnable = true;
-                           camion.move(((suelo.Size.X) - 600), 5, 0);
-                           meshes.Add(camion);
-
-                           var sceneAuto = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
-                           auto = sceneAuto.Meshes[0];
-                           auto.AutoTransformEnable = true;
-                           auto.move(((suelo.Size.X) - 2000), 5, (suelo.Size.Z) - 800);
-                           auto.Scale = new Vector3(1, 1, 1);
-                           auto.rotateY(FastMath.PI_HALF);
-                           meshes.Add(auto);
-
-                           var sceneBuggy = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Buggy\\Buggy-TgcScene.xml");
-                           buggy = sceneBuggy.Meshes[0];
-                           buggy.AutoTransformEnable = true;
-                           buggy.move(((suelo.Size.X) - 4000), 5, (suelo.Size.Z) - 1600);
-                           buggy.rotateY(FastMath.PI_HALF);
-                           buggy.Scale = new Vector3(2, 2, 2);
-                           meshes.Add(buggy);
-
-                           var scenePatrullero = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Patrullero\\Patrullero-TgcScene.xml");
-                           patrullero = scenePatrullero.Meshes[0];
-                           patrullero.AutoTransformEnable = true;
-                           patrullero.move(1000, 5, (suelo.Size.Z) - 2200);
-                           patrullero.rotateY(FastMath.PI);
-                           patrullero.Scale = new Vector3(1, 1, 1);
-                           meshes.Add(patrullero);
-
-           }*/
-
-
 
         private void crearSemaforos()
         {
@@ -645,6 +596,18 @@ namespace TGC.Group.Model
         private int posEncontrada = -1;
         public void Render()
         {
+
+
+            foreach (TgcMesh mesh in this.getAllMeshes())
+            {
+                //rendereo solo lo que esta dentro del frustrum
+                var c = TgcCollisionUtils.classifyFrustumAABB(this.env.Frustum, mesh.BoundingBox);
+                if (c != TgcCollisionUtils.FrustumResult.OUTSIDE)
+                {
+                    mesh.render();
+                }
+            }
+            
             //Renderizar suelo
             suelo.render();
             //calle.render();
@@ -654,8 +617,8 @@ namespace TGC.Group.Model
             skyBox.render();
 
             //Renderizar instancias
-            foreach (var mesh in meshes)
-                  mesh.render();
+          //  foreach (var mesh in meshes)
+          //        mesh.render();
 
             //Renderizar items
             int nroItem = 0;
@@ -775,6 +738,10 @@ namespace TGC.Group.Model
             foreach (var mesh in LpostesDeLuz)
                 mesh.BoundingBox.render();
             
+        }
+        public TgcSkyBox getSkyBox()
+        {
+            return this.skyBox;
         }
         private void iniciarCielo()
         {
