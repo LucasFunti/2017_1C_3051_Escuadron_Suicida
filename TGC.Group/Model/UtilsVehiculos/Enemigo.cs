@@ -63,7 +63,7 @@ namespace TGC.Group.Model.UtilsVehiculos
             doblaD = false;
             doblaI = false;
             
-                if(TiempoRetardoDoblar>10)
+            if(TiempoRetardoDoblar>10)
                 ApuntarAlTarget();
 
             //siempre intenta avanzar;    
@@ -98,33 +98,33 @@ namespace TGC.Group.Model.UtilsVehiculos
         }
         private void ApuntarAlTarget()
         {
-           //Se fija que el target haya cambiado de posicion
+            //Se fija que el target haya cambiado de posicion
             if (targetPos == this.autoP.getMesh().Position)
-                return;
+                 return;
 
-            targetPos = this.autoP.getMesh().Position;
-       
-
-            float X1 = this.getMesh().Position.X;
-            float Z1 = this.getMesh().Position.Z;
-
-            float X2 = this.autoP.getMesh().Position.X;
-            float Z2 = this.autoP.getMesh().Position.Z;
-
-            float ang = FastMath.Atan2((Z2 - Z1), (X2 - X1));
-
-            
-            if (base.anguloFinal != (FastMath.PI * 3 / 2) - ang)
-            {
-                setAnguloFinal((FastMath.PI * 3 / 2) - ang);
-
-                if (ang >= 0 && ang <= 3)
-                    doblaD=true;
-                if (ang < 0 && ang >= -3)
-                    doblaI = true;
+             targetPos = this.autoP.getMesh().Position;
 
 
-            }
+             float X1 = this.getMesh().Position.X;
+             float Z1 = this.getMesh().Position.Z;
+
+             float X2 = this.autoP.getMesh().Position.X;
+             float Z2 = this.autoP.getMesh().Position.Z;
+
+             float ang = FastMath.Atan2((Z2 - Z1), (X2 - X1));
+
+
+             if (base.anguloFinal != (FastMath.PI * 3 / 2) - ang)
+             {
+                 setAnguloFinal((FastMath.PI * 3 / 2) - ang);
+                float f = this.autoP.orientacion;
+                 if (ang >= 0 && ang <= 3)
+                     doblaD=true;
+                 if (ang < 0 && ang >= -3)
+                     doblaI = true;
+
+
+             }
         }
         public override bool disparar()
         {

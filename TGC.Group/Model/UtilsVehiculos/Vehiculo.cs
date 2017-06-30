@@ -214,7 +214,7 @@ namespace TGC.Group.Model
         {
 
         }
-        private void creaDisparo(Vector3 posicion)
+        public void creaDisparo(Vector3 posicion)
         {
             string sonido = env.MediaDir + "MySounds\\MachineGun.wav";
             var loader = new TgcSceneLoader();
@@ -223,39 +223,73 @@ namespace TGC.Group.Model
             mesh.AutoTransformEnable = false;
             mesh.AutoUpdateBoundingBox = true;
             mesh.createBoundingBox();
-           // var m = Matrix.Scaling(new Vector3(0.1f, 0.1f, 0.1f)) * Matrix.RotationY(0.001f) * Matrix.Translation(posicion);
-          //  mesh.Transform = m;
             mesh.Position = posicion;
-          //  mesh.rotateX(FastMath.PI);
-          //  mesh.Scale = new Vector3(0.1f, 0.1f, 0.1f);
-          //  mesh.move(0, 20, 0);
-          
-            Arma arma = new Arma(mesh, this.env, sonido, 40, this.orientacion, base.directionArrow.PEnd); 
+            Arma arma = new Arma(mesh, this.env, sonido, 40, this.orientacion, base.directionArrow.PEnd);
+
             arma.mover();
             ControladorDeVehiculos.getInstance().agregarArma(arma);
             base.agregarArma(arma);
         }
-        private void creaMisilV(Vector3 posicion)
+        public void creaMisilV()
         {
+            TgcSceneLoader loader=new TgcSceneLoader();
             string sonido = env.MediaDir + "MySounds\\Launch4.wav";
-            var loader = new TgcSceneLoader();
             var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml");
             TgcMesh mesh = scene.Meshes[0];
             mesh.AutoTransformEnable = false;
             mesh.AutoUpdateBoundingBox = true;
             mesh.createBoundingBox();
-         //   var m = Matrix.Scaling(new Vector3(0.5f, 0.5f, 0.5f)) * Matrix.RotationY(0.001f) * Matrix.Translation(posicion);
-     //       mesh.Transform = m;
-        //    mesh.Position = posicion;
-            mesh.Position = posicion;
-        //    mesh.rotateX(FastMath.PI);
-         //   mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
-          //  mesh.move(0, 20, 0); ;
+           // mesh.Rotation.Y=;
+            mesh.rotateY(45);
+            mesh.Position = this.getMesh().Position;            
             Arma arma = new Arma(mesh, this.env, sonido, 20, this.orientacion, base.directionArrow.PEnd);
+            arma.mover();
             ControladorDeVehiculos.getInstance().agregarArma(arma);
             base.agregarArma(arma);
+            // mesh.rotateX(FastMath.PI);
+            //mesh.Rotation = this.getMesh().Rotation;
+            //  mesh.Scale = new Vector3(0.3f, 0.3f, 0.3f);
+            //  mesh.Rotation = this.getMesh().Rotation;
+
+            //  var m = Matrix.Scaling(0.3f, 0.3f, 0.3f) * Matrix.RotationY(this.anguloFinal*this.orientacion) * Matrix.Translation(this.getMesh().Position);
+            // mesh.Transform=m;
+
+            // mesh.move(0, 20, 0);
+            //matrixRotacion = this.getMesh().Transform;
+            //matrixRotacion = Matrix.RotationY(orientacion);
+            //mesh.rotateY(orientacion);
+            //this.rotar(new Vector3(0, valor, 0), matrixRotacion, 0);
+            //Matrix matrixTransform = Matrix.Multiply(mesh.Transform, this.getMesh().Transform);
+            //this.rotar(new Vector3(0, -sentido * 1f * this.env.ElapsedTime, 0), matrixRotacion, -sentido * 1f * this.env.ElapsedTime);
+            //mesh.Transform = Matrix.Multiply(this.getMesh().Transform, mesh.Transform);
+
+
+            // var m = Matrix.Scaling(mesh.Scale) * matrixRotacion * Matrix.Translation(this.getMesh().Position);
+            //      Arma arma = new Arma(mesh, this.env, sonido, 20, orientacion, base.directionArrow.PEnd);
+
+            //base.agregarArma(arma);
         }
-       
+        /*  private void creaMisilV(Vector3 posicion)
+          {
+              string sonido = env.MediaDir + "MySounds\\Launch4.wav";
+              var loader = new TgcSceneLoader();
+              var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml");
+              TgcMesh mesh = scene.Meshes[0];
+              mesh.AutoTransformEnable = false;
+              mesh.AutoUpdateBoundingBox = true;
+              mesh.createBoundingBox();
+           //   var m = Matrix.Scaling(new Vector3(0.5f, 0.5f, 0.5f)) * Matrix.RotationY(0.001f) * Matrix.Translation(posicion);
+       //       mesh.Transform = m;
+          //    mesh.Position = posicion;
+              mesh.Position = posicion;
+          //    mesh.rotateX(FastMath.PI);
+           //   mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            //  mesh.move(0, 20, 0); ;
+              Arma arma = new Arma(mesh, this.env, sonido, 20, this.orientacion, base.directionArrow.PEnd);
+              ControladorDeVehiculos.getInstance().agregarArma(arma);
+              base.agregarArma(arma);
+          }*/
+
         public virtual void Update()
         {
            // base.CalcularMeshesCercanos();
@@ -274,8 +308,10 @@ namespace TGC.Group.Model
             }
             if (disparaEspecial()) { 
                   base.startArma();
-               creaMisilV(this.getMesh().Position);
-             }
+                //   creaMisilV(this.getMesh().Position);
+                creaMisilV();
+
+            }
 
             //Actualizar valores de la linea de movimiento
             //   directionArrow.PStart = this.getMesh().Position;

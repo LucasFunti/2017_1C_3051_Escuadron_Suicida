@@ -11,11 +11,8 @@ namespace TGC.Group.Model.UtilsVehiculos
 {
     class Arma : Vehiculo
     {
-        private int TiempoRetardo = 1;
-
-        private Vector3 target;
-        private Boolean doblaD = false;
-        private Boolean doblaI = false;
+    //   private Boolean doblaD = false;
+     //   private Boolean doblaI = false;
         private int tiempoDeVida = 0;
 
         public Arma(TgcMesh Mesh, TwistedMetal env, string sonido, float aceleracion, float orientacion, Vector3 target) : base(Mesh, env)
@@ -42,8 +39,7 @@ namespace TGC.Group.Model.UtilsVehiculos
             //this.getMesh().Transform = MT;
 
             //string sonido = env.MediaDir + "MySounds\\MachineGun.wav";
-            this.target = target;
-            ApuntarAlTarget();
+            this.setAnguloFinal(this.orientacion);
             base.setSonido(sonido);
             base.setSonidoMotor(sonido);
             base.setSonidoArma(sonido);
@@ -54,9 +50,7 @@ namespace TGC.Group.Model.UtilsVehiculos
         }
         public override void Update()
         {
-            
             if (base.getMesh().Enabled ) base.Update();
-
         }
         public void setTiempoDeVida(int t)
         {
@@ -66,47 +60,18 @@ namespace TGC.Group.Model.UtilsVehiculos
         {
             return tiempoDeVida;
         }
-        private void ApuntarAlTarget()
-        {
-            //1- bajo el contador que se fija cuando fue la ultima vez que apunte.
-
-             float X1 = this.getMesh().Position.X;
-            float Z1 = this.getMesh().Position.Z;
-
-            float X2 = this.target.X;
-            float Z2 = this.target.Z;
-
-            float ang = FastMath.Atan2((Z2 - Z1), (X2 - X1));
-
-
-            if (base.anguloFinal != (FastMath.PI * 3 / 2) - ang)
-            {
-                setAnguloFinal((FastMath.PI * 3 / 2) - ang);
-
-                if (ang >= 0 && ang <= 3)
-                    doblaD = true;
-                if (ang < 0 && ang >= -3)
-                    doblaI = true;
-
-
-            }
-         
-        }
         public override bool moverAIzquierda()
         {
-
-            return doblaI;
+            return false;
         }
         public override bool moverADerecha()
         {
-
-            return doblaD;
+            return false;
         }
       
         public override void Render()
         {
             base.Render();
-
         }
 
         public override bool moverAdelante()

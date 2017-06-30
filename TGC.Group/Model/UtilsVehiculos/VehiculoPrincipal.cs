@@ -278,7 +278,7 @@ namespace TGC.Group.Model.UtilsVehiculos
 
         }
 
-        private void creaMisilV()
+      /*  private void creaMisilV()
         {
             Vector3 posicion = this.getMesh().Position;
             float orientacion = this.orientacion;
@@ -303,12 +303,14 @@ namespace TGC.Group.Model.UtilsVehiculos
             mesh.Rotation = this.getMesh().Rotation;
 
             var m = Matrix.Scaling(mesh.Scale) * matrixRotacion * Matrix.Translation(posicion);
-            Arma arma = new Arma(mesh, this.env, sonido, 20, orientacion, base.directionArrow.PEnd);
+            //      Arma arma = new Arma(mesh, this.env, sonido, 20, orientacion, base.directionArrow.PEnd);
+            Arma arma = new Arma(mesh, this.env, sonido, 20, this.orientacion, base.directionArrow.PEnd);
+
             ControladorDeVehiculos.getInstance().agregarArma(arma);
             //base.agregarArma(arma);
-        }
+        }*/
 
-        private void creaDisparo()
+     /*   private void creaDisparo()
         {
             Vector3 posicion = this.getMesh().Position;
             float orientacion = this.orientacion;
@@ -326,10 +328,12 @@ namespace TGC.Group.Model.UtilsVehiculos
             //Matrix matrixTransform = Matrix.Multiply( mesh.Transform, this.getMesh().Transform);
             var m = Matrix.Scaling(mesh.Scale) * matrixRotacion * Matrix.Translation(posicion);
 
+            //   Arma arma = new Arma(mesh, this.env, sonido, 40, orientacion, base.directionArrow.PEnd);
             Arma arma = new Arma(mesh, this.env, sonido, 40, orientacion, base.directionArrow.PEnd);
+
             ControladorDeVehiculos.getInstance().agregarArma(arma);
            // base.agregarArma(arma);
-        }
+        }*/
 
         public override void Update()
         {
@@ -344,7 +348,7 @@ namespace TGC.Group.Model.UtilsVehiculos
 
             if (disparar()) {
                 base.startDisparo();
-                creaDisparo();
+                base.creaDisparo(this.getMesh().Position);
             }
 
             if (moverArriba())

@@ -99,11 +99,11 @@ namespace TGC.Group.Model.UtilsVehiculos
                 if (!vehiculo.esAutoPrincipal())
                 {
                     //rendereo solo lo que esta dentro del frustrum
-                    var c = TgcCollisionUtils.classifyFrustumAABB(this.env.Frustum, vehiculo.getMesh().BoundingBox);
-                    if (c != TgcCollisionUtils.FrustumResult.OUTSIDE)
-                    {
+               //     var c = TgcCollisionUtils.classifyFrustumAABB(this.env.Frustum, vehiculo.getMesh().BoundingBox);
+                 //   if (c != TgcCollisionUtils.FrustumResult.OUTSIDE)
+                   // {
                         vehiculo.getMesh().render();
-                    }
+                    //}
                 }
             }
             this.autoPrincipal.Render();
