@@ -16,50 +16,54 @@ namespace TGC.Group.Model.UtilsVehiculos
         private CustomSprite spriteAguja;
         private TwistedMetal env;
         private Drawer2D drawer2D;
-     
+        float velocidadMaxAuto;
+        float agujaPuntoCero = FastMath.PI / 4; //0 del velocimetro
+        float agujaPuntoMax = (FastMath.PI * 1.76f)- FastMath.PI / 4;// 220 en el velocimetro
 
-        public Velocimetro(TwistedMetal env)
+        public Velocimetro(TwistedMetal env,float vMax)
         {
             this.env = env;
+            //  this.velocidadMaxAuto = vMax;
+            this.velocidadMaxAuto = 150;
             spriteVelocimetro = new CustomSprite();
             spriteVelocimetro.Bitmap = new CustomBitmap(this.env.MediaDir + "\\Velocimetro\\velocimetro.png", D3DDevice.Instance.Device);
-            spriteVelocimetro.Scaling = new Vector2(0.1f, 0.1f);
+            spriteVelocimetro.Scaling = new Vector2(0.8f, 0.8f);
             var textureSize = spriteVelocimetro.Bitmap.Size;
-            spriteVelocimetro.Position = new Vector2(FastMath.Max(D3DDevice.Instance.Width - textureSize.Width, 0),
-                FastMath.Max(D3DDevice.Instance.Height - textureSize.Height, 0));
 
-            spriteAguja = new CustomSprite();
-            spriteAguja.Bitmap = new CustomBitmap(this.env.MediaDir + "\\Velocimetro\\aguja.png", D3DDevice.Instance.Device);
-            spriteAguja.Scaling = new Vector2(0.5f, 0.5f);
-            spriteAguja.Rotation = FastMath.PI/2;
-            spriteAguja.Position = new Vector2(spriteVelocimetro.Position.X + (textureSize.Width / 38), spriteVelocimetro.Position.Y + (textureSize.Height / 9.4f));
-            
-         //   spriteAguja.Rotation = 0;
+            //Velocimetro a derecha:
+            //   spriteVelocimetro.Position = new Vector2(FastMath.Max(D3DDevice.Instance.Width - textureSize.Width, 0), FastMath.Max(D3DDevice.Instance.Height - textureSize.Height, 0));
+            //Velocimetro a izquierda:
+            spriteVelocimetro.Position = new Vector2(0,FastMath.Max(D3DDevice.Instance.Height - textureSize.Height, 0));
+         
+           spriteAguja = new CustomSprite();
+           spriteAguja.Bitmap = new CustomBitmap(this.env.MediaDir + "\\Velocimetro\\aguja.png", D3DDevice.Instance.Device);
+           spriteAguja.Scaling = new Vector2(0.2f, 0.3f);
+           spriteAguja.Position = new Vector2(spriteVelocimetro.Position.X + (textureSize.Width / 2.5f), spriteVelocimetro.Position.Y + (textureSize.Height / 2.5f));
+
             drawer2D = new Drawer2D();
-            
+        
         }
 
-        public void Update(float velocidad, bool huboMarchaAtras)
+        public void Update(float velocidad)
         {
-       /*   if (velocidad < 0)
-                spriteAguja.Rotation = (FastMath.PI / 4 - velocidad);
-            else
-                spriteAguja.Rotation = FastMath.PI / 4 + velocidad;
-            if (velocidad < 0 && huboMarchaAtras)
-                spriteAguja.Rotation = FastMath.PI / 4;
-        */
+            spriteAguja.Rotation = getAnguloAguja(velocidad);
         }
-
-        //int time = 0;
+        
         public void Render()
         {
             drawer2D.BeginDrawSprite();
             drawer2D.DrawSprite(spriteVelocimetro);
-         //   spriteAguja.Rotation = FastMath.PI/4;
-
             drawer2D.DrawSprite(spriteAguja);
             
             drawer2D.EndDrawSprite();
       }
+
+      private float getAnguloAguja(float velocidad)
+        {
+            if (velocidad <= 0)
+                return agujaPuntoCero;
+
+            return ((velocidad * agujaPuntoMax) / this.velocidadMaxAuto)+agujaPuntoCero;
+        }
     }
 }

@@ -40,8 +40,7 @@ namespace TGC.Group.Model.UtilsVehiculos
 
         public VehiculoPrincipal(TwistedMetal env) : base(env)
         {
-            velocimetro = new Velocimetro(env);
-
+          
             Personaje personaje = Personaje.getInstance();
             loader = new TgcSceneLoader();
             var scene = loader.loadSceneFromFile(personaje.FileMesh);
@@ -121,6 +120,7 @@ namespace TGC.Group.Model.UtilsVehiculos
             //ruedaDelantera2 = rueda.Meshes[0];
             //ruedaTrasera1 = rueda.Meshes[0];
             //ruedaTrasera2 = rueda.Meshes[0];
+            crearVelocimetro();
             cargarShaders();
         }
 
@@ -130,6 +130,11 @@ namespace TGC.Group.Model.UtilsVehiculos
             efectoOriginal = this.getMesh().Effect;
             efectoShaderChoque = TgcShaders.loadEffect(this.env.ShadersDir + "EfectoMetal_ConChoque.fx");
             this.getMesh().Technique = "RenderScene";
+        }
+        private void crearVelocimetro()
+        {
+            velocimetro = new Velocimetro(env,this.getVelocidadMaxima());
+
         }
 
         public override Boolean esAutoPrincipal()
@@ -371,7 +376,7 @@ namespace TGC.Group.Model.UtilsVehiculos
                 //rueda[1].Update();
                 //rueda[2].Update();
             }*/
-            this.velocimetro.Update(this.getVelocidadX(), true);
+            this.velocimetro.Update(this.getVelocidadX());
         }
         public override void Render()
         {
