@@ -122,8 +122,6 @@ namespace TGC.Group.Model.UtilsVehiculos
                      doblaD=true;
                  if (ang < 0 && ang >= -3)
                      doblaI = true;
-
-
              }
         }
         public override bool disparar()

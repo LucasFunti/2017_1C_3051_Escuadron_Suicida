@@ -31,7 +31,7 @@ namespace TGC.Group.Model.UtilsVehiculos
             spriteAguja = new CustomSprite();
             spriteAguja.Bitmap = new CustomBitmap(this.env.MediaDir + "\\Velocimetro\\aguja.png", D3DDevice.Instance.Device);
             spriteAguja.Scaling = new Vector2(0.5f, 0.5f);
-            spriteAguja.Rotation = FastMath.PI+45 ;
+            spriteAguja.Rotation = FastMath.PI/2;
             spriteAguja.Position = new Vector2(spriteVelocimetro.Position.X + (textureSize.Width / 38), spriteVelocimetro.Position.Y + (textureSize.Height / 9.4f));
             
          //   spriteAguja.Rotation = 0;
@@ -55,7 +55,7 @@ namespace TGC.Group.Model.UtilsVehiculos
         {
             drawer2D.BeginDrawSprite();
             drawer2D.DrawSprite(spriteVelocimetro);
-            //spriteAguja.Rotation = spriteAguja.Rotation + FastMath.PI;
+         //   spriteAguja.Rotation = FastMath.PI/4;
 
             drawer2D.DrawSprite(spriteAguja);
             

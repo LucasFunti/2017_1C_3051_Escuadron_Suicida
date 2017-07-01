@@ -240,10 +240,13 @@ namespace TGC.Group.Model
             mesh.AutoUpdateBoundingBox = true;
             mesh.createBoundingBox();
            // mesh.Rotation.Y=;
-            mesh.rotateY(45);
-            mesh.Position = this.getMesh().Position;            
+         //   mesh.rotateY(45);
+            mesh.Position = this.getMesh().Position;
+        //   mesh.Transform = this.getMesh().Transform;
             Arma arma = new Arma(mesh, this.env, sonido, 20, this.orientacion, base.directionArrow.PEnd);
+            
             arma.mover();
+           // arma.getMesh().rotateY(FastMath.p);
             ControladorDeVehiculos.getInstance().agregarArma(arma);
             base.agregarArma(arma);
             // mesh.rotateX(FastMath.PI);
