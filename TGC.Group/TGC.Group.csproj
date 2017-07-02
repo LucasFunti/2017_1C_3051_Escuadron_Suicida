@@ -98,6 +98,7 @@
     <Compile Include="Model\UtilsColisiones\Colisionador.cs" />
     <Compile Include="Model\UtilsColisiones\ManejadorDeColisiones.cs" />
     <Compile Include="Model\UtilsEfectos\FixedLight.cs" />
+    <Compile Include="Model\UtilsEfectos\Humo.cs" />
     <Compile Include="Model\UtilsEfectos\Niebla.cs" />
     <Compile Include="Model\UtilsEfectos\PuntoDeLuz.cs" />
     <Compile Include="Model\UtilsSounds\Musica.cs" />

@@ -170,7 +170,7 @@
             this.ResumeLayout(false);
 
         }
-
+      
         #endregion
         private System.Windows.Forms.Button BtnComenzar;
         private System.Windows.Forms.Button BtnSalir;

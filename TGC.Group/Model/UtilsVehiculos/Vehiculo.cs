@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using TGC.Core.SceneLoader;
 using TGC.Core.Utils;
+using TGC.Group.Model.UtilsEfectos;
 using TGC.Group.Model.UtilsVehiculos;
 
 namespace TGC.Group.Model
@@ -10,6 +11,12 @@ namespace TGC.Group.Model
     class Vehiculo : ObjetoConMovimiento
     {
         private LifeLevel lifeLevel;
+        private Humo humoCañoEscape;
+        private Humo humoChoque;
+        private Boolean EfectoNitro=false;
+        public float tInicioHumo = 1f; 
+        public static float tDuracionHumo = 1f;
+        public float tFinHumo = 2f;
 
         public Vehiculo(TgcMesh Mesh, TwistedMetal env) : base(env)
         {
@@ -20,19 +27,30 @@ namespace TGC.Group.Model
             //      direcionadores();
             updateTGCArrow();
             iniciarNivelDeVida();
+            iniciarHumo();
         }
-        public Vehiculo(TwistedMetal env) : base(env)
+        public Vehiculo(TwistedMetal env) : base(env)  
         {
             this.setVelocidadY(0);
             base.setAluraMaxima(100);
             //    direcionadores();
             iniciarNivelDeVida();
+            iniciarHumo();
         }
         private void iniciarNivelDeVida()
         {
             this.lifeLevel = new LifeLevel(this.esAutoPrincipal());
         }
-       
+        private void iniciarHumo()
+        {
+            humoCañoEscape = new Humo(this.env);
+            humoChoque = new Humo(this.env,true);
+        }
+        private void TirarHumoChoque()
+        {
+            tInicioHumo = this.env.ElapsedTime;
+            tFinHumo = tInicioHumo + tDuracionHumo;
+        }
         public  virtual Boolean esAutoPrincipal()
         {
             return false;
@@ -297,7 +315,12 @@ namespace TGC.Group.Model
               ControladorDeVehiculos.getInstance().agregarArma(arma);
               base.agregarArma(arma);
           }*/
-
+        protected override void aplicarEfecto()
+        {
+            tInicioHumo = FastMath.Abs(this.env.ElapsedTime);
+            tFinHumo = tInicioHumo + tDuracionHumo;
+            this.humoChoque.Update(this.getNuevaPosicion(), this.anguloFinal);
+        }
         public virtual void Update()
         {
            // base.CalcularMeshesCercanos();
@@ -318,7 +341,8 @@ namespace TGC.Group.Model
                 creaMisilV();
 
             }
-
+            this.humoCañoEscape.Update(this.getNuevaPosicion(), this.anguloFinal);
+ 
             //Actualizar valores de la linea de movimiento
             //   directionArrow.PStart = this.getMesh().Position;
             //directionArrow.PEnd = this.getMesh().Position + Vector3.Multiply(this.getMesh().Position, 50);
@@ -343,6 +367,12 @@ namespace TGC.Group.Model
             
             base.getMesh().render();
             this.lifeLevel.render();
+            humoCañoEscape.Render(EfectoNitro);
+
+            if (tInicioHumo < tFinHumo)
+                humoChoque.Render(false); //si es momento de choque, muestro humito
+
+            tInicioHumo = tInicioHumo + FastMath.Abs(this.env.ElapsedTime);
             //     base.getBoxDeColision().render();
             // base.getBoxDeColision().render();
             //   directionArrow.render();

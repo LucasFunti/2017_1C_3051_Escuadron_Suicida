@@ -245,7 +245,9 @@ namespace TGC.Group.Model
                 offset_row = 1065 + ((i - 1) * 900);
                 offset_Col = 200 + ((j - 1) * 900);
             }
+            
             edificio = scene.Meshes[nMesh];
+            
             var instance = edificio.createMeshInstance(edificio.Name + i + "_" + j);
             //No recomendamos utilizar AutoTransform, en juegos complejos se pierde el control. mejor utilizar Transformaciones con matrices.
             instance.AutoTransformEnable = true; //AS
@@ -258,7 +260,8 @@ namespace TGC.Group.Model
 
             //Matrix m=new Matrix();
             //Vector3 pos = new Vector3(offset_row + fix_posX, offset_Y, offset_Col + fix_posZ);
-            instance.move(offset_row+ fix_posX, offset_Y, offset_Col+ fix_posZ); 
+            instance.move(offset_row+ fix_posX, offset_Y, offset_Col+ fix_posZ);
+            
             //m = Matrix.Scaling(new Vector3(1f, 1f, 1f)) * Matrix.RotationY(0.001f) * Matrix.Translation(pos);
             if (nMesh == 0)
             {
@@ -270,8 +273,9 @@ namespace TGC.Group.Model
                  instance.Scale = new Vector3(0.40f, 1f, 1f); 
               //  m = Matrix.Scaling(new Vector3(0.40f, 1f, 1f)) * Matrix.RotationY(0.001f) * Matrix.Translation(pos);
             }
-          //  instance.Transform = m;
-           // instance.Position = pos;
+            //  instance.Transform = m;
+            // instance.Position = pos;
+           
             edificios.Add(instance);
             
             var posicionX = instance.BoundingBox.calculateBoxCenter().X - (550 / 2);

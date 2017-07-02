@@ -584,7 +584,7 @@ namespace TGC.Group.Model
             /*Si choca se pone el box de choque en DarkRed*/
             if (collisionFound)
             {
-  
+                aplicarEfecto();
                 sonidoColision.startSound();
                 if (!this.esArma) {
 
@@ -639,7 +639,10 @@ namespace TGC.Group.Model
             }
         }
 
+        protected virtual void aplicarEfecto()
+        {
 
+        }
 
         private void ProcesarItems()
         {
