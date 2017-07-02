@@ -30,8 +30,7 @@ namespace TGC.Group.Model
     /// </summary>
     public class TwistedMetal : TgcExample
     {
-        public List<FixedLight> LucesLst;
-        private PuntoDeLuz luz;
+        private PuntoDeLuz luz, luz2;
         public Ciudad Ciudad;
         public Musica sonidos;
         public Niebla niebla;
@@ -64,11 +63,8 @@ namespace TGC.Group.Model
        private void iniciarIluminacion()
        {
             luz = new PuntoDeLuz(this, new Vector3(100f, 100f, 100f));
-          /*  this.LucesLst = new List<FixedLight>();
-           Vector3 abajo = new Vector3(0, -1, 0);
-           this.LucesLst.Add(new FixedLight(new Vector3(0, 100, 0), abajo, 3000f, this));
-           */
-      }
+            luz2 =new PuntoDeLuz(this, new Vector3(100f, 100f, 100f));
+        }
         public void cambiarMusica()
         {
             sonidos.nextSound();
@@ -139,9 +135,6 @@ namespace TGC.Group.Model
                     D3DDevice.Instance.AspectRatio,
                     D3DDevice.Instance.ZNearPlaneDistance,
                     D3DDevice.Instance.ZFarPlaneDistance * 2f);
-
-          
-            
             
             //sonido.Update();
             controladorDeVehiculos.update();
@@ -158,53 +151,61 @@ namespace TGC.Group.Model
         {
             //Inicio el rende de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
              PreRender();//Comentar Para iluminacion
-            //BorrarPantalla(); //Para iluminacion
-            //preRenderPointLight(); //Para iluminacion
-            //IniciarScene();//Para iluminacion
+            renderNormal();
+            PostRender();//Comentar Para iluminacion
+            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
+
+        }
+        /* //Render Con Iluminación
+        public override void Render()
+        {
+            //Inicio el rende de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
+            // PreRender();//Comentar Para iluminacion
+            BorrarPantalla(); //Para iluminacion
+            preRenderPuntoDeLuz(); //Para iluminacion
+            IniciarScene();//Para iluminacion
             //  AplicarShaderEnvironment();
 
 
             //    messages.MostrarPuntoColisionVehiculoPrincipal(manejadorDeColiciones.Manager().LastCollisionPoint);
             renderNormal();
-            //TerminarScene();//Para iluminacion
-            //  ImprimirPantalla();//Para iluminacion
-            PostRender();//Comentar Para iluminacion
+            TerminarScene();//Para iluminacion
+            ImprimirPantalla();//Para iluminacion
+            //PostRender();//Comentar Para iluminacion
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
 
-        }
+        }*/
         private void BorrarPantalla()
         {
             ClearTextures();
             D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
         }
-        private void preRenderPointLight()
+        private void preRenderPuntoDeLuz()
         {
             //una escena para cada luz
-           
+            //una escena para cada luz
+            IniciarScene();
             luz.render(this.Ciudad.getAllMeshes(),
                            this.autoPrincipal.getCamara().Position,
                            this.autoPrincipal.getMesh(),
                            this.autoPrincipal.matrixRotacion,
-                           new Vector3(-12,
-                           this.autoPrincipal.getBoxDeColision().Extents.Y + 1,
+                           new Vector3(-12,this.autoPrincipal.getBoxDeColision().Extents.Y + 1,
                            -this.autoPrincipal.getBoxDeColision().Extents.Z + 2),
                            this.autoPrincipal.getNuevaPosicion(), this.autoPrincipal.anguloFinal, true,
                            new Vector3(350 * -FastMath.Sin(this.autoPrincipal.anguloFinal), 0, 350 * -FastMath.Cos(this.autoPrincipal.anguloFinal)));
+            //     TerminarScene();
+            luz2.render(this.Ciudad.getAllMeshes(),
+                               this.autoPrincipal.getCamara().Position,
+                               this.autoPrincipal.getMesh(),
+                               this.autoPrincipal.matrixRotacion,
+                               new Vector3(-12, this.autoPrincipal.getBoxDeColision().Extents.Y + 1,-this.autoPrincipal.getBoxDeColision().Extents.Z + 2),
+                              this.autoPrincipal.getNuevaPosicion(), this.autoPrincipal.anguloFinal, true,
+                               new Vector3(350 * -FastMath.Sin(this.autoPrincipal.anguloFinal), 0, 350 * -FastMath.Cos(this.autoPrincipal.anguloFinal)));
+              TerminarScene();
 
-        /*    pointLuz2.render(MapScene.Meshes,
-                           AutoJugador.CamaraAuto.Position,
-                           AutoJugador.TodosLosMeshes,
-                           AutoJugador.matrixRotacion,
-                           new Vector3(12,
-                           AutoJugador.obb.Extents.Y + 1,
-                           -AutoJugador.obb.Extents.Z + 2),
-                           AutoJugador.newPosicion, AutoJugador.anguloFinal, lucesPrendidas,
-                           new Vector3(350 * -FastMath.Sin(AutoJugador.anguloFinal), 0, 350 * -FastMath.Cos(AutoJugador.anguloFinal)));*/
-          //  TerminarScene();
-
-            /*IniciarScene();
+          //  IniciarScene();
             
-            TerminarScene();*/
+          //  TerminarScene();
         }
         /// <summary>
         /// inicia un scene

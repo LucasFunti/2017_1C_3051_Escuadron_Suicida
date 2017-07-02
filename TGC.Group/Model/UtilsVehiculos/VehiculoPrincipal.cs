@@ -415,7 +415,7 @@ namespace TGC.Group.Model.UtilsVehiculos
             efectoShaderChoque.SetValue("fvLightPosition", new Vector4(0, 100, 0, 0));
             efectoShaderChoque.SetValue("fvEyePosition", TgcParserUtils.vector3ToFloat3Array(this.getCamara().Position));
             this.getMesh().Effect = efectoShaderChoque;
-
+            this.getMesh().Technique = "RenderScene";
 
 
 

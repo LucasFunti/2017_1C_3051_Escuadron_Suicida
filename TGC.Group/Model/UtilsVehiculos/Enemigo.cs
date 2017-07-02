@@ -46,12 +46,7 @@ namespace TGC.Group.Model.UtilsVehiculos
                 if (arma.getTiempoDeVida() > 20)
                      listaDeArmasToRemove.Add(arma);
           
-            /*foreach (var item in listaDeArmasToRemove)
-            {
-                listaDeArmas.Remove(item);
-                item.dispose();
-            }*/
-
+         
             TiempoRetardoDoblar++;
             contadorDeCiclos++;
 

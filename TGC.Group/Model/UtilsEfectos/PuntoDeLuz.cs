@@ -31,7 +31,7 @@ namespace TGC.Group.Model.UtilsEfectos
             lightMesh.AutoTransformEnable = false;
             lightMesh.updateValues();
             //currentShader = TgcShaders.Instance.TgcMeshPointLightShader;
-            currentShader = TgcShaders.loadEffect(this.env.ShadersDir + "TgcMeshPointLightShader.fx");
+            currentShader = TgcShaders.loadEffect(this.env.ShadersDir + "TgcMeshSpotLightShader.fx");
         }
 
         public void render(List<TgcMesh> mapMeshes, Vector3 camPos, TgcMesh meshesAuto, Matrix mr, Vector3 Posicion, Vector3 pivote, float anguloFinal, bool lucesOn, Vector3 v3)
