@@ -18,6 +18,7 @@ namespace TGC.Group.Model
         public static float tDuracionHumo = 1f;
         public float tFinHumo = 2f;
 
+
         public Vehiculo(TgcMesh Mesh, TwistedMetal env) : base(env)
         {
             base.setMesh(Mesh);
