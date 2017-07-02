@@ -18,6 +18,7 @@ using TGC.Core.Sound;
 using TGC.Group.Model.UtilsEfectos;
 using TGC.Core.Shaders;
 using Microsoft.DirectX.Direct3D;
+using TGC.Group.Model.UtilsVehiculos._2DObjects;
 
 namespace TGC.Group.Model
 {
@@ -41,6 +42,7 @@ namespace TGC.Group.Model
         private static TwistedMetal myInstance;
         private VehiculoPrincipal autoPrincipal;
         private Microsoft.DirectX.Direct3D.Effect efectoShaderEnvironmentMap;
+        public  Cronometro cronometro;
 
         public static TwistedMetal getInstance()
         {
@@ -55,7 +57,7 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
             myInstance = this;
             sonidos = new Musica(mediaDir);
-
+            cronometro = new Cronometro(300000, this);
             //sonidos.startGame();
             iniciarIluminacion();
         }
@@ -240,10 +242,12 @@ namespace TGC.Group.Model
            
             Ciudad.Render();
             controladorDeVehiculos.render();
-           // PostRender();
+            this.cronometro.render(ElapsedTime);
+            // PostRender();
         }
         public void renderScene(float elapsedTime, bool cubemap)
         {
+            
             messages.MostrarComandosPorPantalla();
             messages.MostrarVelocidadPorPantalla(controladorDeVehiculos.getAutoPrincipal().getVelocidadX());
             messages.MostrarPosicioMeshPorPantalla(controladorDeVehiculos.getAutoPrincipal().getMesh().Position);

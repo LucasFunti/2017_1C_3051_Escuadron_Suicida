@@ -9,7 +9,7 @@ namespace TGC.Group.Model
 {
     class Vehiculo : ObjetoConMovimiento
     {
-       
+        private LifeLevel lifeLevel;
 
         public Vehiculo(TgcMesh Mesh, TwistedMetal env) : base(env)
         {
@@ -19,19 +19,24 @@ namespace TGC.Group.Model
             base.setAluraMaxima(20);
             //      direcionadores();
             updateTGCArrow();
+            iniciarNivelDeVida();
         }
         public Vehiculo(TwistedMetal env) : base(env)
         {
             this.setVelocidadY(0);
             base.setAluraMaxima(100);
-        //    direcionadores();
+            //    direcionadores();
+            iniciarNivelDeVida();
         }
+        private void iniciarNivelDeVida()
+        {
+            this.lifeLevel = new LifeLevel(this.esAutoPrincipal());
+        }
+       
         public  virtual Boolean esAutoPrincipal()
         {
             return false;
         }
-
-       
 
         /*     private void direcionadores()
              {
@@ -302,8 +307,6 @@ namespace TGC.Group.Model
             base.calculosDePosicion();
             base.updateTGCArrow();
 
-           
-
             if (disparar())
             {
                 base.startDisparo();
@@ -339,11 +342,12 @@ namespace TGC.Group.Model
         {
             
             base.getMesh().render();
-       //     base.getBoxDeColision().render();
-           // base.getBoxDeColision().render();
-         //   directionArrow.render();
-         //   collisionNormalArrow.render();
-          //  collisionPoint.render();
+            this.lifeLevel.render();
+            //     base.getBoxDeColision().render();
+            // base.getBoxDeColision().render();
+            //   directionArrow.render();
+            //   collisionNormalArrow.render();
+            //  collisionPoint.render();
 
         }
         public void dispose()

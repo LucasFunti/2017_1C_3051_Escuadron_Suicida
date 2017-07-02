@@ -376,7 +376,7 @@ namespace TGC.Group.Model.UtilsVehiculos
                 //rueda[1].Update();
                 //rueda[2].Update();
             }*/
-            this.velocimetro.Update(this.getVelocidadX());
+            this.velocimetro.Update(FastMath.Abs(this.getVelocidadX()));
         }
         public override void Render()
         {
