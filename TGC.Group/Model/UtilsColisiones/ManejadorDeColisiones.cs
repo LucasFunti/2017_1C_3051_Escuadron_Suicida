@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TGC.Core.Geometry;
 using TGC.Core.SceneLoader;
+using TGC.Group.Model.UtilsVehiculos;
 
 namespace TGC.Group.Model
 {
@@ -14,6 +15,7 @@ namespace TGC.Group.Model
      //   private readonly List<Colisionador> objetosColisionables = new List<Colisionador>();
         public readonly List<TgcMesh> MeshesColicionables = new List<TgcMesh>();
         public readonly List<TgcMesh> MeshesItemColicionables = new List<TgcMesh>();
+        public readonly List<TgcMesh> MeshesArmasDisparadasColicionables = new List<TgcMesh>();
         //   private SphereTriangleCollisionManager collisionManager;
         //  private bool Collision = false;
         // TwistedMetal env;
@@ -34,6 +36,11 @@ namespace TGC.Group.Model
         {
             MeshesColicionables.Add(mesh);
            // objetosColisionables.Add(BoundingBoxCollider.fromBoundingBox(mesh.BoundingBox));
+        }
+        public void addBoundingBoxMeshArmaDisparada(TgcMesh mesh)
+        {
+            MeshesArmasDisparadasColicionables.Add(mesh);
+            // objetosColisionables.Add(BoundingBoxCollider.fromBoundingBox(mesh.BoundingBox));
         }
         public void addListOfBoundingBoxMeshesColisionables(List<TgcMesh> lista)
         {

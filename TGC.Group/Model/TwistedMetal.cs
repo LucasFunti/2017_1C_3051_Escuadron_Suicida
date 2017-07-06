@@ -103,6 +103,8 @@ namespace TGC.Group.Model
             controladorDeVehiculos.crearAutoPrincipal();
             controladorDeVehiculos.crearEnemigo1();
             autoPrincipal = controladorDeVehiculos.getAutoPrincipal();
+
+            manejadorDeColiciones.addBoundingBoxMeshColisionable(controladorDeVehiculos.getEnemigo().getMesh());
             //niebla = new Niebla(this);
             // niebla.CargarCamara(controladorDeVehiculos.getAutoPrincipal().getCamara());
             //  niebla

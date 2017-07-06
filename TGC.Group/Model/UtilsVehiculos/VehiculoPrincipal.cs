@@ -23,6 +23,7 @@ namespace TGC.Group.Model.UtilsVehiculos
         private CamaraTerceraPersona camaraInterna;
         private CamaraTerceraPersona camaraInterna2;
         private TgcRotationalCamera camaraRotante;
+        
         //private Rueda[] ruedas;
         //private List<Rueda[]> listaDeRuedas;
         public static float camaraOffsetDefaulForward = 300f;
@@ -351,19 +352,9 @@ namespace TGC.Group.Model.UtilsVehiculos
             if (cambiarMusica())
                 tm.cambiarMusica();
 
-            if (disparar()) {
-                base.startDisparo();
-                base.creaDisparo(this.getMesh().Position);
-            }
-
+  
             if (moverArriba())
                 base.startSalto();
-
-            if (disparaEspecial()) { 
-                base.startArma();
-                creaMisilV();
-            }
-
 
             base.Update();
             camaraInterna.Target = this.getMesh().Position;
@@ -403,12 +394,11 @@ namespace TGC.Group.Model.UtilsVehiculos
             if (this.colisionoAlgunaVez && this.getMesh().Position.Y == 5)
                 ChoqueDelantero = 1;
 
+            //if (this.colisiono() && !this.colisionoPorDelante() && this.getMesh().Position.Y == 5)
+          //      ChoqueTrasero = -1;
+            
             if (this.colisiono() && this.getMesh().Position.Y == 5)
-                ChoqueDelantero = 1;
-
-
-            if (this.colisiono() && !this.colisionoPorDelante() && this.getMesh().Position.Y == 5)
-                ChoqueTrasero = -1;
+               ChoqueDelantero = 1;          
 
             efectoShaderChoque.SetValue("ChoqueAtras", ChoqueTrasero);
             efectoShaderChoque.SetValue("ChoqueAdelante", ChoqueDelantero);

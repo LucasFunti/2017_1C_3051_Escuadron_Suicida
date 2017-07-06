@@ -392,7 +392,7 @@ namespace TGC.Group.Model
         private void crearItems()
         {
 
-            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Cura\\cura-TgcScene.xml", new Vector3(2609, 15, 2450), FastMath.PI_HALF);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Cura\\cura-TgcScene.xml", new Vector3(2609, 40, 2450), FastMath.PI_HALF);
             creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(5237, 10, 50), FastMath.PI);
             creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(50, 10, 5240), FastMath.PI);
             creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(5295, 10, 5223), FastMath.PI);

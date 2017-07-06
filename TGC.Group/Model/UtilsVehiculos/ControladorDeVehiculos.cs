@@ -26,6 +26,7 @@ namespace TGC.Group.Model.UtilsVehiculos
 
         public void agregarArma(Arma arma)
         {
+            this.env.GetManejadorDeColision().addBoundingBoxMeshArmaDisparada(arma.getMesh());
             this.listaDeArmas.Add(arma);
             this.listaDeVehiculos.Add(arma);
         }
@@ -99,10 +100,11 @@ namespace TGC.Group.Model.UtilsVehiculos
                 if (!vehiculo.esAutoPrincipal())
                 {
                     //rendereo solo lo que esta dentro del frustrum
-               //     var c = TgcCollisionUtils.classifyFrustumAABB(this.env.Frustum, vehiculo.getMesh().BoundingBox);
-                 //   if (c != TgcCollisionUtils.FrustumResult.OUTSIDE)
-                   // {
-                        vehiculo.getMesh().render();
+                    //     var c = TgcCollisionUtils.classifyFrustumAABB(this.env.Frustum, vehiculo.getMesh().BoundingBox);
+                     //  if (c != TgcCollisionUtils.FrustumResult.OUTSIDE)
+                    // {
+                    vehiculo.Render();
+                     //   vehiculo.getMesh().render();
                     //}
                 }
             }

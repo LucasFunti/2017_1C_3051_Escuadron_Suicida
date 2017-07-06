@@ -77,6 +77,14 @@ namespace TGC.Group.Model
             this.env.DrawText.drawText("Velocidad Enemigo X: " + Velocidad, 0, 210, System.Drawing.Color.Red);
 
         }
+        public void MostrarOrientacionEnemigo(float orientacion)
+        {
+            this.env.DrawText.drawText("Orientacion Enemigo (" + orientacion + ")", 0, 225, System.Drawing.Color.Red);
+        }
+        public void MostrarOrientacionAuto(float orientacion)
+        {
+            this.env.DrawText.drawText("Orientacion auto (" + orientacion + ")", 0, 235, System.Drawing.Color.Red);
+        }
         public void test(String text, Vector3[] vector)
         {
             for (int i = 0; i < vector.Length; i++)

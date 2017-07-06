@@ -107,6 +107,7 @@
     <Compile Include="Model\UtilsVehiculos\2DObjects\CustomSprite.cs" />
     <Compile Include="Model\UtilsVehiculos\2DObjects\Drawer2D.cs" />
     <Compile Include="Model\UtilsVehiculos\2DObjects\LifeLevel.cs" />
+    <Compile Include="Model\UtilsVehiculos\2DObjects\WeaponCount.cs" />
     <Compile Include="Model\UtilsVehiculos\Arma.cs" />
     <Compile Include="Model\UtilsVehiculos\2DObjects\CustomBitmap.cs" />
     <Compile Include="Model\UtilsVehiculos\Personaje.cs" />
