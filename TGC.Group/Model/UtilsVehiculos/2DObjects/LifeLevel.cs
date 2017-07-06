@@ -35,8 +35,15 @@ namespace TGC.Group.Model.UtilsVehiculos
                 text2d.Position = new Point((D3DDevice.Instance.Width / 2) - 100, 0);
                 text2d.Size = new Size(300, 100);
                 text2d.changeFont(new Font("TimesNewRoman", 25, FontStyle.Bold));
+                text2d.Color = Color.Green;
+                if(this.lifeLevel<65)
                 text2d.Color = Color.Yellow;
-                text2d.render();
+                if (this.lifeLevel < 40)
+                text2d.Color = Color.Orange;
+                if (this.lifeLevel < 20)
+                text2d.Color = Color.Red;
+
+            text2d.render();
            
         }
         public float nivelDeVida()
