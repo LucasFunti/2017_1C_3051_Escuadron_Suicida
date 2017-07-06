@@ -248,7 +248,7 @@ namespace TGC.Group.Model
             mesh.AutoUpdateBoundingBox = true;
             mesh.createBoundingBox();
             mesh.Position = posicion;
-            Arma arma = new Arma(mesh, this.env, sonido, 40, this.orientacion, base.directionArrow.PEnd);
+            Arma arma = new Arma(mesh, this.env, sonido, 40, this.orientacion);
 
             arma.mover();
             ControladorDeVehiculos.getInstance().agregarArma(arma);
@@ -267,7 +267,7 @@ namespace TGC.Group.Model
          //   mesh.rotateY(45);
             mesh.Position = this.getMesh().Position;
         //   mesh.Transform = this.getMesh().Transform;
-            Arma arma = new Arma(mesh, this.env, sonido, 20, this.orientacion, base.directionArrow.PEnd);
+            Arma arma = new Arma(mesh, this.env, sonido, 20, this.orientacion);
             
             arma.mover();
            // arma.getMesh().rotateY(FastMath.p);
@@ -384,7 +384,7 @@ namespace TGC.Group.Model
         public void dispose()
         {
             base.getMesh().dispose();
-            directionArrow.dispose();
+            //directionArrow.dispose();
         }
 
     }

@@ -41,7 +41,31 @@ namespace TGC.Group.Model
         private static TwistedMetal myInstance;
         private VehiculoPrincipal autoPrincipal;
         private Microsoft.DirectX.Direct3D.Effect efectoShaderEnvironmentMap;
+        private static bool inicializado = false;
         public  Cronometro cronometro;
+        private const int MENU = 0;
+        private const int PLAYING = 1;
+        private const int SELECTION = 2;
+        private TgcRotationalCamera camaraRotante;
+        private const float ROTATION_SPEED = -0.1f;
+
+        private TgcBox boxComenzar;
+        private TgcBox boxPersonaje;
+        private TgcBox boxSalir;
+        private Matrix boxComenzarOrig;
+        private Matrix boxPersonajeOrig;
+        private Matrix boxSalirOrig;
+        private int contLimpiarTruco;
+        //private const int ABAJO 
+        private TgcMesh personaje1;
+        private TgcMesh personaje2;
+        private TgcMesh personaje3;
+        private TgcMesh personaje4;
+        private bool EndGame = false;
+
+        private int opcionSeleccionada = 1;
+
+        private int gameMode = MENU;
 
         public static TwistedMetal getInstance()
         {
@@ -55,11 +79,35 @@ namespace TGC.Group.Model
             Name = Game.Default.Name;
             Description = Game.Default.Description;
             myInstance = this;
-            sonidos = new Musica(mediaDir);
+            this.MediaDir = mediaDir;
+            this.ShadersDir = shadersDir;
+            /*sonidos = new Musica(mediaDir);
             cronometro = new Cronometro(300000, this);
-            //sonidos.startGame();
-            iniciarIluminacion();
+            sonidos.startGame();
+            iniciarIluminacion();*/
+            
         }
+
+        private void startGame()
+        {
+            sonidos = new Musica(this.MediaDir);
+            sonidos.startGame();
+
+            controladorDeVehiculos.crearAutoPrincipal();
+            controladorDeVehiculos.crearEnemigo1();
+            autoPrincipal = controladorDeVehiculos.getAutoPrincipal();
+
+            //Agrega objetos colisionables
+            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getEdificios());
+            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getSemaforos());
+            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getArboles());
+            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getPostesDeLuz());
+
+            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getMeshParedes());
+            //manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getItems());
+            manejadorDeColiciones.addListOfBoundingBoxItemMeshColisionable(Ciudad.getItems());
+        }
+
        private void iniciarIluminacion()
        {
             luz = new PuntoDeLuz(this, new Vector3(100f, 100f, 100f));
@@ -70,7 +118,7 @@ namespace TGC.Group.Model
             sonidos.nextSound();
         }
 
-        private TgcD3dInput Input { get; set; }
+        private new TgcD3dInput Input { get; set; }
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -80,29 +128,81 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Init()
         {
-            sonidos.startGame();
+            //startGame();
+            
             var d3dDevice = D3DDevice.Instance.Device;
+            messages = new PrintMessageText(this);
+
             //Carga la estructura de la ciudad
             manejadorDeColiciones = new ManejadorDeColisiones();
             controladorDeVehiculos = new ControladorDeVehiculos(this);
             Ciudad = new Ciudad(this);
             
-            messages = new PrintMessageText(this);
-           
-            //Agrega objetos colisionables
-           manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getEdificios());
-           manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getSemaforos());
-           manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getArboles());
-           manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getPostesDeLuz());
-              
-            manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getMeshParedes());
-            //manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getItems());
-            manejadorDeColiciones.addListOfBoundingBoxItemMeshColisionable(Ciudad.getItems());
+            cronometro = new Cronometro(300000, this);
+            //sonidos.startGame();
+            iniciarIluminacion();
 
-           
-            controladorDeVehiculos.crearAutoPrincipal();
+            TgcD3dInput input = new TgcD3dInput();
+            Input = input;
+
+            camaraRotante = new TgcRotationalCamera(
+                    new Vector3(3300, 250, 3100), 2000, 0.15f, 10f, base.Input);
+
+            this.Camara = camaraRotante;
+            //camaraRotante.SetCamera(new Vector3(500, 700, 500),
+            //                         new Vector3(3000, 50, 3000));
+
+            //Creamos una caja 3D con textura
+            var center = new Vector3(3000, 200, 4500);
+            var texture = TgcTexture.createTexture(MediaDir + "Menu\\COMENZAR.png");
+            boxComenzar = TgcBox.fromSize(center, new Vector3(250, 50, 50), texture);
+            boxComenzar.AutoTransformEnable = true;
+            boxComenzarOrig = boxComenzar.Transform;
+
+            // Creamos una caja 3D con textura
+            center = new Vector3(3000, 140, 4500);
+            texture = TgcTexture.createTexture(MediaDir + "Menu\\PERSONAJE.png");
+            boxPersonaje = TgcBox.fromSize(center, new Vector3(250, 50, 50), texture);
+            boxPersonaje.AutoTransformEnable = true;
+            boxPersonajeOrig = boxPersonaje.Transform;
+
+            // Creamos una caja 3D con textura
+            center = new Vector3(3000, 80, 4500);
+            texture = TgcTexture.createTexture(MediaDir + "Menu\\SALIR.png");
+            boxSalir = TgcBox.fromSize(center, new Vector3(250, 50, 50), texture);
+            boxSalir.AutoTransformEnable = true;
+            boxSalirOrig = boxSalir.Transform;
+
+
+            boxComenzar.Position = new Vector3(3000, 300, 4500);
+            boxComenzar.rotateY(FastMath.PI);
+            boxPersonaje.Position = new Vector3(3000, 200, 4500);
+            boxPersonaje.rotateY(FastMath.PI);
+            boxSalir.Position = new Vector3(3000, 100, 4500);
+            boxSalir.rotateY(FastMath.PI);
+
+            var loader = new TgcSceneLoader();
+            var scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
+            personaje1 = scene.Meshes[0];
+            personaje1.AutoTransformEnable = true;
+            personaje1.Position = new Vector3(3400, 200, 5700);
+
+            scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
+            personaje2 = scene.Meshes[0];
+            personaje2.AutoTransformEnable = true;
+            personaje2.Position = new Vector3(3200, 200, 5700);
+
+            scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Patrullero\\Patrullero-TgcScene.xml");
+            personaje3 = scene.Meshes[0];
+            personaje3.AutoTransformEnable = true;
+            personaje3.Position = new Vector3(3000, 200, 5700);
+
+            TwistedMetal.inicializado = true;
+
+            /*controladorDeVehiculos.crearAutoPrincipal();
             controladorDeVehiculos.crearEnemigo1();
             autoPrincipal = controladorDeVehiculos.getAutoPrincipal();
+            */
             //niebla = new Niebla(this);
             // niebla.CargarCamara(controladorDeVehiculos.getAutoPrincipal().getCamara());
             //  niebla
@@ -118,7 +218,66 @@ namespace TGC.Group.Model
         {
             return this.manejadorDeColiciones;
         }
-        
+
+
+        private void seleccionPorDefault()
+        {
+            
+            Personaje personaje = new Personaje();
+            personaje.FileSonido = MediaDir + "MySounds\\MachineGun.wav";
+            personaje.FileSonidoColision = MediaDir + "MySounds\\Crash4.wav";
+            personaje.FileMesh = MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml";
+            personaje.FileSonidoMotor = MediaDir + "MySounds\\Engine2.wav";
+            personaje.FileSonidoArma = MediaDir + "MySounds\\Special5.wav";
+            personaje.FileSonidoItem = MediaDir + "MySounds\\PickUp2.wav";
+            personaje.FileSonidoSalto = MediaDir + "MySounds\\portazo.wav";
+            personaje.VelocidadMax = 70;
+            personaje.VelocidadMin = -5;
+            personaje.ConstanteAceleracion = 0.6f;
+        }
+
+
+
+        private void seleccionaPersonaje(int indice)
+        {
+
+            Personaje personaje = new Personaje();
+            personaje.FileSonido = MediaDir + "MySounds\\MachineGun.wav";
+            personaje.FileSonidoColision = MediaDir + "MySounds\\Crash4.wav";
+            switch (indice)
+            {
+                case 1:
+                    personaje.FileMesh = MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml";
+                    personaje.FileSonidoMotor = MediaDir + "MySounds\\Engine2.wav";
+                    personaje.FileSonidoArma = MediaDir + "MySounds\\Special5.wav";
+                    personaje.FileSonidoItem = MediaDir + "MySounds\\PickUp2.wav";
+                    personaje.FileSonidoSalto = MediaDir + "MySounds\\portazo.wav";
+                    personaje.VelocidadMax = 70;
+                    personaje.VelocidadMin = -5;
+                    personaje.ConstanteAceleracion = 0.6f;
+                    break;
+                case 2:
+                    personaje.FileMesh = MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml";
+                    personaje.FileSonidoMotor = MediaDir + "MySounds\\Engine4.wav";
+                    personaje.FileSonidoArma = MediaDir + "MySounds\\Launch3.wav";
+                    personaje.FileSonidoItem = MediaDir + "MySounds\\PickUp2.wav";
+                    personaje.FileSonidoSalto = MediaDir + "MySounds\\portazo.wav";
+                    personaje.VelocidadMax = 90;
+                    personaje.VelocidadMin = -15;
+                    personaje.ConstanteAceleracion = 0.8f;
+                    break;
+                default:
+                    personaje.FileMesh = MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Patrullero\\Patrullero-TgcScene.xml";
+                    personaje.FileSonidoMotor = MediaDir + "MySounds\\Engine1.wav";
+                    personaje.FileSonidoArma = MediaDir + "MySounds\\Special1.wav";
+                    personaje.FileSonidoItem = MediaDir + "MySounds\\PickUp2.wav";
+                    personaje.FileSonidoSalto = MediaDir + "MySounds\\portazo.wav";
+                    personaje.VelocidadMax = 80;
+                    personaje.VelocidadMin = -10;
+                    personaje.ConstanteAceleracion = 0.7f;
+                    break;
+            }
+        }
 
         /// <summary>
         ///     Se llama en cada frame.
@@ -128,17 +287,124 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-
             //Se cambia el valor por defecto del farplane para evitar cliping de farplane.
             D3DDevice.Instance.Device.Transform.Projection =
                 Matrix.PerspectiveFovLH(D3DDevice.Instance.FieldOfView,
                     D3DDevice.Instance.AspectRatio,
                     D3DDevice.Instance.ZNearPlaneDistance,
                     D3DDevice.Instance.ZFarPlaneDistance * 2f);
+
+            if (TwistedMetal.inicializado)
+            {
+               
+
+                //sonido.Update();
+               
+
+                if (gameMode == PLAYING) {
+                    controladorDeVehiculos.update();
+                }
+
+                if (gameMode == SELECTION) {
+
+                    if (base.Input.keyPressed(Key.Space)) {
+                        seleccionaPersonaje(opcionSeleccionada);
+                        gameMode = MENU;
+                        opcionSeleccionada = 1;
+                    }
+                    
+                } else
+                {
+                    if (gameMode == MENU)
+                    {
+                        if (base.Input.keyPressed(Key.Space))
+                        {
+                            switch (opcionSeleccionada)
+                            {
+                                case 1:
+                                    gameMode = PLAYING;
+                                    if (Personaje.getInstance() == null) seleccionPorDefault();
+                                    startGame();
+                                    boxComenzar.Enabled = false;
+                                    boxPersonaje.Enabled = false;
+                                    boxSalir.Enabled = false;
+                                    personaje1.Enabled = false;
+                                    personaje2.Enabled = false;
+                                    personaje3.Enabled = false;
+                                    break;
+                                case 2:
+                                    gameMode = SELECTION;
+                                    opcionSeleccionada = 1;
+                                    break;
+                                case 3:
+                                    EndGame = true;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                }
+                
+
+                if (gameMode == SELECTION || gameMode == MENU)
+                {
+                    if (base.Input.keyPressed(Key.Tab))
+                    {
+                        opcionSeleccionada += 1;
+                        if (opcionSeleccionada > 3) opcionSeleccionada = 1;
+                    }
+
+                    if (gameMode == MENU) {
+                        switch (opcionSeleccionada)
+                        {
+                            case 1:
+                                boxComenzar.rotateX(ROTATION_SPEED);
+                                boxPersonaje.Transform = boxPersonajeOrig;
+                                boxSalir.Transform = boxSalirOrig;
+                                break;
+                            case 2:
+                                boxPersonaje.rotateX(ROTATION_SPEED);
+                                boxComenzar.Transform = boxComenzarOrig;
+                                boxSalir.Transform = boxSalirOrig;
+                                break;
+                            case 3:
+                                boxSalir.rotateX(ROTATION_SPEED);
+                                boxComenzar.Transform = boxComenzarOrig;
+                                boxPersonaje.Transform = boxPersonajeOrig;
+                                break;
+                            default:
+                                break;
+                        }
+
+                    } else //Estoy en modo SELECTION
+                    {
+                        switch (opcionSeleccionada)
+                        {
+                            case 1:
+                                personaje1.rotateY(ROTATION_SPEED);
+                                break;
+                            case 2:
+                                personaje2.rotateY(ROTATION_SPEED);
+                                break;
+                            case 3:
+                                personaje3.rotateY(ROTATION_SPEED);
+                                break;
+                            case 4:
+                                personaje4.rotateY(ROTATION_SPEED);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                }
+
+                Ciudad.Update();
+            } else {
+                
+            }
             
-            //sonido.Update();
-            controladorDeVehiculos.update();
-            Ciudad.Update();
           
         }
 
@@ -153,6 +419,7 @@ namespace TGC.Group.Model
              PreRender();//Comentar Para iluminacion
             renderNormal();
             PostRender();//Comentar Para iluminacion
+            if (EndGame ) TGC.Group.Form.GameForm.ActiveForm.Close();
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
 
         }
@@ -227,23 +494,65 @@ namespace TGC.Group.Model
         }
         private void renderNormal()
         {
-            messages.MostrarComandosPorPantalla();
-            messages.MostrarVelocidadPorPantalla(controladorDeVehiculos.getAutoPrincipal().getVelocidadX());
-            messages.MostrarPosicioMeshPorPantalla(controladorDeVehiculos.getAutoPrincipal().getMesh().Position);
-            messages.MostrarVelocidadYPorPantalla(controladorDeVehiculos.getAutoPrincipal().getVelocidadY());
-            messages.MostrarPosicionCamaraPorPantalla(controladorDeVehiculos.getAutoPrincipal().getCamara().Position);
-            messages.MostrarDireccionVehiculoPrincipal(controladorDeVehiculos.getAutoPrincipal().getMesh().Position);
-            messages.MostrarAnguloVehiculoPrincipal(controladorDeVehiculos.getAutoPrincipal().anguloFinal);
-            messages.MostrarAnguloVehiculoEnemigo(controladorDeVehiculos.getEnemigo().anguloFinal);
-            messages.MostrarDireccionEnemigo(controladorDeVehiculos.getEnemigo().getMesh().Position);
-            messages.MostrarVelocidadEnemigoPorPantalla(controladorDeVehiculos.getEnemigo().getVelocidadX());
-            messages.MostrarTiempo();
-            //  niebla.Update(controladorDeVehiculos.getAutoPrincipal().getCamara());
-            //  messages.test("BoudningBox", this.autoPrincipal.getMesh().BoundingBox.computeCorners());
-           
-            Ciudad.Render();
-            controladorDeVehiculos.render();
-            this.cronometro.render(ElapsedTime);
+            if (TwistedMetal.inicializado)
+            {
+
+                if (gameMode == PLAYING)
+                {
+                    messages.MostrarComandosPorPantalla();
+                    messages.MostrarTiempo();
+                    messages.MostrarVelocidadPorPantalla(controladorDeVehiculos.getAutoPrincipal().getVelocidadX());
+                    messages.MostrarPosicioMeshPorPantalla(controladorDeVehiculos.getAutoPrincipal().getMesh().Position);
+                    messages.MostrarVelocidadYPorPantalla(controladorDeVehiculos.getAutoPrincipal().getVelocidadY());
+                    messages.MostrarPosicionCamaraPorPantalla(controladorDeVehiculos.getAutoPrincipal().getCamara().Position);
+                    messages.MostrarDireccionVehiculoPrincipal(controladorDeVehiculos.getAutoPrincipal().getMesh().Position);
+                    messages.MostrarAnguloVehiculoPrincipal(controladorDeVehiculos.getAutoPrincipal().anguloFinal);
+                    messages.MostrarAnguloVehiculoEnemigo(controladorDeVehiculos.getEnemigo().anguloFinal);
+                    messages.MostrarDireccionEnemigo(controladorDeVehiculos.getEnemigo().getMesh().Position);
+                    messages.MostrarVelocidadEnemigoPorPantalla(controladorDeVehiculos.getEnemigo().getVelocidadX());
+                    controladorDeVehiculos.render();
+                    this.cronometro.render(ElapsedTime);
+                    //  niebla.Update(controladorDeVehiculos.getAutoPrincipal().getCamara());
+                    //  messages.test("BoudningBox", this.autoPrincipal.getMesh().BoundingBox.computeCorners());
+                }
+
+                Ciudad.Render();
+                personaje1.render();
+                personaje2.render();
+                personaje3.render();
+                boxComenzar.render();
+                boxPersonaje.render();
+                boxSalir.render();
+
+                messages.MostrarMensaje("gameMode = " + gameMode, 50, 600);
+                messages.MostrarMensaje("opcionSeleccionada = " + opcionSeleccionada, 50, 620);
+
+                if (gameMode == MENU)
+                {
+
+                    //camaraRotante.;
+                    camaraRotante.CameraDistance = 2000;
+                    camaraRotante.UpdateCamera(ElapsedTime);
+                    this.Camara = camaraRotante;
+                    messages.MostrarComandosDeSeleccion();
+                    messages.MostrarPosicioMeshPorPantalla(camaraRotante.Position);
+
+                   
+                }
+                if (gameMode == SELECTION)
+                {
+                    messages.MostrarComandosDeSeleccion();
+                    //camaraRotante.CameraCenter = new Vector3(3000, 50, 3000);
+                    //camaraRotante.SetCamera(new Vector3(250, 450, 3000), new Vector3(3000, 150, 3000));
+                    camaraRotante.CameraDistance = 3100;
+                    camaraRotante.UpdateCamera(ElapsedTime);
+                    this.Camara = camaraRotante;
+                    
+
+                }
+                messages.MostrarMensaje("boxComenzar.Position = " + boxComenzar.Position, 50, 640);
+
+            }
             // PostRender();
         }
         public void renderScene(float elapsedTime, bool cubemap)
@@ -265,8 +574,6 @@ namespace TGC.Group.Model
 
             Ciudad.Render();
 
-
-
             //  controladorDeVehiculos.render();
             this.controladorDeVehiculos.getEnemigo().Render();
             if (!cubemap)
@@ -283,8 +590,14 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
-            Ciudad.dispose();
+            //Ciudad.dispose();
             controladorDeVehiculos.dispose();
+            boxComenzar.dispose();
+            boxPersonaje.dispose();
+            boxSalir.dispose();
+            personaje1.dispose();
+            personaje2.dispose();
+            personaje3.dispose();
         }
 
         private void AplicarShaderEnvironment()

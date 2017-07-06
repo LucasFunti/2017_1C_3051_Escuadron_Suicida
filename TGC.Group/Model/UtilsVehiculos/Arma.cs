@@ -15,7 +15,7 @@ namespace TGC.Group.Model.UtilsVehiculos
      //   private Boolean doblaI = false;
         private int tiempoDeVida = 0;
 
-        public Arma(TgcMesh Mesh, TwistedMetal env, string sonido, float aceleracion, float orientacion, Vector3 target) : base(Mesh, env)
+        public Arma(TgcMesh Mesh, TwistedMetal env, string sonido, float aceleracion, float orientacion) : base(Mesh, env)
         {
             this.doblar(0.001f);//Inicializa las matrices de rotación, no tocar!!
             

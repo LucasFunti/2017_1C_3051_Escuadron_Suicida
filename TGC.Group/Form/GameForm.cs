@@ -53,7 +53,7 @@ namespace TGC.Group.Form
             //Directorio actual de ejecución
             var currentDirectory = Environment.CurrentDirectory + "\\";
 
-            int posicionX = this.Size.Width - 40 - 232;
+            /*int posicionX = this.Size.Width - 40 - 232;
             int laMitad = this.Size.Height / 2;
             int posicionY = laMitad - 177;
 
@@ -78,13 +78,24 @@ namespace TGC.Group.Form
             posicionX = posicionX + 300;
 
             picture3.Visible = false;
-            picture3.Location = new System.Drawing.Point(posicionX, posicionY);
+            picture3.Location = new System.Drawing.Point(posicionX, posicionY);*/
 
             sonidos = new Musica(currentDirectory + Game.Default.MediaDirectory);
             sonidos.menuSound();
             sonidos.startSound();
 
-           
+            InitGraphics();
+
+            //Titulo de la ventana principal.
+            Text = Modelo.Name + " - " + Modelo.Description;
+
+            //Focus panel3D.
+            panel3D.Focus();
+
+            //Inicio el ciclo de Render.
+            InitRenderLoop();
+
+
         }
 
         private void GameForm_FormClosing(object sender, FormClosingEventArgs e)

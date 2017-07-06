@@ -44,6 +44,7 @@
             // 
             // panel3D
             // 
+            this.panel3D.AllowDrop = true;
             this.panel3D.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("panel3D.BackgroundImage")));
             this.panel3D.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.panel3D.Controls.Add(this.picture3);
@@ -69,6 +70,7 @@
             this.picture3.Size = new System.Drawing.Size(250, 250);
             this.picture3.TabIndex = 5;
             this.picture3.TabStop = false;
+            this.picture3.Visible = false;
             this.picture3.Click += new System.EventHandler(this.picture3_Click);
             // 
             // picture2
@@ -82,6 +84,7 @@
             this.picture2.Size = new System.Drawing.Size(250, 250);
             this.picture2.TabIndex = 4;
             this.picture2.TabStop = false;
+            this.picture2.Visible = false;
             this.picture2.Click += new System.EventHandler(this.picture2_Click);
             // 
             // BtnSalir
@@ -95,6 +98,7 @@
             this.BtnSalir.Size = new System.Drawing.Size(232, 71);
             this.BtnSalir.TabIndex = 2;
             this.BtnSalir.UseVisualStyleBackColor = false;
+            this.BtnSalir.Visible = false;
             this.BtnSalir.Click += new System.EventHandler(this.BtnSalir_Click);
             this.BtnSalir.Enter += new System.EventHandler(this.BtnSalir_Enter);
             this.BtnSalir.Leave += new System.EventHandler(this.BtnSalir_Leave);
@@ -112,6 +116,7 @@
             this.BtnPersonaje.Size = new System.Drawing.Size(232, 71);
             this.BtnPersonaje.TabIndex = 1;
             this.BtnPersonaje.UseVisualStyleBackColor = false;
+            this.BtnPersonaje.Visible = false;
             this.BtnPersonaje.Click += new System.EventHandler(this.BtnPersonaje_Click);
             this.BtnPersonaje.Enter += new System.EventHandler(this.BtnPersonaje_Enter);
             this.BtnPersonaje.Leave += new System.EventHandler(this.BtnPersonaje_Leave);
@@ -129,6 +134,7 @@
             this.BtnComenzar.Size = new System.Drawing.Size(232, 71);
             this.BtnComenzar.TabIndex = 0;
             this.BtnComenzar.UseVisualStyleBackColor = false;
+            this.BtnComenzar.Visible = false;
             this.BtnComenzar.Click += new System.EventHandler(this.BtnComenzar_Click);
             this.BtnComenzar.Enter += new System.EventHandler(this.BtnComenzar_Enter);
             this.BtnComenzar.Leave += new System.EventHandler(this.BtnComenzar_Leave);
@@ -146,6 +152,7 @@
             this.picture1.Size = new System.Drawing.Size(250, 250);
             this.picture1.TabIndex = 3;
             this.picture1.TabStop = false;
+            this.picture1.Visible = false;
             this.picture1.Click += new System.EventHandler(this.picture1_Click);
             // 
             // GameForm

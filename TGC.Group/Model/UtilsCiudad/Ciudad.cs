@@ -392,13 +392,13 @@ namespace TGC.Group.Model
         private void crearItems()
         {
 
-            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Cura\\cura-TgcScene.xml", new Vector3(2609, 15, 2450), FastMath.PI_HALF);
-            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(5237, 10, 50), FastMath.PI);
-            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(50, 10, 5240), FastMath.PI);
-            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(5295, 10, 5223), FastMath.PI);
-            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(2728, 10, 5559), FastMath.PI);
-            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(1676, 10, 60), FastMath.PI);
-            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(2602, 10, 719), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Cura\\cura-TgcScene.xml", new Vector3(3109, 15, 2950), FastMath.PI_HALF);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(5737, 10, 550), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(550, 10, 5740), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml", new Vector3(5795, 10, 5723), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(3228, 10, 5959), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(2176, 10, 560), FastMath.PI);
+            creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(3102, 10, 1219), FastMath.PI);
             itemsTiempoInvisibilidad = new int[7];
             for ( var i = 0; i<7; i++)
             {
@@ -574,15 +574,25 @@ namespace TGC.Group.Model
             if (contadorDeCiclos > TiempoRetardo)
             {
                 contadorDeCiclos = 0;
+                int nroItem = 0;
                 foreach (var item in items)
                 {
-                    //TgcMesh mesh = item.getMesh();
-                    item.rotateY(ROTATION_SPEED);
-                    item.move(0, MOVEMENT_SPEED * currentMoveDir, 0);
-                    if (item.Position.Y > 30 || item.Position.Y < 0)
+                    if (itemsTiempoInvisibilidad[nroItem] < 380)
                     {
-                        currentMoveDir *= -1;
+                        if (item.Position.Y > 0 )
+                            item.move(0, -50, 0);
+                    } else
+                    {
+                        //TgcMesh mesh = item.getMesh();
+                        item.rotateY(ROTATION_SPEED);
+                        item.move(0, MOVEMENT_SPEED * currentMoveDir, 0);
+                        if (item.Position.Y > 30 || item.Position.Y < 0)
+                        {
+                            currentMoveDir *= -1;
+                        }
                     }
+                    
+                    nroItem += 1;
                 }
             }
             
@@ -601,7 +611,6 @@ namespace TGC.Group.Model
         public void Render()
         {
 
-
             foreach (TgcMesh mesh in this.getAllMeshes())
             {
                 //rendereo solo lo que esta dentro del frustrum
@@ -611,7 +620,7 @@ namespace TGC.Group.Model
                     mesh.render();
                 }
             }
-            
+
             //Renderizar suelo
             suelo.render();
             //calle.render();
@@ -621,23 +630,25 @@ namespace TGC.Group.Model
             skyBox.render();
 
             //Renderizar instancias
-          //  foreach (var mesh in meshes)
-          //        mesh.render();
+            //  foreach (var mesh in meshes)
+            //        mesh.render();
 
             //Renderizar items
             int nroItem = 0;
             foreach (var item in items)
             {
-                
+
                 if (itemsTiempoInvisibilidad[nroItem] < 380)
                 {
-                    item.Enabled = false;
+
                     //posEncontrada = nroItem;
                     itemsTiempoInvisibilidad[nroItem] = itemsTiempoInvisibilidad[nroItem]++;
-                } else
+                }
+                else
                 {
-                    item.Enabled = true;
-                    
+                    if (item.Position.Y < 10)
+                        item.move(0, 50, 0);
+
                 }
                 item.render();
 
@@ -648,12 +659,12 @@ namespace TGC.Group.Model
             //Renderizado de cordones
             foreach (var cordon in cordones)
                 cordon.render();
- 
+
 
             //Renderizado de veredas
             foreach (var v in veredas)
-                 v.render();
- 
+                v.render();
+
 
             //Renderizado de paredes
             foreach (var p in paredes)
@@ -666,17 +677,19 @@ namespace TGC.Group.Model
             {
                 c.render();
             }
-         /*   foreach (var vehiculo in vehiculos)
-            {
-                vehiculo.getMesh().render();
-            }*/
+            /*   foreach (var vehiculo in vehiculos)
+                {
+                    vehiculo.getMesh().render();
+                }*/
 
             //mostrarBounding();
-          
+
+
         }
         public void dispose()
         {
 
+            //suelo.Enabled = true;
             suelo.dispose();
             //calle.dispose();
             //Al hacer dispose del original, se hace dispose automaticamente de todas las instancias
@@ -691,11 +704,16 @@ namespace TGC.Group.Model
             {
                 vehiculo.getMesh().dispose();
             }*/
-            //disposeListas();
+           
 
             //Liberar recursos del SkyBox
             skyBox.dispose();
+            foreach (TgcMesh mesh in this.getAllMeshes())
+            {
+                mesh.dispose();
+            }
 
+             disposeListas();
 
         }
 
@@ -704,7 +722,7 @@ namespace TGC.Group.Model
             //Renderizar instancias
             foreach (var mesh in meshes)
             {
-                mesh.dispose();
+                if (mesh.Enabled) mesh.dispose();
             }
 
             //Renderizado de cordones
@@ -729,6 +747,12 @@ namespace TGC.Group.Model
             foreach (var c in calles)
             {
                 c.dispose();
+            }
+
+            //Renderizado de paredes
+            foreach (var item in items)
+            {
+                item.dispose();
             }
         }
         private void mostrarBounding()
