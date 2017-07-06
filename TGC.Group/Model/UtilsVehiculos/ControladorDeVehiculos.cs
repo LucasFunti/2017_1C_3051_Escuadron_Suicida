@@ -71,7 +71,7 @@ namespace TGC.Group.Model.UtilsVehiculos
             //   enemigo.setPosicionInicial(new Vector3(-100, 5, 3000));
 
 
-            enemigo.setPosicionInicial(new Vector3(200, 5, 4000));
+            enemigo.setPosicionInicial(new Vector3(5000, 5, 5750));
             enemigo.setVelocidadMaxima(10);
             enemigo.setVelocidadMinima(-5);
             enemigo.setConstanteDeAsceleracionX(0.5f);
@@ -86,7 +86,10 @@ namespace TGC.Group.Model.UtilsVehiculos
         public void update()
         {
             foreach (var enemigo in this.listaDeEnemigos)
+            {
                 enemigo.Update();
+            }
+                
 
             foreach (var arma in this.listaDeArmas)
                 if (arma.getMesh().Enabled ) arma.Update();

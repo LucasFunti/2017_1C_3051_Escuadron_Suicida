@@ -59,7 +59,7 @@ namespace TGC.Group.Model.UtilsVehiculos
         }
         public void recibirDañoPorChoque()
         {
-            this.recibirDaño(5);
+            this.recibirDaño(0);
         }
         public void recibirDaño(float daño)
         {

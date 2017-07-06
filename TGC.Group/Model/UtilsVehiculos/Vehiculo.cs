@@ -15,8 +15,8 @@ namespace TGC.Group.Model
         private WeaponCount weapons;
         private Humo humoCañoEscape;
         private Humo humoChoque;
-        private Boolean EfectoNitro=false;
-        public float tInicioHumo = 1f; 
+        private Boolean EfectoNitro = false;
+        public float tInicioHumo = 1f;
         public static float tDuracionHumo = 1f;
         public float tFinHumo = 2f;
 
@@ -25,7 +25,7 @@ namespace TGC.Group.Model
         public Vehiculo(TgcMesh Mesh, TwistedMetal env) : base(env)
         {
             base.setMesh(Mesh);
-          //  base.getMesh().(pos);
+            //  base.getMesh().(pos);
             base.setVelocidadY(0);
             base.setAluraMaxima(20);
             //      direcionadores();
@@ -34,7 +34,7 @@ namespace TGC.Group.Model
             iniciarWeaponCount();
             iniciarHumo();
         }
-        public Vehiculo(TwistedMetal env) : base(env)  
+        public Vehiculo(TwistedMetal env) : base(env)
         {
             this.setVelocidadY(0);
             base.setAluraMaxima(100);
@@ -43,6 +43,12 @@ namespace TGC.Group.Model
             iniciarWeaponCount();
             iniciarHumo();
         }
+
+        public LifeLevel getLifeLevel()
+        {
+            return this.lifeLevel;
+        }
+
         private void iniciarNivelDeVida()
         {
             this.lifeLevel = new LifeLevel(this.esAutoPrincipal());
@@ -307,7 +313,7 @@ namespace TGC.Group.Model
         }
         public void dañoPorChoqueEnemigo()
         {
-            this.lifeLevel.recibirDaño(20);
+            this.lifeLevel.recibirDaño(1);
         }
         protected override void dañoPorChoque()
         {
@@ -373,7 +379,7 @@ namespace TGC.Group.Model
         }
         public void dispose()
         {
-            base.getMesh().dispose();
+            //base.getMesh().dispose();
 
            // directionArrow.dispose();
 

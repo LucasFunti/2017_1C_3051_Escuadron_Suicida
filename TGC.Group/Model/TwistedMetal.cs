@@ -502,7 +502,7 @@ namespace TGC.Group.Model
 
                 if (gameMode == PLAYING)
                 {
-                    messages.MostrarComandosPorPantalla();
+                    /*messages.MostrarComandosPorPantalla();
                     messages.MostrarTiempo();
                     messages.MostrarVelocidadPorPantalla(controladorDeVehiculos.getAutoPrincipal().getVelocidadX());
                     messages.MostrarPosicioMeshPorPantalla(controladorDeVehiculos.getAutoPrincipal().getMesh().Position);
@@ -512,9 +512,14 @@ namespace TGC.Group.Model
                     messages.MostrarAnguloVehiculoPrincipal(controladorDeVehiculos.getAutoPrincipal().anguloFinal);
                     messages.MostrarAnguloVehiculoEnemigo(controladorDeVehiculos.getEnemigo().anguloFinal);
                     messages.MostrarDireccionEnemigo(controladorDeVehiculos.getEnemigo().getMesh().Position);
-                    messages.MostrarVelocidadEnemigoPorPantalla(controladorDeVehiculos.getEnemigo().getVelocidadX());
+                    messages.MostrarVelocidadEnemigoPorPantalla(controladorDeVehiculos.getEnemigo().getVelocidadX());*/
                     controladorDeVehiculos.render();
                     this.cronometro.render(ElapsedTime);
+                    if (controladorDeVehiculos.getAutoPrincipal().getLifeLevel().nivelDeVida() <= 0)
+                    {
+                        EndGame = true;
+                    }
+                    //messages.MostrarMensaje("VIDA ENEMIGO = " + controladorDeVehiculos.getEnemigo().getLifeLevel().nivelDeVida(), 850, 50);  
                     //  niebla.Update(controladorDeVehiculos.getAutoPrincipal().getCamara());
                     //  messages.test("BoudningBox", this.autoPrincipal.getMesh().BoundingBox.computeCorners());
                 }

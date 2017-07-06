@@ -45,6 +45,7 @@ namespace TGC.Group.Model
       //  private TgcArrow collisionNormalArrow;
        // private TgcBox collisionPoint;
         public TgcArrow directionArrow;
+        private Vehiculo vehiculo;
         private bool esRueda = false;
         private bool esArma = false;
         private bool esRuedaDelantera = false;
@@ -91,6 +92,23 @@ namespace TGC.Group.Model
             return this.chocoAdelante;
         }
         
+        public void setVehiculo(Vehiculo auto)
+        {
+            this.vehiculo = auto;
+        }
+
+        public Vehiculo getVehiculo()
+        {
+            return this.vehiculo;
+        }
+
+        private bool esVehiculo()
+        {
+            bool ret = false;
+            if (getVehiculo() != null) ret = true;
+            return ret;
+        }
+
         public void setSonido(String fileName)
         {
             Vector3 vecDisparo = new Vector3(this.getMesh().Position.X - 100,
@@ -675,6 +693,10 @@ namespace TGC.Group.Model
                     mesh.Enabled = false;
                     dañoPorArma();
                     this.sonidoColision.startSound();
+                    if (esVehiculo())
+                    {
+                        getVehiculo().dañoPorArma();
+                    }
                     break;
                 }
             }
