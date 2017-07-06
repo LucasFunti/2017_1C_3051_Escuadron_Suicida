@@ -399,6 +399,7 @@ namespace TGC.Group.Model
             creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(3228, 10, 5959), FastMath.PI);
             creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(2176, 10, 560), FastMath.PI);
             creaUnItem(MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-V\\misil-V-TgcScene.xml", new Vector3(3102, 10, 1219), FastMath.PI);
+
             itemsTiempoInvisibilidad = new int[7];
             for ( var i = 0; i<7; i++)
             {

@@ -25,18 +25,26 @@ namespace TGC.Group.Model.UtilsVehiculos
         public void render()
         {
             //Muestra la vida solo del auto principal
-            if (this.auto_principal)
-            {
+            if (!this.auto_principal)
+                return;
+
                 text2d = new TgcText2D();
                 text2d.Text = "Vida: " + Math.Truncate(this.lifeLevel).ToString() + "%";
                 text2d.Color = Color.WhiteSmoke;
                 text2d.Align = TgcText2D.TextAlign.LEFT;
-                text2d.Position = new Point((D3DDevice.Instance.Width / 2)-100, 0);
+                text2d.Position = new Point((D3DDevice.Instance.Width / 2) - 100, 0);
                 text2d.Size = new Size(300, 100);
                 text2d.changeFont(new Font("TimesNewRoman", 25, FontStyle.Bold));
+                text2d.Color = Color.Green;
+                if(this.lifeLevel<65)
                 text2d.Color = Color.Yellow;
-                text2d.render();
-            }
+                if (this.lifeLevel < 40)
+                text2d.Color = Color.Orange;
+                if (this.lifeLevel < 20)
+                text2d.Color = Color.Red;
+
+            text2d.render();
+           
         }
         public float nivelDeVida()
         {
@@ -48,6 +56,10 @@ namespace TGC.Group.Model.UtilsVehiculos
                 return true;
             else
                 return false;
+        }
+        public void recibirDañoPorChoque()
+        {
+            this.recibirDaño(5);
         }
         public void recibirDaño(float daño)
         {

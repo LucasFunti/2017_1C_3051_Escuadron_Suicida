@@ -5,18 +5,21 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Utils;
 using TGC.Group.Model.UtilsEfectos;
 using TGC.Group.Model.UtilsVehiculos;
+using TGC.Group.Model.UtilsVehiculos._2DObjects;
 
 namespace TGC.Group.Model
 {
     class Vehiculo : ObjetoConMovimiento
     {
         private LifeLevel lifeLevel;
+        private WeaponCount weapons;
         private Humo humoCañoEscape;
         private Humo humoChoque;
         private Boolean EfectoNitro=false;
         public float tInicioHumo = 1f; 
         public static float tDuracionHumo = 1f;
         public float tFinHumo = 2f;
+
 
 
         public Vehiculo(TgcMesh Mesh, TwistedMetal env) : base(env)
@@ -28,6 +31,7 @@ namespace TGC.Group.Model
             //      direcionadores();
             updateTGCArrow();
             iniciarNivelDeVida();
+            iniciarWeaponCount();
             iniciarHumo();
         }
         public Vehiculo(TwistedMetal env) : base(env)  
@@ -36,11 +40,16 @@ namespace TGC.Group.Model
             base.setAluraMaxima(100);
             //    direcionadores();
             iniciarNivelDeVida();
+            iniciarWeaponCount();
             iniciarHumo();
         }
         private void iniciarNivelDeVida()
         {
             this.lifeLevel = new LifeLevel(this.esAutoPrincipal());
+        }
+        private void iniciarWeaponCount()
+        {
+            this.weapons = new WeaponCount(this.esAutoPrincipal());
         }
         private void iniciarHumo()
         {
@@ -57,34 +66,7 @@ namespace TGC.Group.Model
             return false;
         }
 
-        /*     private void direcionadores()
-             {
-                 directionArrow = new TgcArrow();
-                 directionArrow.BodyColor = Color.Red;
-                 directionArrow.HeadColor = Color.Green;
-                 directionArrow.Thickness = 0.4f;
-                 directionArrow.HeadSize = new Vector2(5, 10);
-
-                 //Linea para normal de colision
-                 collisionNormalArrow = new TgcArrow();
-                 collisionNormalArrow.BodyColor = Color.Blue;
-                 collisionNormalArrow.HeadColor = Color.Yellow;
-                 collisionNormalArrow.Thickness = 0.4f;
-                 collisionNormalArrow.HeadSize = new Vector2(2, 5);
-
-                 //Caja para marcar punto de colision
-                 collisionPoint = TgcBox.fromSize(new Vector3(4, 4, 4), Color.Red);
-                 collisionPoint.AutoTransformEnable = true;
-             }*/
-
-        /*   public void setPEndDirectionArrow(Vector3 vector)
-           {
-               directionArrow.PEnd = vector;
-           }
-           public Vector3 getPEndDirectionArrow(Vector3 vector)
-           {
-               return directionArrow.PEnd;
-           }*/
+      
         //Rota el objeto y si tiene camara sobre el.
         public override void rotar(Vector3 v, Matrix m,float anguloCamara)
         {
@@ -238,7 +220,7 @@ namespace TGC.Group.Model
         {
 
         }
-        public void creaDisparo(Vector3 posicion)
+        public virtual void creaDisparo(Vector3 posicion)
         {
             string sonido = env.MediaDir + "MySounds\\MachineGun.wav";
             var loader = new TgcSceneLoader();
@@ -258,6 +240,7 @@ namespace TGC.Group.Model
         {
             TgcSceneLoader loader=new TgcSceneLoader();
             string sonido = env.MediaDir + "MySounds\\Launch4.wav";
+             //   var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Cama-TgcScene.xml");
             var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml");
             TgcMesh mesh = scene.Meshes[0];
             mesh.AutoTransformEnable = false;
@@ -322,6 +305,27 @@ namespace TGC.Group.Model
             tFinHumo = tInicioHumo + tDuracionHumo;
             this.humoChoque.Update(this.getNuevaPosicion(), this.anguloFinal);
         }
+        public void dañoPorChoqueEnemigo()
+        {
+            this.lifeLevel.recibirDaño(20);
+        }
+        protected override void dañoPorChoque()
+        {
+            this.lifeLevel.recibirDañoPorChoque();
+        }
+        protected override void dañoPorArma()
+        {
+            this.lifeLevel.recibirDaño(20);
+        }
+        protected override void sumarVida()
+        {
+            this.lifeLevel.recibirVida(25);
+        }
+        protected override void sumarArmas()
+        {
+            this.weapons.sumarBalas(10);
+            this.weapons.sumarMisiles(5);
+        }
         public virtual void Update()
         {
            // base.CalcularMeshesCercanos();
@@ -331,43 +335,29 @@ namespace TGC.Group.Model
             base.calculosDePosicion();
             base.updateTGCArrow();
 
-            if (disparar())
+            if (disparar() && this.weapons.getnBalas()>0)
             {
+                this.weapons.sumarBalas(-1);
                 base.startDisparo();
                 creaDisparo(this.getMesh().Position);
             }
-            if (disparaEspecial()) { 
-                  base.startArma();
+            if (disparaEspecial() && this.weapons.getnMisiles()> 0) {
+                this.weapons.sumarMisiles(-1);
+                base.startArma();
                 //   creaMisilV(this.getMesh().Position);
                 creaMisilV();
 
             }
             this.humoCañoEscape.Update(this.getNuevaPosicion(), this.anguloFinal);
- 
-            //Actualizar valores de la linea de movimiento
-            //   directionArrow.PStart = this.getMesh().Position;
-            //directionArrow.PEnd = this.getMesh().Position + Vector3.Multiply(this.getMesh().Position, 50);
-            // directionArrow.updateValues();
-
-            //Actualizar valores de normal de colision
-            /*     if (this.env.GetManejadorDeColision().Manager().Collision)
-                 {
-                     collisionNormalArrow.PStart = this.env.GetManejadorDeColision().Manager().LastCollisionPoint;
-                     collisionNormalArrow.PEnd = this.env.GetManejadorDeColision().Manager().LastCollisionPoint +
-                                                 Vector3.Multiply(this.env.GetManejadorDeColision().Manager().LastCollisionNormal, 80);
-
-                     collisionNormalArrow.updateValues();
-
-
-                     collisionPoint.Position = this.env.GetManejadorDeColision().Manager().LastCollisionPoint;
-                     collisionPoint.render();
-                 }*/
         }
         public virtual void Render()
         {
             
             base.getMesh().render();
             this.lifeLevel.render();
+            this.weapons.render();
+
+            if(this.getMesh().Enabled)
             humoCañoEscape.Render(EfectoNitro);
 
             if (tInicioHumo < tFinHumo)
@@ -376,7 +366,7 @@ namespace TGC.Group.Model
             tInicioHumo = tInicioHumo + FastMath.Abs(this.env.ElapsedTime);
             //     base.getBoxDeColision().render();
             // base.getBoxDeColision().render();
-            //   directionArrow.render();
+              //directionArrow.render();
             //   collisionNormalArrow.render();
             //  collisionPoint.render();
 
@@ -384,7 +374,9 @@ namespace TGC.Group.Model
         public void dispose()
         {
             base.getMesh().dispose();
-            //directionArrow.dispose();
+
+           // directionArrow.dispose();
+
         }
 
     }

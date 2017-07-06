@@ -536,6 +536,7 @@ namespace TGC.Group.Model
             {
                 ProcesarChoques();
                 ProcesarItems();
+                ProcesarArmasDisparadas();
             }
             
 
@@ -593,6 +594,7 @@ namespace TGC.Group.Model
                         this.boxDeColision.setRenderColor(Color.DarkRed);
                         //sonidoColision.startSound();
                         VolverAPosicionAnterior();
+                        dañoPorChoque();
                     }
                 }
                 else {
@@ -611,10 +613,10 @@ namespace TGC.Group.Model
                     this.boxDeColision.setRenderColor(Color.Yellow);
                 } else {
                     //Si el arma está fuera de los limites del mapa, que se deshabilite
-                    if ((this.getMesh().Position.X > 5500) ||
-                        (this.getMesh().Position.X < -500) ||
-                        (this.getMesh().Position.Z > 5500) ||
-                        (this.getMesh().Position.Z < -500))
+                    if ((this.getMesh().Position.X > 6000) ||
+                        (this.getMesh().Position.X < 0) ||
+                        (this.getMesh().Position.Z > 6000) ||
+                        (this.getMesh().Position.Z < 0))
                     {
                         this.getMesh().Enabled = false;
                         ControladorDeVehiculos.getInstance().deshabilitarObjeto(this.getMesh());
@@ -643,11 +645,44 @@ namespace TGC.Group.Model
         {
 
         }
+        protected virtual void dañoPorChoque()
+        {
 
+        }
+        private void ProcesarArmasDisparadas()
+        {
+            bool tocaItem = false;
+            var ray = calcularRayoDePosicion();
+
+            int posicionItem = -1;
+            foreach (var mesh in this.env.GetManejadorDeColision().MeshesArmasDisparadasColicionables)
+            {
+                posicionItem++;
+                var escenaAABB = mesh.BoundingBox;
+
+                if (mesh == this.getMesh() || !mesh.Enabled)
+                    break;
+
+                //Ejecutar algoritmo de detección de colisiones
+                var collisionResult = TgcCollisionUtils.classifyBoxBox(mesh.BoundingBox, this.getMesh().BoundingBox);
+                //collisionResult.
+
+                /*Si choca sale del bucle*/
+                // if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB) || (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera))
+                if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB))
+                {
+                    tocaItem = true;
+                    mesh.Enabled = false;
+                    dañoPorArma();
+                    this.sonidoColision.startSound();
+                    break;
+                }
+            }
+           
+        }
         private void ProcesarItems()
         {
-            collisionFound = false;
-            chocoAdelante = false;
+            bool tocaItem = false;
             var ray = calcularRayoDePosicion();
            
             int posicionItem = -1;
@@ -656,7 +691,7 @@ namespace TGC.Group.Model
                 posicionItem++;
                 var escenaAABB = mesh.BoundingBox;
 
-                if (mesh == this.getMesh())
+                if (mesh == this.getMesh() || !mesh.Enabled)
                     break;
 
                 //Ejecutar algoritmo de detección de colisiones
@@ -664,22 +699,38 @@ namespace TGC.Group.Model
                 //collisionResult.
 
                 /*Si choca sale del bucle*/
-                if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB) || (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera))
+                // if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB) || (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera))
+                if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB) )
                 {
-                    collisionFound = true;
+                    tocaItem = true;
+                    
+                    if(mesh.Name.Equals("cura"))
+                    sumarVida();
+                    else
+                    sumarArmas();
 
                     break;
                 }
             }
-            
-            /*Si choca se oculta el item por un tiempo*/
-            if (collisionFound && Ciudad.getInstance().getVisible(posicionItem))
+           /*Si choca se oculta el item por un tiempo*/
+            if (tocaItem && Ciudad.getInstance().getVisible(posicionItem))
             {
                 Ciudad.getInstance().setNotVisible(posicionItem);
                 sonidoItem.startSound();
             }
         }
+        protected virtual void sumarVida()
+        {
 
+        }
+        protected virtual void sumarArmas()
+        {
+
+        }
+        protected virtual void dañoPorArma()
+        {
+
+        }
         private TgcRay.RayStruct calcularRayoDePosicion()
         {
             var ray = new TgcRay.RayStruct();

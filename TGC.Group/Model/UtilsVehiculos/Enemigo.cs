@@ -81,6 +81,13 @@ namespace TGC.Group.Model.UtilsVehiculos
             TiempoDisparoMisil++;
             TiempoDisparo++;
 
+
+            if (TgcCollisionUtils.testObbObb(this.getBoxDeColision(), this.autoP.getBoxDeColision()))
+            {
+                this.autoP.dañoPorChoqueEnemigo();
+                this.autoP.VolverAPosicionAnterior();
+            }
+
             base.Update();
 
             adelante = false;
@@ -103,22 +110,39 @@ namespace TGC.Group.Model.UtilsVehiculos
              float X1 = this.getMesh().Position.X;
              float Z1 = this.getMesh().Position.Z;
 
-             float X2 = this.autoP.getMesh().Position.X;
-             float Z2 = this.autoP.getMesh().Position.Z;
+             float X2 = targetPos.X;
+             float Z2 = targetPos.Z;
 
              float ang = FastMath.Atan2((Z2 - Z1), (X2 - X1));
+            float ang2 = (FastMath.PI * 3 / 2) - ang;
 
-
-             if (base.anguloFinal != (FastMath.PI * 3 / 2) - ang)
+             if (base.anguloFinal != ang2)
              {
-                 setAnguloFinal((FastMath.PI * 3 / 2) - ang);
-                float f = this.autoP.orientacion;
+                setAnguloFinal(ang2);
+                 //float f = this.autoP.orientacion;
                  if (ang >= 0 && ang <= 3)
                      doblaD=true;
                  if (ang < 0 && ang >= -3)
                      doblaI = true;
+
              }
         }
+    /*    public override void creaDisparo(Vector3 posicion)
+        {
+            string sonido = env.MediaDir + "MySounds\\MachineGun.wav";
+            var loader = new TgcSceneLoader();
+            var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Vela\\Vela-TgcScene.xml");
+            TgcMesh mesh = scene.Meshes[0];
+            mesh.AutoTransformEnable = false;
+            mesh.AutoUpdateBoundingBox = true;
+            mesh.createBoundingBox();
+            mesh.Position = posicion;
+            Arma arma = new Arma(mesh, this.env, sonido, 40, this.orientacion, this.autoP.getMesh().Position);
+
+            arma.mover();
+            ControladorDeVehiculos.getInstance().agregarArma(arma);
+            base.agregarArma(arma);
+        }*/
         public override bool disparar()
         {
             return bolDisparar;

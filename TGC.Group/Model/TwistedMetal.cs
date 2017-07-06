@@ -106,6 +106,7 @@ namespace TGC.Group.Model
             manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getMeshParedes());
             //manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getItems());
             manejadorDeColiciones.addListOfBoundingBoxItemMeshColisionable(Ciudad.getItems());
+            manejadorDeColiciones.addBoundingBoxMeshColisionable(controladorDeVehiculos.getEnemigo().getMesh());
         }
 
        private void iniciarIluminacion()
@@ -202,7 +203,9 @@ namespace TGC.Group.Model
             /*controladorDeVehiculos.crearAutoPrincipal();
             controladorDeVehiculos.crearEnemigo1();
             autoPrincipal = controladorDeVehiculos.getAutoPrincipal();
+
             */
+
             //niebla = new Niebla(this);
             // niebla.CargarCamara(controladorDeVehiculos.getAutoPrincipal().getCamara());
             //  niebla
