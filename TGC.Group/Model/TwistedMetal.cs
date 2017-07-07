@@ -61,6 +61,8 @@ namespace TGC.Group.Model
         private TgcMesh personaje2;
         private TgcMesh personaje3;
         private TgcMesh personaje4;
+        private int deltaSonido = 280;
+        private int contSonido = 0;
         private bool EndGame = false;
 
         private int opcionSeleccionada = 1;
@@ -290,6 +292,7 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
+            
             //Se cambia el valor por defecto del farplane para evitar cliping de farplane.
             D3DDevice.Instance.Device.Transform.Projection =
                 Matrix.PerspectiveFovLH(D3DDevice.Instance.FieldOfView,
@@ -306,6 +309,9 @@ namespace TGC.Group.Model
 
                 if (gameMode == PLAYING) {
                     controladorDeVehiculos.update();
+                    contSonido += 1;
+                    if (contSonido == deltaSonido) sonidos.nextSound();
+                    if (contSonido > deltaSonido ) sonidos.soundControl();
                 }
 
                 if (gameMode == SELECTION) {
@@ -402,6 +408,8 @@ namespace TGC.Group.Model
                     }
 
                 }
+
+                
 
                 Ciudad.Update();
             } else {

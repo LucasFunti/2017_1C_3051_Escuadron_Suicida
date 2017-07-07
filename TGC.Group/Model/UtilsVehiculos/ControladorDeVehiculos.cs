@@ -95,6 +95,13 @@ namespace TGC.Group.Model.UtilsVehiculos
                 if (arma.getMesh().Enabled ) arma.Update();
 
             this.autoPrincipal.Update();
+
+            if (TgcCollisionUtils.testObbObb(this.autoPrincipal.getBoxDeColision(), this.getEnemigo().getBoxDeColision()))
+            {
+                this.autoPrincipal.dañoPorChoqueEnemigo();
+                this.getEnemigo().VolverAPosicionAnterior();
+            }
+
         }
         public void render()
         {
