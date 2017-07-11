@@ -73,5 +73,10 @@ namespace TGC.Group.Model.UtilsVehiculos
             //contadorDeCiclos++;
            // adelante = false;
         }
+
+        public void setPosicionReferencia(Vector3 posicion)
+        {
+            base.PosicionReferencia = posicion;
+        }
     }
 }

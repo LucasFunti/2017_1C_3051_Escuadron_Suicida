@@ -527,7 +527,7 @@ namespace TGC.Group.Model
                     {
                         EndGame = true;
                     }
-                    //messages.MostrarMensaje("VIDA ENEMIGO = " + controladorDeVehiculos.getEnemigo().getLifeLevel().nivelDeVida(), 850, 50);  
+                    messages.MostrarMensaje("VIDA ENEMIGO = " + controladorDeVehiculos.getEnemigo().getLifeLevel().nivelDeVida(), 850, 50);  
                     //  niebla.Update(controladorDeVehiculos.getAutoPrincipal().getCamara());
                     //  messages.test("BoudningBox", this.autoPrincipal.getMesh().BoundingBox.computeCorners());
                 }
@@ -540,8 +540,7 @@ namespace TGC.Group.Model
                 boxPersonaje.render();
                 boxSalir.render();
 
-                messages.MostrarMensaje("gameMode = " + gameMode, 50, 600);
-                messages.MostrarMensaje("opcionSeleccionada = " + opcionSeleccionada, 50, 620);
+                
 
                 if (gameMode == MENU)
                 {
@@ -566,7 +565,6 @@ namespace TGC.Group.Model
                     
 
                 }
-                messages.MostrarMensaje("boxComenzar.Position = " + boxComenzar.Position, 50, 640);
 
             }
             // PostRender();

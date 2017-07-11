@@ -15,31 +15,20 @@ namespace TGC.Group.Model.UtilsVehiculos
      //   private Boolean doblaI = false;
         private int tiempoDeVida = 0;
 
-        public Arma(TgcMesh Mesh, TwistedMetal env, string sonido, float aceleracion, float orientacion) : base(Mesh, env)
+        public Arma(TgcMesh Mesh, TwistedMetal env, string sonido, float aceleracion, 
+                    float orientacion, float angulo, Vector3 scale) : base(Mesh, env)
         {
             this.doblar(0.001f);//Inicializa las matrices de rotación, no tocar!!
-            
+            this.getMesh().AutoTransformEnable = false;
+            this.getMesh().AutoUpdateBoundingBox = true;
+            this.getMesh().createBoundingBox();
             this.setVelocidadMaxima(150);
             this.setVelocidadMinima(0);
             this.setConstanteDeAsceleracionX(aceleracion);
             this.orientacion = orientacion;
-            //this.getMesh().rotateY(orientacion);
-            //this.getMesh().Rotation = me.Rotation;
-            //this.matrixRotacion = me.Transform;
-            //var m = Matrix.Scaling(scale3) * me.matrixRotacion * Matrix.Translation(NuevaPosicion);
-            //this.getMesh().Transform = MT;
-            //this.getMesh().rotateY(orientacion);
-            //this.getMesh().Position = NuevaPosicion;
-            /*var sentido = 1f;
-            if (this.getVelocidadX() < 0)
-                sentido *= -1;
-
-            sentido = sentido * this.getVelocidadRotacion();
-            base.rotar(new Vector3(0, orientacion, 0), MT, 0);*/
-            //this.getMesh().Transform = MT;
-
-            //string sonido = env.MediaDir + "MySounds\\MachineGun.wav";
-            this.setAnguloFinal(this.orientacion);
+            this.escalado = scale;
+            this.getMesh().Scale = scale;
+            this.setAnguloFinal(angulo);
             base.setSonido(sonido);
             base.setSonidoMotor(sonido);
             base.setSonidoArma(sonido);
@@ -47,6 +36,7 @@ namespace TGC.Group.Model.UtilsVehiculos
             base.setSonidoItem(env.MediaDir + "MySounds\\Crash4.wav");
             base.setSonidoSalto(env.MediaDir + "MySounds\\Crash4.wav");
             base.setEsArma(true);
+            this.doblar(orientacion);
         }
         public override void Update()
         {

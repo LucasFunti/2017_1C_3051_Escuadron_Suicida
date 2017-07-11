@@ -24,8 +24,8 @@ namespace TGC.Group.Model.UtilsVehiculos
         private CamaraTerceraPersona camaraInterna2;
         private TgcRotationalCamera camaraRotante;
         
-        //private Rueda[] ruedas;
-        //private List<Rueda[]> listaDeRuedas;
+        private Rueda[] ruedas;
+        private List<Rueda[]> listaDeRuedas;
         public static float camaraOffsetDefaulForward = 300f;
 
 
@@ -64,6 +64,27 @@ namespace TGC.Group.Model.UtilsVehiculos
             base.setSonidoItem(personaje.FileSonidoItem);
             base.setSonidoSalto(personaje.FileSonidoSalto);
 
+            Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
+            //var sceneRueda = loader.loadSceneFromFile(env.MediaDir + "Wheel\\wheel2-TgcScene.xml");
+            var sceneRueda = loader.loadSceneFromFile(env.MediaDir + "Wheel\\wheel2-TgcScene.xml");
+            Vector3 pos = this.getMesh().Position;
+            pos = new Vector3(pos.X + 50, pos.Y, pos.Z + 100);
+            TgcMesh rueda1_p1 = sceneRueda.Meshes[0];
+            //rueda1_p1.AutoTransformEnable = true;
+            rueda1_p1.Position = pos;
+            rueda1_p1.Scale = scale;
+            TgcMesh rueda1_p2 = sceneRueda.Meshes[1];
+           // rueda1_p2.AutoTransformEnable = true;
+            rueda1_p2.Position = pos;
+            rueda1_p2.Scale = scale;
+            TgcMesh rueda1_p3 = sceneRueda.Meshes[2];
+           // rueda1_p3.AutoTransformEnable = true;
+            rueda1_p3.Position = pos;
+            rueda1_p3.Scale = scale;
+
+            TgcMesh[] meshRuedas = new TgcMesh[] { rueda1_p1, rueda1_p2, rueda1_p3 };
+            base.setRueda(meshRuedas);
+
             //Seteo posicion Inicial
             //  Vector3 scale3 = new Vector3(1f, 1f, 1f);
             // var m = Matrix.Scaling(scale3) * this.matrixRotacion * Matrix.Translation(new Vector3(100, 5, 3000));
@@ -75,19 +96,24 @@ namespace TGC.Group.Model.UtilsVehiculos
 
 
             //Creo las ruedas
-            //listaDeRuedas = new System.Collections.Generic.List<Rueda[]>();
-            /*ruedas = new Rueda[3];
+            /*listaDeRuedas = new System.Collections.Generic.List<Rueda[]>();
+            ruedas = new Rueda[3];
             Vector3 vectorPos = new Vector3(this.getMesh().Position.X - 100, this.getMesh().Position.Y, this.getMesh().Position.Z - 100);
-            var sceneRueda = loader.loadSceneFromFile(env.MediaDir + "ModelosTgc\\Robot\\Robot-TgcScene.xml");
+            var sceneRueda = loader.loadSceneFromFile(env.MediaDir + "Wheel\\wheel2-TgcScene.xml");
 
-            Vector3 scale3 = new Vector3(0.01f, 0.01f, 0.01f);
-            var m = Matrix.Scaling(scale3) * this.matrixRotacion * Matrix.Translation(vectorPos);
+            Vector3 scale = new Vector3(0.01f, 0.01f, 0.01f);
+            var ruedaMesh = sceneRueda.Meshes[1];
+            ruedaMesh.AutoTransformEnable = true;
+            ruedaMesh.Position = vectorPos;
+            ruedaMesh.Scale = scale;
+            ruedas[0] = new Rueda(this.env, ruedaMesh, true);*/
+
+            //rueda1_p1.rotateY(FastMath.PI);
 
             /*var rueda1_p1 = sceneRueda.Meshes[0];
             rueda1_p1.move(vectorPos);
             rueda1_p1.AutoTransformEnable = true;
             rueda1_p1.Position = vectorPos;
-            rueda1_p1.Transform = m;
             rueda1_p1.Scale = new Vector3(1f, 1f, 1f);
             //rueda1_p1.rotateY(FastMath.PI);
             ruedas[0] = new Rueda(this.env, rueda1_p1, true);
@@ -361,11 +387,9 @@ namespace TGC.Group.Model.UtilsVehiculos
             camaraRotante.SetCamera(new Vector3(camaraInterna.Position.X, 150, camaraInterna.Position.Z),
                                      new Vector3(camaraInterna.Target.X, 100, camaraInterna.Target.Z));
 
-            /*foreach (var rueda in this.listaDeRuedas)
+            /*foreach (var rueda in base.getRueda())
             {
-                rueda[0].Update();
-                //rueda[1].Update();
-                //rueda[2].Update();
+                rueda.up
             }*/
             this.velocimetro.Update(FastMath.Abs(this.getVelocidadX()));
         }
@@ -376,15 +400,10 @@ namespace TGC.Group.Model.UtilsVehiculos
             base.Render();
             this.velocimetro.Render();
 
-            /*foreach (var rueda in this.listaDeRuedas)
+            foreach (var rueda in base.getRueda())
             {
-                rueda[0].Render();
-                //rueda[0].Render();
-                //rueda[1].Render();
-                //rueda[1].Render();
-                //rueda[2].Render();
-               // rueda[2].Render();
-            }*/
+                rueda.render();
+            }
 
         }
         private void AplicarShaderChoque()

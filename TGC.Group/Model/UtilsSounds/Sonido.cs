@@ -49,7 +49,7 @@ namespace TGC.Group.Model
         public void playSound(String fileName, Vector3 position)
         {
             Tgc3dSound sound = new Tgc3dSound(fileName, position, DirectSound.DsDevice);
-            sound.MinDistance = 50f;
+            sound.MinDistance = 500f;
             theSound = sound;
             contadorDeCiclos = 0;
         }
