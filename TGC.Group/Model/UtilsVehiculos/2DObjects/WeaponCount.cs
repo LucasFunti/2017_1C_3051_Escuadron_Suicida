@@ -12,13 +12,18 @@ namespace TGC.Group.Model.UtilsVehiculos._2DObjects
     public class WeaponCount
     {
         private TgcText2D text2d, text2d2;
-        private int nBalas = 20;
+        private int nBalas = 200;
         private int nMisiles = 15;
         private Boolean auto_principal;
 
         public WeaponCount(Boolean autoPrincipal)
         {
             this.auto_principal = autoPrincipal;
+            if (!autoPrincipal)
+            {
+                this.nBalas = 3000;
+                this.nMisiles = 1500;
+            }
         }
         public void render()
         {

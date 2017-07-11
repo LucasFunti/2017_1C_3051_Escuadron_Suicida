@@ -63,6 +63,7 @@ namespace TGC.Group.Model.UtilsVehiculos
             base.setSonidoColision(personaje.FileSonidoColision);
             base.setSonidoItem(personaje.FileSonidoItem);
             base.setSonidoSalto(personaje.FileSonidoSalto);
+            this.getMesh().AutoUpdateBoundingBox = true;
 
             Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
             //var sceneRueda = loader.loadSceneFromFile(env.MediaDir + "Wheel\\wheel2-TgcScene.xml");
@@ -83,7 +84,7 @@ namespace TGC.Group.Model.UtilsVehiculos
             rueda1_p3.Scale = scale;
 
             TgcMesh[] meshRuedas = new TgcMesh[] { rueda1_p1, rueda1_p2, rueda1_p3 };
-            base.setRueda(meshRuedas);
+            //base.setRueda(meshRuedas);
 
             //Seteo posicion Inicial
             //  Vector3 scale3 = new Vector3(1f, 1f, 1f);
@@ -400,9 +401,12 @@ namespace TGC.Group.Model.UtilsVehiculos
             base.Render();
             this.velocimetro.Render();
 
-            foreach (var rueda in base.getRueda())
+            if (base.getRueda() != null)
             {
-                rueda.render();
+                foreach (var rueda in base.getRueda())
+                {
+                    rueda.render();
+                }
             }
 
         }

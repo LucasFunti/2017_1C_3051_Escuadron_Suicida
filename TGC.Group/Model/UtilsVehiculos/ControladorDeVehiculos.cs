@@ -79,6 +79,27 @@ namespace TGC.Group.Model.UtilsVehiculos
             this.listaDeVehiculos.Add(enemigo);
             this.listaDeEnemigos.Add(enemigo);
         }
+
+        public void crearEnemigoFinal()
+        {
+
+            var sceneAuto = loader.loadSceneFromFile(this.env.MediaDir + "MeshCreator\\Meshes\\Vehiculos\\GruaExcavadora\\GruaExcavadora-TgcScene.xml");
+
+            Enemigo enemigo = new Enemigo(this.env, sceneAuto.Meshes[0]);
+            enemigo.esEnemigoFinal = true;
+            enemigo.setAutoTarget(this.getAutoPrincipal());
+            //   enemigo.setPosicionInicial(new Vector3(-100, 5, 3000));
+
+
+            enemigo.setPosicionInicial(new Vector3(5000, 5, 5750));
+            enemigo.setVelocidadMaxima(10);
+            enemigo.setVelocidadMinima(-5);
+            enemigo.setConstanteDeAsceleracionX(0.5f);
+            enemigo1aux = enemigo;
+            this.listaDeVehiculos.Add(enemigo);
+            this.listaDeEnemigos.Add(enemigo);
+        }
+
         public Enemigo getEnemigo()
         {
             return enemigo1aux;
@@ -113,7 +134,7 @@ namespace TGC.Group.Model.UtilsVehiculos
                     //     var c = TgcCollisionUtils.classifyFrustumAABB(this.env.Frustum, vehiculo.getMesh().BoundingBox);
                      //  if (c != TgcCollisionUtils.FrustumResult.OUTSIDE)
                     // {
-                    vehiculo.Render();
+                    if (!vehiculo.estaMuerto) vehiculo.Render();
                      //   vehiculo.getMesh().render();
                     //}
                 }

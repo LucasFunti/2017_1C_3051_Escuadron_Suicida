@@ -15,14 +15,15 @@ namespace TGC.Group.Model.UtilsVehiculos
      //   private Boolean doblaI = false;
         private int tiempoDeVida = 0;
 
-        public Arma(TgcMesh Mesh, TwistedMetal env, string sonido, float aceleracion, 
-                    float orientacion, float angulo, Vector3 scale) : base(Mesh, env)
+        public Arma(TgcMesh Mesh, TwistedMetal env, string sonido, float aceleracion, float orientacion,
+                     float angulo, Vector3 scale, TgcMesh meshOrigen, bool esDisparo) : base(Mesh, env)
         {
             this.doblar(0.001f);//Inicializa las matrices de rotación, no tocar!!
             this.getMesh().AutoTransformEnable = false;
             this.getMesh().AutoUpdateBoundingBox = true;
             this.getMesh().createBoundingBox();
             this.setVelocidadMaxima(150);
+            this.setVelocidadRotacion(0);
             this.setVelocidadMinima(0);
             this.setConstanteDeAsceleracionX(aceleracion);
             this.orientacion = orientacion;
@@ -36,6 +37,8 @@ namespace TGC.Group.Model.UtilsVehiculos
             base.setSonidoItem(env.MediaDir + "MySounds\\Crash4.wav");
             base.setSonidoSalto(env.MediaDir + "MySounds\\Crash4.wav");
             base.setEsArma(true);
+            if (esDisparo) base.setEsDisparo(true);
+            base.setMeshDeOrigen(meshOrigen);
             this.doblar(orientacion);
         }
         public override void Update()

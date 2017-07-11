@@ -8,6 +8,7 @@ using TGC.Core.Input;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
+using TGC.Core.Text;
 using System.Collections.Generic;
 using TGC.Examples.Camara;
 using TGC.Core.Terrain;
@@ -19,6 +20,7 @@ using TGC.Group.Model.UtilsEfectos;
 using TGC.Core.Shaders;
 using Microsoft.DirectX.Direct3D;
 using TGC.Group.Model.UtilsVehiculos._2DObjects;
+using TGC.Core.Text;
 
 namespace TGC.Group.Model
 {
@@ -34,7 +36,7 @@ namespace TGC.Group.Model
         public Ciudad Ciudad;
         public Musica sonidos;
         public Niebla niebla;
-        //private Sonido sonido;
+        private Sonido sonido;
         private PrintMessageText messages;
         private ControladorDeVehiculos controladorDeVehiculos;
         private ManejadorDeColisiones manejadorDeColiciones;
@@ -64,10 +66,15 @@ namespace TGC.Group.Model
         private int deltaSonido = 280;
         private int contSonido = 0;
         private bool EndGame = false;
+        private int contadorFinal = 800;
+        private bool juegoTerminado = false;
+        private int contadorEnemigoFinal = 200;
+        private bool enemigoFinalCreado = false;
 
         private int opcionSeleccionada = 1;
 
         private int gameMode = MENU;
+        private TgcText2D text2d, text2d2;
 
         public static TwistedMetal getInstance()
         {
@@ -109,6 +116,31 @@ namespace TGC.Group.Model
             //manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getItems());
             manejadorDeColiciones.addListOfBoundingBoxItemMeshColisionable(Ciudad.getItems());
             manejadorDeColiciones.addBoundingBoxMeshColisionable(controladorDeVehiculos.getEnemigo().getMesh());
+
+            manejadorDeColiciones.addBoundingBoxMeshColisionable(autoPrincipal.getMesh());
+            //manejadorDeColiciones.addBoundingBoxMeshColisionable(controladorDeVehiculos.getEnemigo().getMesh());
+        }
+    
+        private void terminarJuego(bool winner)
+        {
+            juegoTerminado = true;
+            text2d = new TgcText2D();
+            text2d.Text = "GAME OVER!";
+            text2d.Align = TgcText2D.TextAlign.CENTER;
+            text2d.Position = new Point((D3DDevice.Instance.Width / 3), (D3DDevice.Instance.Height / 2) - 200);
+            text2d.Size = new Size(500, 300);
+            text2d.changeFont(new System.Drawing.Font("TimesNewRoman", 40, FontStyle.Bold));
+            text2d.Color = Color.Yellow;
+
+            text2d2 = new TgcText2D();
+            text2d2.Text = "PERDISTE...";
+            if (winner) text2d2.Text = "GANASTE!";
+            text2d2.Align = TgcText2D.TextAlign.CENTER;
+            text2d2.Position = new Point((D3DDevice.Instance.Width / 3), (D3DDevice.Instance.Height / 2) + 200);
+            text2d2.Size = new Size(500, 300);
+            text2d2.changeFont(new System.Drawing.Font("TimesNewRoman", 40, FontStyle.Bold));
+            text2d2.Color = Color.Red;
+            if (winner) text2d2.Color = Color.SpringGreen;
         }
 
        private void iniciarIluminacion()
@@ -134,6 +166,7 @@ namespace TGC.Group.Model
             //startGame();
             
             var d3dDevice = D3DDevice.Instance.Device;
+            sonido = new Sonido(MediaDir, ShadersDir, DirectSound);
             messages = new PrintMessageText(this);
 
             //Carga la estructura de la ciudad
@@ -224,6 +257,13 @@ namespace TGC.Group.Model
             return this.manejadorDeColiciones;
         }
 
+        public void playSonidoPorMuerte()
+        {
+            Vector3 vecDisparo = new Vector3(controladorDeVehiculos.getAutoPrincipal().getMesh().Position.X,
+                                                        controladorDeVehiculos.getAutoPrincipal().getMesh().Position.Y,
+                                                       controladorDeVehiculos.getAutoPrincipal().getMesh().Position.Z);
+            sonido.playSound(MediaDir + "MySounds\\Scream1.wav", vecDisparo);
+        }
 
         private void seleccionPorDefault()
         {
@@ -302,16 +342,40 @@ namespace TGC.Group.Model
 
             if (TwistedMetal.inicializado)
             {
-               
+
 
                 //sonido.Update();
-               
 
-                if (gameMode == PLAYING) {
+
+                if (gameMode == PLAYING)
+                {
                     controladorDeVehiculos.update();
                     contSonido += 1;
                     if (contSonido == deltaSonido) sonidos.nextSound();
-                    if (contSonido > deltaSonido ) sonidos.soundControl();
+                    if (contSonido > deltaSonido) sonidos.soundControl();
+                    /*if (controladorDeVehiculos.getEnemigo().getLifeLevel().nivelDeVida() == 0 && contadorEnemigoFinal > 0)
+                    {
+                        contadorEnemigoFinal = contadorEnemigoFinal - 1;
+                    }
+
+                    if (contadorEnemigoFinal == 0 && !enemigoFinalCreado)
+                    {
+                        //Creo enemigoFinal
+                        Vector3 vecDisparo = new Vector3(controladorDeVehiculos.getAutoPrincipal().getMesh().Position.X,
+                                                         controladorDeVehiculos.getAutoPrincipal().getMesh().Position.Y,
+                                                        controladorDeVehiculos.getAutoPrincipal().getMesh().Position.Z);
+                        sonido.playSound(MediaDir + "MySounds\\risa.wav", vecDisparo);
+                        controladorDeVehiculos.crearEnemigoFinal();
+                        enemigoFinalCreado = true;
+                        manejadorDeColiciones.addBoundingBoxMeshColisionable(controladorDeVehiculos.getEnemigo().getMesh());
+                    }*/
+
+                    //enemigoFinalCreado && 
+                    if (controladorDeVehiculos.getEnemigo().getLifeLevel().nivelDeVida() == 0)
+                    {
+                        terminarJuego(true);
+                    }
+
                 }
 
                 if (gameMode == SELECTION) {
@@ -505,68 +569,70 @@ namespace TGC.Group.Model
         }
         private void renderNormal()
         {
-            if (TwistedMetal.inicializado)
+            if (juegoTerminado)
             {
-
-                if (gameMode == PLAYING)
+                contadorFinal = contadorFinal - 1;
+                text2d2.render();
+                text2d.render();
+                if (contadorFinal == 0)
                 {
-                    /*messages.MostrarComandosPorPantalla();
-                    messages.MostrarTiempo();
-                    messages.MostrarVelocidadPorPantalla(controladorDeVehiculos.getAutoPrincipal().getVelocidadX());
-                    messages.MostrarPosicioMeshPorPantalla(controladorDeVehiculos.getAutoPrincipal().getMesh().Position);
-                    messages.MostrarVelocidadYPorPantalla(controladorDeVehiculos.getAutoPrincipal().getVelocidadY());
-                    messages.MostrarPosicionCamaraPorPantalla(controladorDeVehiculos.getAutoPrincipal().getCamara().Position);
-                    messages.MostrarDireccionVehiculoPrincipal(controladorDeVehiculos.getAutoPrincipal().getMesh().Position);
-                    messages.MostrarAnguloVehiculoPrincipal(controladorDeVehiculos.getAutoPrincipal().anguloFinal);
-                    messages.MostrarAnguloVehiculoEnemigo(controladorDeVehiculos.getEnemigo().anguloFinal);
-                    messages.MostrarDireccionEnemigo(controladorDeVehiculos.getEnemigo().getMesh().Position);
-                    messages.MostrarVelocidadEnemigoPorPantalla(controladorDeVehiculos.getEnemigo().getVelocidadX());*/
-                    controladorDeVehiculos.render();
-                    this.cronometro.render(ElapsedTime);
-                    if (controladorDeVehiculos.getAutoPrincipal().getLifeLevel().nivelDeVida() <= 0)
+                    EndGame = true;
+                }
+            } else
+            {
+                if (TwistedMetal.inicializado)
+                {
+
+                    if (gameMode == PLAYING)
                     {
-                        EndGame = true;
+                       
+                        controladorDeVehiculos.render();
+                        this.cronometro.render(ElapsedTime);
+                        if (controladorDeVehiculos.getAutoPrincipal().getLifeLevel().nivelDeVida() <= 0)
+                        {
+                            terminarJuego(false);
+                        }
+                       
                     }
-                    messages.MostrarMensaje("VIDA ENEMIGO = " + controladorDeVehiculos.getEnemigo().getLifeLevel().nivelDeVida(), 850, 50);  
-                    //  niebla.Update(controladorDeVehiculos.getAutoPrincipal().getCamara());
-                    //  messages.test("BoudningBox", this.autoPrincipal.getMesh().BoundingBox.computeCorners());
-                }
 
-                Ciudad.Render();
-                personaje1.render();
-                personaje2.render();
-                personaje3.render();
-                boxComenzar.render();
-                boxPersonaje.render();
-                boxSalir.render();
+                    Ciudad.Render();
+                    personaje1.render();
+                    personaje2.render();
+                    personaje3.render();
+                    boxComenzar.render();
+                    boxPersonaje.render();
+                    boxSalir.render();
 
-                
 
-                if (gameMode == MENU)
-                {
 
-                    //camaraRotante.;
-                    camaraRotante.CameraDistance = 2000;
-                    camaraRotante.UpdateCamera(ElapsedTime);
-                    this.Camara = camaraRotante;
-                    messages.MostrarComandosDeSeleccion();
-                    messages.MostrarPosicioMeshPorPantalla(camaraRotante.Position);
+                    if (gameMode == MENU)
+                    {
 
-                   
-                }
-                if (gameMode == SELECTION)
-                {
-                    messages.MostrarComandosDeSeleccion();
-                    //camaraRotante.CameraCenter = new Vector3(3000, 50, 3000);
-                    //camaraRotante.SetCamera(new Vector3(250, 450, 3000), new Vector3(3000, 150, 3000));
-                    camaraRotante.CameraDistance = 3100;
-                    camaraRotante.UpdateCamera(ElapsedTime);
-                    this.Camara = camaraRotante;
-                    
+                        //camaraRotante.;
+                        camaraRotante.CameraDistance = 2000;
+                        camaraRotante.UpdateCamera(ElapsedTime);
+                        this.Camara = camaraRotante;
+                        messages.MostrarComandosDeSeleccion();
+                        messages.MostrarPosicioMeshPorPantalla(camaraRotante.Position);
+
+
+                    }
+                    if (gameMode == SELECTION)
+                    {
+                        messages.MostrarComandosDeSeleccion();
+                        //camaraRotante.CameraCenter = new Vector3(3000, 50, 3000);
+                        //camaraRotante.SetCamera(new Vector3(250, 450, 3000), new Vector3(3000, 150, 3000));
+                        camaraRotante.CameraDistance = 3100;
+                        camaraRotante.UpdateCamera(ElapsedTime);
+                        this.Camara = camaraRotante;
+
+
+                    }
 
                 }
-
             }
+
+            
             // PostRender();
         }
         public void renderScene(float elapsedTime, bool cubemap)

@@ -24,12 +24,14 @@ namespace TGC.Group.Model.UtilsVehiculos
         private Vector3 targetPos;
         private Boolean bolDisparar = false;
         private Boolean bolDispararMisil = false;
+        public Boolean esEnemigoFinal = false;
         private List<Vector3> nodos = new List<Vector3>();
 
         public Enemigo(TwistedMetal env, TgcMesh mesh) : base(mesh, env)
         {
 
             base.doblar(0.001f);//Inicializa las matrices de rotación, no tocar!!
+            this.getMesh().AutoUpdateBoundingBox = true;
 
          }
         public void setAutoTarget(VehiculoPrincipal auto)
@@ -66,14 +68,14 @@ namespace TGC.Group.Model.UtilsVehiculos
             
             //Cada 70 ciclos dispara
             bolDisparar = false;
-            if (TiempoDisparo>150)
+            if (TiempoDisparo>150 || (esEnemigoFinal && TiempoDisparo > 20))
             {
                 bolDisparar = true;
                 TiempoDisparo = 0;
             }
             //Cada 150 ciclos dispara un misil 
             bolDispararMisil = false;
-            if (TiempoDisparoMisil > 300)
+            if (TiempoDisparoMisil > 300 || (esEnemigoFinal && TiempoDisparoMisil > 50))
             {
                 bolDispararMisil = true;
                 TiempoDisparoMisil = 0;

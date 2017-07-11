@@ -21,8 +21,9 @@ namespace TGC.Group.Model
         public float tInicioHumo = 1f;
         public static float tDuracionHumo = 1f;
         public float tFinHumo = 2f;
-
-
+        private Sonido sonidoPorDaño;
+        private Sonido sonidoPorMuerte;
+        public bool estaMuerto = false;
 
         public Vehiculo(TgcMesh Mesh, TwistedMetal env) : base(env)
         {
@@ -31,6 +32,8 @@ namespace TGC.Group.Model
             base.setVelocidadY(0);
             base.setAluraMaxima(20);
             //      direcionadores();
+            sonidoPorDaño = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
+            sonidoPorMuerte = new Sonido(env.MediaDir, env.ShadersDir, env.DirectSound);
             updateTGCArrow();
             iniciarNivelDeVida();
             iniciarWeaponCount();
@@ -44,6 +47,22 @@ namespace TGC.Group.Model
             iniciarNivelDeVida();
             iniciarWeaponCount();
             iniciarHumo();
+        }
+
+        private void playSonidoPorDaño()
+        {
+            Vector3 vecDisparo = new Vector3(this.getMesh().Position.X,
+                                                 this.getMesh().Position.Y,
+                                                 this.getMesh().Position.Z);
+            if (sonidoPorDaño!= null) sonidoPorDaño.playSound(env.MediaDir + "MySounds\\Crash1.wav", vecDisparo);
+        }
+
+        private void playSonidoPorMuerte()
+        {
+            Vector3 vecDisparo = new Vector3(this.getMesh().Position.X,
+                                                 this.getMesh().Position.Y,
+                                                 this.getMesh().Position.Z);
+            if (sonidoPorMuerte != null) sonidoPorMuerte.playSound(env.MediaDir + "MySounds\\Scream1.wav", vecDisparo);
         }
 
         public LifeLevel getLifeLevel()
@@ -241,7 +260,7 @@ namespace TGC.Group.Model
             mesh.Position = posicion;
             
             
-            Arma arma = new Arma(mesh, this.env, sonido, 40, this.orientacion, this.anguloFinal, scale);
+            Arma arma = new Arma(mesh, this.env, sonido, 40, this.orientacion, this.anguloFinal, scale, this.getMesh(), true);
 
             //arma.mover();
             ControladorDeVehiculos.getInstance().agregarArma(arma);
@@ -251,14 +270,13 @@ namespace TGC.Group.Model
         {
             TgcSceneLoader loader=new TgcSceneLoader();
             string sonido = env.MediaDir + "MySounds\\Launch4.wav";
-            //var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Armas\\EspadaDoble\\EspadaDoble-TgcScene.xml");
             var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml");
             TgcMesh mesh = scene.Meshes[0];
             mesh.AutoUpdateBoundingBox = true;
             mesh.createBoundingBox();
             mesh.Position = this.getMesh().Position;
             Vector3 scale = new Vector3(1f, 1f, 1f);
-            Arma arma = new Arma(mesh, this.env, sonido, 20, this.orientacion, this.anguloFinal, scale);
+            Arma arma = new Arma(mesh, this.env, sonido, 20, this.orientacion, this.anguloFinal, scale, this.getMesh(), false);
             
             ControladorDeVehiculos.getInstance().agregarArma(arma);
             base.agregarArma(arma);
@@ -300,7 +318,29 @@ namespace TGC.Group.Model
         }
         protected override void dañoPorArma()
         {
-            this.lifeLevel.recibirDaño(20);
+            this.lifeLevel.recibirDaño(10);
+            
+            if (this.lifeLevel.nivelDeVida() == 0) {
+                TwistedMetal.getInstance().playSonidoPorMuerte();
+                this.estaMuerto = true;
+            } else
+            {
+                playSonidoPorDaño();
+            }
+        }
+        protected override void dañoPorDisparo()
+        {
+            this.lifeLevel.recibirDaño(2);
+            if (this.lifeLevel.nivelDeVida() == 0)
+            {
+                TwistedMetal.getInstance().playSonidoPorMuerte();
+                this.estaMuerto = true;
+            }
+            else
+            {
+                playSonidoPorDaño();
+            }
+
         }
         protected override void sumarVida()
         {

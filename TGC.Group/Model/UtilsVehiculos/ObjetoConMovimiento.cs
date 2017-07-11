@@ -31,6 +31,7 @@ namespace TGC.Group.Model
         public TwistedMetal env;
         public Matrix matrixRotacion;
         public float anguloFinal = 0;
+        public float anguloFinalR = 0;
         public Vector3 escalado = new Vector3(1f, 1f, 1f);
         public float anguloRueda = 0;
         public float anguloPrev = 0;
@@ -53,6 +54,7 @@ namespace TGC.Group.Model
         private Vehiculo vehiculo;
         private bool esRueda = false;
         private bool esArma = false;
+        private bool esDisparo = false;
         private bool esRuedaDelantera = false;
         private bool ruedaGirada = false;
         private Sonido sonido;
@@ -67,7 +69,7 @@ namespace TGC.Group.Model
         private List<TgcMesh> MeshesCeranos;
         private Vector3 posicionReferencia;
         private TgcMesh[] rueda;
-        private Matrix mOriginal;
+        private TgcMesh meshDeOrigen;
 
         public ObjetoConMovimiento(TwistedMetal env)
         {
@@ -91,7 +93,16 @@ namespace TGC.Group.Model
         public void setRueda(TgcMesh[] rueda)
         {
             this.rueda = rueda;
-            this.mOriginal = rueda[0].Transform;
+        }
+
+        public TgcMesh getMeshDeOrigen()
+        {
+            return this.meshDeOrigen;
+        }
+
+        public void setMeshDeOrigen(TgcMesh mesh)
+        {
+            this.meshDeOrigen = mesh;
         }
 
         public Vector3 getNuevaPosicion()
@@ -197,6 +208,11 @@ namespace TGC.Group.Model
         public void setEsArma(bool valor)
         {
             this.esArma = valor;
+        }
+
+        public void setEsDisparo(bool valor)
+        {
+            this.esDisparo = valor;
         }
 
         public void setEsRuedaDelantera(bool valor)
@@ -470,11 +486,13 @@ namespace TGC.Group.Model
 
             if (this.getVelocidadX() < 0)
                 sentido *= -1;
-
+            var sentidoR = sentido * 0.3f;
             sentido = sentido * this.getVelocidadRotacion();
+
             orientacion += sentido * 1f * this.env.ElapsedTime;
 
             anguloFinal = anguloFinal - sentido * 1f * this.env.ElapsedTime;
+            //var anguloFinalR = anguloFinalR - sentido * 1f * this.env.ElapsedTime;
             matrixRotacion = Matrix.Multiply( Matrix.RotationY(anguloFinal), Matrix.Scaling(escalado) );
             this.rotar(new Vector3(0, -sentido * 1f * this.env.ElapsedTime, 0), matrixRotacion, -sentido * 1f * this.env.ElapsedTime);
             if (this.getRueda() != null)
@@ -482,6 +500,7 @@ namespace TGC.Group.Model
                 foreach (var r in this.getRueda())
                 {
                     Matrix mRot = Matrix.RotationY(anguloFinal);
+                    //r.rotateY(anguloFinal);
                     r.Transform = mRot;
                     //r.rotateY(anguloFinal);
                 }
@@ -672,19 +691,26 @@ namespace TGC.Group.Model
                 if (TgcCollisionUtils.testObbAABB(this.boxDeColision, escenaAABB) )
                 {
                     collisionFound = true;
-                    if(ControladorDeVehiculos.getInstance().getAutoPrincipal().getMesh().Equals(mesh))
-                    {
-                        chocoAutoPrincipal = true;
+                    //Si es arma y colisiono con el mismo elemento que me originó, descarto la colision
+                    if (this.esArma && mesh.Equals(getMeshDeOrigen())) {
+                        collisionFound = false;
+                    } else {
+                        if (ControladorDeVehiculos.getInstance().getAutoPrincipal().getMesh().Equals(mesh))
+                        {
+                            chocoAutoPrincipal = true;
+                        }
+                        if (ControladorDeVehiculos.getInstance().getEnemigo().getMesh().Equals(mesh)
+                            && !mesh.Equals(getMeshDeOrigen()))
+                        {
+                            chocoEnemigo = true;
+                        }
+                        float t;
+                        Vector3 p;
+                        chocoAdelante = (intersectRayAABB(ray, escenaAABB, out t, out p) || t > 1.0f);
+                        colisionoAlgunaVez = chocoAdelante;
+                        break;
                     }
-                    if (ControladorDeVehiculos.getInstance().getEnemigo().getMesh().Equals(mesh))
-                    {
-                        chocoEnemigo = true;
-                    }
-                    float t;
-                    Vector3 p;
-                    chocoAdelante = (intersectRayAABB(ray, escenaAABB, out t, out p) || t > 1.0f);
-                    colisionoAlgunaVez = chocoAdelante;
-                    break;
+                   
                 }
             }
             /*Si choca se pone el box de choque en DarkRed*/
@@ -703,12 +729,22 @@ namespace TGC.Group.Model
                     }
                 }
                 else {
-                    this.getMesh().Enabled = false;
-                    if (chocoAutoPrincipal) ControladorDeVehiculos.getInstance().getAutoPrincipal().dañoPorArma();
-                    if (chocoEnemigo) ControladorDeVehiculos.getInstance().getEnemigo().dañoPorArma();
-
-                    // ControladorDeVehiculos.getInstance().deshabilitarObjeto(this.getMesh());
-                    // this.getMesh().dispose();
+                     this.getMesh().Enabled = false;
+                    if (chocoAutoPrincipal) {
+                        if (esDisparo) {
+                            ControladorDeVehiculos.getInstance().getAutoPrincipal().dañoPorDisparo();
+                        } else {
+                            ControladorDeVehiculos.getInstance().getAutoPrincipal().dañoPorArma();
+                        }
+                        
+                    }
+                    if (chocoEnemigo) {
+                        if (esDisparo) {
+                            ControladorDeVehiculos.getInstance().getEnemigo().dañoPorDisparo();
+                        } else {
+                            ControladorDeVehiculos.getInstance().getEnemigo().dañoPorArma();
+                        }
+                    }
                 }
 
 
@@ -840,6 +876,10 @@ namespace TGC.Group.Model
 
         }
         protected virtual void dañoPorArma()
+        {
+
+        }
+        protected virtual void dañoPorDisparo()
         {
 
         }

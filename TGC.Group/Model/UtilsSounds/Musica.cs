@@ -31,10 +31,10 @@ namespace TGC.Group.Model
         {
             MediaDir = mediaDir;
             sonidos = new System.Collections.Generic.List<String>();
-            sonidos.Add(MediaDir + "MySounds\\sound4.mp3");
-            sonidos.Add(MediaDir + "MySounds\\sound1.mp3");
-            sonidos.Add(MediaDir + "MySounds\\sound2.mp3");
             sonidos.Add(MediaDir + "MySounds\\sound3.mp3");
+            sonidos.Add(MediaDir + "MySounds\\sound4.mp3");
+            sonidos.Add(MediaDir + "MySounds\\sound2.mp3");
+            sonidos.Add(MediaDir + "MySounds\\sound1.mp3");
             nroFile = 0;
             currentFile = null;
 
