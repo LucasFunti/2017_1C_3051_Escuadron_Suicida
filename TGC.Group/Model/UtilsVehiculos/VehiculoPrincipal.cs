@@ -28,7 +28,11 @@ namespace TGC.Group.Model.UtilsVehiculos
         private List<Rueda[]> listaDeRuedas;
         public static float camaraOffsetDefaulForward = 300f;
 
-
+        private Matrix mTransRuedaDelDer;
+        private Matrix mTransRuedaDelIzq;
+        private Matrix mTransRuedaTraDer;
+        private Matrix mTransRuedaTraIzq;
+        private Matrix mEscRuedas;
         //Shaders
         public string TecnicaOriginal { get; private set; }
         private Microsoft.DirectX.Direct3D.Effect efectoOriginal;
@@ -37,7 +41,35 @@ namespace TGC.Group.Model.UtilsVehiculos
         public float ChoqueDelantero = 0;
         public float ChoqueTrasero = 0;
 
-
+        private void seteaPosicionRuedas(int nro)
+        {
+            switch (nro)
+            {
+                case 1:
+                    mTransRuedaDelDer = Matrix.Translation(new Vector3(-39, 0, -49));
+                    mTransRuedaTraDer = Matrix.Translation(new Vector3(-39, 0, 68));
+                    mTransRuedaDelIzq = Matrix.Translation(new Vector3(30, 0, -49));
+                    mTransRuedaTraIzq = Matrix.Translation(new Vector3(30, 0, 68));
+                    mEscRuedas = Matrix.Scaling(new Vector3(0.1f, 0.1f, 0.1f));
+                    break;
+                case 2:
+                    mTransRuedaDelDer = Matrix.Translation(new Vector3(-28, 0, -23));
+                    mTransRuedaTraDer = Matrix.Translation(new Vector3(-28, 0, 40));
+                    mTransRuedaDelIzq = Matrix.Translation(new Vector3(22, 0, -23));
+                    mTransRuedaTraIzq = Matrix.Translation(new Vector3(22, 0, 40));
+                    mEscRuedas = Matrix.Scaling(new Vector3(0.055f, 0.055f, 0.055f));
+                    break;
+                case 3:
+                    mTransRuedaDelDer = Matrix.Translation(new Vector3(-24, 0, -40));
+                    mTransRuedaTraDer = Matrix.Translation(new Vector3(-24, 0, 57));
+                    mTransRuedaDelIzq = Matrix.Translation(new Vector3(18, 0, -40));
+                    mTransRuedaTraIzq = Matrix.Translation(new Vector3(18, 0, 57));
+                    mEscRuedas = Matrix.Scaling(new Vector3(0.07f, 0.07f, 0.07f));
+                    break;
+                default:
+                    break;
+            }
+        }
 
         public VehiculoPrincipal(TwistedMetal env) : base(env)
         {
@@ -65,89 +97,84 @@ namespace TGC.Group.Model.UtilsVehiculos
             base.setSonidoSalto(personaje.FileSonidoSalto);
             this.getMesh().AutoUpdateBoundingBox = true;
 
+            seteaPosicionRuedas(personaje.NroPersonaje);
+
             Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
+            Matrix mEsc = Matrix.Scaling(scale);
             //var sceneRueda = loader.loadSceneFromFile(env.MediaDir + "Wheel\\wheel2-TgcScene.xml");
             var sceneRueda = loader.loadSceneFromFile(env.MediaDir + "Wheel\\wheel2-TgcScene.xml");
-            Vector3 pos = this.getMesh().Position;
-            pos = new Vector3(pos.X + 50, pos.Y, pos.Z + 100);
+
+            Vector3 pos = new Vector3(-40, 0, -48);
+            Matrix mRot = Matrix.RotationY(FastMath.PI);            
+            Matrix mTra = Matrix.Translation(pos);
+            
             TgcMesh rueda1_p1 = sceneRueda.Meshes[0];
-            //rueda1_p1.AutoTransformEnable = true;
-            rueda1_p1.Position = pos;
-            rueda1_p1.Scale = scale;
+            rueda1_p1.AutoTransformEnable = false;
+            rueda1_p1.Transform = mEsc * mRot * mTra ;
             TgcMesh rueda1_p2 = sceneRueda.Meshes[1];
-           // rueda1_p2.AutoTransformEnable = true;
-            rueda1_p2.Position = pos;
-            rueda1_p2.Scale = scale;
+            rueda1_p2.AutoTransformEnable = false;
+            rueda1_p2.Transform = mEsc * mRot * mTra;
             TgcMesh rueda1_p3 = sceneRueda.Meshes[2];
-           // rueda1_p3.AutoTransformEnable = true;
-            rueda1_p3.Position = pos;
-            rueda1_p3.Scale = scale;
+            rueda1_p3.AutoTransformEnable = false;
+            rueda1_p3.Transform = mEsc * mRot * mTra;
 
             TgcMesh[] meshRuedas = new TgcMesh[] { rueda1_p1, rueda1_p2, rueda1_p3 };
-            //base.setRueda(meshRuedas);
+            base.setRuedaDelDer(meshRuedas);
 
-            //Seteo posicion Inicial
-            //  Vector3 scale3 = new Vector3(1f, 1f, 1f);
-            // var m = Matrix.Scaling(scale3) * this.matrixRotacion * Matrix.Translation(new Vector3(100, 5, 3000));
-            //  var m = Matrix.Scaling(scale3) * Matrix.RotationY(1f) * Matrix.Translation(new Vector3(100, 5, 3000)) ;
+            pos = new Vector3(-40, 0, 68);
+            mRot = Matrix.RotationY(FastMath.PI);
+            mTra = Matrix.Translation(pos);
 
-            //   this.getMesh().Transform = m;
+            TgcMesh rueda2_p1 = sceneRueda.Meshes[0];
+            rueda2_p1.AutoTransformEnable = false;
+            rueda2_p1.Transform = mEsc * mRot * mTra;
+            TgcMesh rueda2_p2 = sceneRueda.Meshes[1];
+            rueda2_p2.AutoTransformEnable = false;
+            rueda2_p2.Transform = mEsc * mRot * mTra;
+            TgcMesh rueda2_p3 = sceneRueda.Meshes[2];
+            rueda2_p3.AutoTransformEnable = false;
+            rueda2_p3.Transform = mEsc * mRot * mTra;
+
+            meshRuedas = new TgcMesh[] { rueda2_p1, rueda2_p2, rueda2_p3 };
+            base.setRuedaTraDer(meshRuedas);
+
+            pos = new Vector3(30, 0, -48);
+            mRot = Matrix.RotationY(FastMath.PI);
+            mTra = Matrix.Translation(pos);
+
+            TgcMesh rueda3_p1 = sceneRueda.Meshes[0];
+            rueda3_p1.AutoTransformEnable = false;
+            rueda3_p1.Transform = mEsc * mRot * mTra;
+            TgcMesh rueda3_p2 = sceneRueda.Meshes[1];
+            rueda3_p2.AutoTransformEnable = false;
+            rueda3_p2.Transform = mEsc * mRot * mTra;
+            TgcMesh rueda3_p3 = sceneRueda.Meshes[2];
+            rueda3_p3.AutoTransformEnable = false;
+            rueda3_p3.Transform = mEsc * mRot * mTra;
+
+            meshRuedas = new TgcMesh[] { rueda3_p1, rueda3_p2, rueda3_p3 };
+            base.setRuedaDelIzq(meshRuedas);
+
+            pos = new Vector3(30, 0, 68);
+            mRot = Matrix.RotationY(FastMath.PI);
+            mTra = Matrix.Translation(pos);
+
+            TgcMesh rueda4_p1 = sceneRueda.Meshes[0];
+            rueda4_p1.AutoTransformEnable = false;
+            rueda4_p1.Transform = mEsc * mRot * mTra;
+            TgcMesh rueda4_p2 = sceneRueda.Meshes[1];
+            rueda4_p2.AutoTransformEnable = false;
+            rueda4_p2.Transform = mEsc * mRot * mTra;
+            TgcMesh rueda4_p3 = sceneRueda.Meshes[2];
+            rueda4_p3.AutoTransformEnable = false;
+            rueda4_p3.Transform = mEsc * mRot * mTra;
+
+            meshRuedas = new TgcMesh[] { rueda4_p1, rueda4_p2, rueda4_p3 };
+            base.setRuedaTraIzq(meshRuedas);
+
             this.cargarShaders();
             this.mover();
 
-
-            //Creo las ruedas
-            /*listaDeRuedas = new System.Collections.Generic.List<Rueda[]>();
-            ruedas = new Rueda[3];
-            Vector3 vectorPos = new Vector3(this.getMesh().Position.X - 100, this.getMesh().Position.Y, this.getMesh().Position.Z - 100);
-            var sceneRueda = loader.loadSceneFromFile(env.MediaDir + "Wheel\\wheel2-TgcScene.xml");
-
-            Vector3 scale = new Vector3(0.01f, 0.01f, 0.01f);
-            var ruedaMesh = sceneRueda.Meshes[1];
-            ruedaMesh.AutoTransformEnable = true;
-            ruedaMesh.Position = vectorPos;
-            ruedaMesh.Scale = scale;
-            ruedas[0] = new Rueda(this.env, ruedaMesh, true);*/
-
-            //rueda1_p1.rotateY(FastMath.PI);
-
-            /*var rueda1_p1 = sceneRueda.Meshes[0];
-            rueda1_p1.move(vectorPos);
-            rueda1_p1.AutoTransformEnable = true;
-            rueda1_p1.Position = vectorPos;
-            rueda1_p1.Scale = new Vector3(1f, 1f, 1f);
-            //rueda1_p1.rotateY(FastMath.PI);
-            ruedas[0] = new Rueda(this.env, rueda1_p1, true);
-            //var instance1 = ruedas[0].getMesh().createMeshInstance("rueda1_1");
-            //instance1.rotateY(1f);
-            //instance1.Scale = new Vector3(-1000, -1000, -1000);
-            //ruedas[0].Instancia = instance1;
-
-            /*var rueda1_p2 = sceneRueda.Meshes[1];
-            rueda1_p2.move(vectorPos);
-            rueda1_p2.AutoTransformEnable = true;
-            rueda1_p2.Position = vectorPos;
-            rueda1_p2.Transform = m;
-            rueda1_p2.Scale = new Vector3(0.1f, 0.1f, 0.1f);
-            rueda1_p2.updateBoundingBox();
-            //rueda1_p2.rotateY(FastMath.PI);
-            ruedas[1] = new Rueda(this.env, rueda1_p2, true);
-
-
-            var rueda1_p3 = sceneRueda.Meshes[2];
-            rueda1_p3.move(vectorPos);
-            rueda1_p3.AlphaBlendEnable = true;
-            rueda1_p3.AutoTransformEnable = true;
-            rueda1_p3.Position = vectorPos;
-            rueda1_p3.Transform = m;
-            rueda1_p3.Scale = new Vector3(0.1f, 0.1f, 0.1f);
-            //rueda1_p3.rotateY(FastMath.PI);
-            ruedas[2] = new Rueda(this.env, rueda1_p3, true);*/
-
-            //listaDeRuedas.Add(ruedas);
-            //ruedaDelantera2 = rueda.Meshes[0];
-            //ruedaTrasera1 = rueda.Meshes[0];
-            //ruedaTrasera2 = rueda.Meshes[0];
             crearVelocimetro();
             cargarShaders();
         }
@@ -311,63 +338,6 @@ namespace TGC.Group.Model.UtilsVehiculos
 
         }
 
-      /*  private void creaMisilV()
-        {
-            Vector3 posicion = this.getMesh().Position;
-            float orientacion = this.orientacion;
-            string sonido = env.MediaDir + "MySounds\\Launch4.wav";
-            var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Misil-T\\misil-T-TgcScene.xml");
-            TgcMesh mesh = scene.Meshes[0];
-            mesh.AutoTransformEnable = true;
-            mesh.AutoUpdateBoundingBox = true;
-            mesh.createBoundingBox();
-            mesh.Position = posicion;
-            mesh.rotateX(FastMath.PI);
-            //mesh.Rotation = this.getMesh().Rotation;
-            mesh.Scale = new Vector3(0.3f, 0.3f, 0.3f);
-            mesh.move(0, 20, 0);
-            //matrixRotacion = this.getMesh().Transform;
-            //matrixRotacion = Matrix.RotationY(orientacion);
-            //mesh.rotateY(orientacion);
-            //this.rotar(new Vector3(0, valor, 0), matrixRotacion, 0);
-            //Matrix matrixTransform = Matrix.Multiply(mesh.Transform, this.getMesh().Transform);
-            //this.rotar(new Vector3(0, -sentido * 1f * this.env.ElapsedTime, 0), matrixRotacion, -sentido * 1f * this.env.ElapsedTime);
-            //mesh.Transform = Matrix.Multiply(this.getMesh().Transform, mesh.Transform);
-            mesh.Rotation = this.getMesh().Rotation;
-
-            var m = Matrix.Scaling(mesh.Scale) * matrixRotacion * Matrix.Translation(posicion);
-            //      Arma arma = new Arma(mesh, this.env, sonido, 20, orientacion, base.directionArrow.PEnd);
-            Arma arma = new Arma(mesh, this.env, sonido, 20, this.orientacion, base.directionArrow.PEnd);
-
-            ControladorDeVehiculos.getInstance().agregarArma(arma);
-            //base.agregarArma(arma);
-        }*/
-
-     /*   private void creaDisparo()
-        {
-            Vector3 posicion = this.getMesh().Position;
-            float orientacion = this.orientacion;
-            string sonido = env.MediaDir + "MySounds\\MachineGun.wav";
-            var scene = loader.loadSceneFromFile(env.MediaDir + "MeshCreator\\Meshes\\Objetos\\Vela\\Vela-TgcScene.xml");
-            TgcMesh mesh = scene.Meshes[0];
-            mesh.AutoTransformEnable = true;
-            mesh.AutoUpdateBoundingBox = true;
-            mesh.createBoundingBox();
-            mesh.Position = posicion;
-            mesh.rotateX(FastMath.PI);
-            mesh.Scale = new Vector3(0.1f, 0.1f, 0.1f);
-            mesh.move(0, 20, 0);
-            //matrixRotacion = this.getMesh().Transform;
-            //Matrix matrixTransform = Matrix.Multiply( mesh.Transform, this.getMesh().Transform);
-            var m = Matrix.Scaling(mesh.Scale) * matrixRotacion * Matrix.Translation(posicion);
-
-            //   Arma arma = new Arma(mesh, this.env, sonido, 40, orientacion, base.directionArrow.PEnd);
-            Arma arma = new Arma(mesh, this.env, sonido, 40, orientacion, base.directionArrow.PEnd);
-
-            ControladorDeVehiculos.getInstance().agregarArma(arma);
-           // base.agregarArma(arma);
-        }*/
-
         public override void Update()
         {
 
@@ -394,19 +364,57 @@ namespace TGC.Group.Model.UtilsVehiculos
             }*/
             this.velocimetro.Update(FastMath.Abs(this.getVelocidadX()));
         }
+
         public override void Render()
         {
             AplicarShaderChoque(); //aplica efecto;
           
             base.Render();
             this.velocimetro.Render();
+            //mEscRuedas = Matrix.Scaling(new Vector3(0.1f, 0.1f, 0.1f));
+            
+            Matrix mRot = Matrix.RotationY(FastMath.PI_HALF);
+            var T = Matrix.Translation(0, 1, 0);
+            var pivoteRueda = Vector3.TransformCoordinate(new Vector3(0, 5f, 0.0f), T);
 
-            if (base.getRueda() != null)
+            Matrix A = Matrix.Translation(-pivoteRueda.X, -pivoteRueda.Y, -pivoteRueda.Z);
+            Matrix B = Matrix.Translation(pivoteRueda.X, pivoteRueda.Y, pivoteRueda.Z);
+
+
+            //mTransRuedaDelDer = Matrix.Translation(new Vector3(-39, 0, -49));
+            foreach (var rueda in base.getRuedaDelDer())
             {
-                foreach (var rueda in base.getRueda())
-                {
-                    rueda.render();
-                }
+                T = A * base.transRuedaDel * mTransRuedaDelDer;
+                if (!base.transGiro.Equals(Matrix.Identity)) T = T * base.transGiro;
+                rueda.Transform = mEscRuedas * T * B * this.getMesh().Transform;
+                rueda.render();
+            }
+
+            //mTransRuedaTraDer = Matrix.Translation(new Vector3(-39, 0, 68));
+            foreach (var rueda in base.getRuedaTraDer())
+            {
+                T = A * base.transRuedaTra * mTransRuedaTraDer;
+                if (!base.transGiro.Equals(Matrix.Identity)) T = T * base.transGiro;
+                rueda.Transform = mEscRuedas * T * B * this.getMesh().Transform;
+                rueda.render();
+            }
+
+            //mTransRuedaDelIzq = Matrix.Translation(new Vector3(30, 0, -49));
+            foreach (var rueda in base.getRuedaDelIzq())
+            {
+                T = A * base.transRuedaDel * mTransRuedaDelIzq;
+                if (!base.transGiro.Equals(Matrix.Identity)) T = T * base.transGiro;
+                rueda.Transform = mEscRuedas * T * B * this.getMesh().Transform;
+                rueda.render();
+            }
+
+            //mTransRuedaTraIzq = Matrix.Translation(new Vector3(30, 0, 68));
+            foreach (var rueda in base.getRuedaTraIzq())
+            {
+                T = A * base.transRuedaTra * mTransRuedaTraIzq;
+                if (!base.transGiro.Equals(Matrix.Identity)) T = T * base.transGiro;
+                rueda.Transform = mEscRuedas * T * B * this.getMesh().Transform;
+                rueda.render();
             }
 
         }
@@ -417,12 +425,29 @@ namespace TGC.Group.Model.UtilsVehiculos
             if (this.colisionoAlgunaVez && this.getMesh().Position.Y == 5)
                 ChoqueDelantero = 1;
 
-            //if (this.colisiono() && !this.colisionoPorDelante() && this.getMesh().Position.Y == 5)
-          //      ChoqueTrasero = -1;
+            if (this.colisiono() && !this.colisionoAlgunaVez && this.getMesh().Position.Y == 5)
+                ChoqueTrasero = -1;
             
             if (this.colisiono() && this.getMesh().Position.Y == 5)
-               ChoqueDelantero = 1;          
+               ChoqueDelantero = 1;
 
+            float vida = base.getLifeLevel().nivelDeVida();
+            int energia = 10;
+            if (vida < 100) {
+                if (vida < 40) {
+                    if (vida < 20) {
+                        energia = 2;
+                    } else {
+                        energia = 4;
+                    }
+                } else {
+                    if (vida < 70) {
+                        energia = 7;
+                    }
+                }
+            }
+
+            efectoShaderChoque.SetValue("Energia", energia);
             efectoShaderChoque.SetValue("ChoqueAtras", ChoqueTrasero);
             efectoShaderChoque.SetValue("ChoqueAdelante", ChoqueDelantero);
             efectoShaderChoque.SetValue("fvLightPosition", new Vector4(0, 100, 0, 0));

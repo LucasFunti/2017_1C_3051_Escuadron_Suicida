@@ -11,7 +11,7 @@ namespace TGC.Group.Model.UtilsVehiculos._2DObjects
 {
     public class WeaponCount
     {
-        private TgcText2D text2d, text2d2;
+        private TgcText2D text2d = new TgcText2D(), text2d2 = new TgcText2D();
         private int nBalas = 200;
         private int nMisiles = 15;
         private Boolean auto_principal;
@@ -30,7 +30,7 @@ namespace TGC.Group.Model.UtilsVehiculos._2DObjects
             //Muestra la vida solo del auto principal
             if (this.auto_principal)
             {
-                text2d = new TgcText2D();
+                //text2d = new TgcText2D();
                 text2d.Text = "Balas: " + nBalas.ToString() + "";
                 text2d.Color = Color.WhiteSmoke;
                 text2d.Align = TgcText2D.TextAlign.LEFT;
@@ -46,7 +46,7 @@ namespace TGC.Group.Model.UtilsVehiculos._2DObjects
                 
                 text2d.render();
 
-                text2d2 = new TgcText2D();
+                //text2d2 = new TgcText2D();
                 text2d2.Text = "Misiles: " + nMisiles.ToString() + "";
                 text2d2.Color = Color.WhiteSmoke;
                 text2d2.Align = TgcText2D.TextAlign.LEFT;

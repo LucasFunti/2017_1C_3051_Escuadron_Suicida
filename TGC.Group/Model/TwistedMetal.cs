@@ -49,32 +49,48 @@ namespace TGC.Group.Model
         private const int PLAYING = 1;
         private const int SELECTION = 2;
         private TgcRotationalCamera camaraRotante;
+        private CamaraTerceraPersona camaraMenu;
         private const float ROTATION_SPEED = -0.1f;
 
         private TgcBox boxComenzar;
         private TgcBox boxPersonaje;
         private TgcBox boxSalir;
-        private Matrix boxComenzarOrig;
-        private Matrix boxPersonajeOrig;
-        private Matrix boxSalirOrig;
+        private Matrix mBoxComenzar;
+        private Matrix mBoxPersonaje;
+        private Matrix mBoxSalir;
         private int contLimpiarTruco;
         //private const int ABAJO 
         private TgcMesh personaje1;
         private TgcMesh personaje2;
         private TgcMesh personaje3;
+        private Matrix mPersonaje1;
+        private Matrix mPersonaje2;
+        private Matrix mPersonaje3;
         private TgcMesh personaje4;
+        private Matrix mPersonaje4;
         private int deltaSonido = 280;
         private int contSonido = 0;
         private bool EndGame = false;
         private int contadorFinal = 800;
-        private bool juegoTerminado = false;
+        public bool juegoTerminado = false;
         private int contadorEnemigoFinal = 200;
         private bool enemigoFinalCreado = false;
+        float rotacion = 0;
+        private Vector3 puntoMenu;
+        private Vector3 puntoPersonaje;
+        private Vector3 puntoPersonajeOculto;
+        private TgcBox boxGameOver;
+        private TgcBox boxResult;
+        private bool trucoHabilitadp = false;
+        private bool teclaAnteriorArriba = false;
+        private bool teclaAnteriorAbajo = false;
+        private int contadorTruco = 0;
+        private Matrix mBoxGameOver;
+        private Matrix mBoxResult;
 
         private int opcionSeleccionada = 1;
 
         private int gameMode = MENU;
-        private TgcText2D text2d, text2d2;
 
         public static TwistedMetal getInstance()
         {
@@ -90,10 +106,6 @@ namespace TGC.Group.Model
             myInstance = this;
             this.MediaDir = mediaDir;
             this.ShadersDir = shadersDir;
-            /*sonidos = new Musica(mediaDir);
-            cronometro = new Cronometro(300000, this);
-            sonidos.startGame();
-            iniciarIluminacion();*/
             
         }
 
@@ -105,6 +117,12 @@ namespace TGC.Group.Model
             controladorDeVehiculos.crearAutoPrincipal();
             controladorDeVehiculos.crearEnemigo1();
             autoPrincipal = controladorDeVehiculos.getAutoPrincipal();
+
+            Vector3 vecDisparo = new Vector3(controladorDeVehiculos.getAutoPrincipal().getMesh().Position.X,
+                                                         controladorDeVehiculos.getAutoPrincipal().getMesh().Position.Y,
+                                                        controladorDeVehiculos.getAutoPrincipal().getMesh().Position.Z);
+            sonido.playSound(MediaDir + "MySounds\\risa.wav", vecDisparo);
+            sonido.startSound();
 
             //Agrega objetos colisionables
             manejadorDeColiciones.addListOfBoundingBoxMeshesColisionables(Ciudad.getEdificios());
@@ -124,23 +142,19 @@ namespace TGC.Group.Model
         private void terminarJuego(bool winner)
         {
             juegoTerminado = true;
-            text2d = new TgcText2D();
-            text2d.Text = "GAME OVER!";
-            text2d.Align = TgcText2D.TextAlign.CENTER;
-            text2d.Position = new Point((D3DDevice.Instance.Width / 3), (D3DDevice.Instance.Height / 2) - 200);
-            text2d.Size = new Size(500, 300);
-            text2d.changeFont(new System.Drawing.Font("TimesNewRoman", 40, FontStyle.Bold));
-            text2d.Color = Color.Yellow;
-
-            text2d2 = new TgcText2D();
-            text2d2.Text = "PERDISTE...";
-            if (winner) text2d2.Text = "GANASTE!";
-            text2d2.Align = TgcText2D.TextAlign.CENTER;
-            text2d2.Position = new Point((D3DDevice.Instance.Width / 3), (D3DDevice.Instance.Height / 2) + 200);
-            text2d2.Size = new Size(500, 300);
-            text2d2.changeFont(new System.Drawing.Font("TimesNewRoman", 40, FontStyle.Bold));
-            text2d2.Color = Color.Red;
-            if (winner) text2d2.Color = Color.SpringGreen;
+            //Creamos una caja 3D con textura
+            var center = new Vector3(3000, 1300, 3000);
+            var centerResult = new Vector3(3000, 800, 3000);
+            var texture = TgcTexture.createTexture(MediaDir + "Menu\\SuicideSquad.jpg");
+            boxGameOver = TgcBox.fromSize(center, new Vector3(400, 400, 400), texture);
+            boxGameOver.AutoTransformEnable = false;
+            if (winner) {
+                texture = TgcTexture.createTexture(MediaDir + "Menu\\GANASTE.png");
+            } else {
+                texture = TgcTexture.createTexture(MediaDir + "Menu\\PERDISTE.png");
+            }
+            boxResult = TgcBox.fromSize(centerResult, new Vector3(250, 50, 50), texture);
+            boxResult.AutoTransformEnable = false;
         }
 
        private void iniciarIluminacion()
@@ -182,7 +196,9 @@ namespace TGC.Group.Model
             Input = input;
 
             camaraRotante = new TgcRotationalCamera(
-                    new Vector3(3300, 250, 3100), 2000, 0.15f, 10f, base.Input);
+                    new Vector3(3000, 5, 3000), 2000, 0.15f, 10f, base.Input);
+
+            camaraMenu = new CamaraTerceraPersona(new Vector3(5500, 800, 5500), 900, 3600f);
 
             this.Camara = camaraRotante;
             //camaraRotante.SetCamera(new Vector3(500, 700, 500),
@@ -192,46 +208,47 @@ namespace TGC.Group.Model
             var center = new Vector3(3000, 200, 4500);
             var texture = TgcTexture.createTexture(MediaDir + "Menu\\COMENZAR.png");
             boxComenzar = TgcBox.fromSize(center, new Vector3(250, 50, 50), texture);
-            boxComenzar.AutoTransformEnable = true;
-            boxComenzarOrig = boxComenzar.Transform;
+            boxComenzar.AutoTransformEnable = false;
 
             // Creamos una caja 3D con textura
             center = new Vector3(3000, 140, 4500);
             texture = TgcTexture.createTexture(MediaDir + "Menu\\PERSONAJE.png");
             boxPersonaje = TgcBox.fromSize(center, new Vector3(250, 50, 50), texture);
-            boxPersonaje.AutoTransformEnable = true;
-            boxPersonajeOrig = boxPersonaje.Transform;
+            boxPersonaje.AutoTransformEnable = false;
 
             // Creamos una caja 3D con textura
             center = new Vector3(3000, 80, 4500);
             texture = TgcTexture.createTexture(MediaDir + "Menu\\SALIR.png");
             boxSalir = TgcBox.fromSize(center, new Vector3(250, 50, 50), texture);
-            boxSalir.AutoTransformEnable = true;
-            boxSalirOrig = boxSalir.Transform;
+            boxSalir.AutoTransformEnable = false;
 
-
-            boxComenzar.Position = new Vector3(3000, 300, 4500);
+            boxComenzar.Position = new Vector3(5500, 850, 5600);
             boxComenzar.rotateY(FastMath.PI);
-            boxPersonaje.Position = new Vector3(3000, 200, 4500);
+            boxPersonaje.Position = new Vector3(5500, 750, 5600);
             boxPersonaje.rotateY(FastMath.PI);
-            boxSalir.Position = new Vector3(3000, 100, 4500);
+            boxSalir.Position = new Vector3(5500, 650, 5600);
             boxSalir.rotateY(FastMath.PI);
 
             var loader = new TgcSceneLoader();
             var scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
             personaje1 = scene.Meshes[0];
-            personaje1.AutoTransformEnable = true;
-            personaje1.Position = new Vector3(3400, 200, 5700);
+            personaje1.AutoTransformEnable = false;
+            personaje1.Position = new Vector3(5400, 800, 5700);
 
             scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml");
             personaje2 = scene.Meshes[0];
-            personaje2.AutoTransformEnable = true;
-            personaje2.Position = new Vector3(3200, 200, 5700);
+            personaje2.AutoTransformEnable = false;
+            personaje2.Position = new Vector3(5200, 800, 5700);
 
             scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Patrullero\\Patrullero-TgcScene.xml");
             personaje3 = scene.Meshes[0];
-            personaje3.AutoTransformEnable = true;
-            personaje3.Position = new Vector3(3000, 200, 5700);
+            personaje3.AutoTransformEnable = false;
+            personaje3.Position = new Vector3(5000, 800, 5700);
+
+            scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Warthog\\Warthog-TgcScene.xml");
+            personaje4 = scene.Meshes[0];
+            personaje4.AutoTransformEnable = false;
+            personaje4.Position = new Vector3(5000, 800, 5700);
 
             TwistedMetal.inicializado = true;
 
@@ -263,6 +280,7 @@ namespace TGC.Group.Model
                                                         controladorDeVehiculos.getAutoPrincipal().getMesh().Position.Y,
                                                        controladorDeVehiculos.getAutoPrincipal().getMesh().Position.Z);
             sonido.playSound(MediaDir + "MySounds\\Scream1.wav", vecDisparo);
+            sonido.startSound();
         }
 
         private void seleccionPorDefault()
@@ -279,6 +297,7 @@ namespace TGC.Group.Model
             personaje.VelocidadMax = 70;
             personaje.VelocidadMin = -5;
             personaje.ConstanteAceleracion = 0.6f;
+            personaje.NroPersonaje = 1;
         }
 
 
@@ -297,9 +316,10 @@ namespace TGC.Group.Model
                     personaje.FileSonidoArma = MediaDir + "MySounds\\Special5.wav";
                     personaje.FileSonidoItem = MediaDir + "MySounds\\PickUp2.wav";
                     personaje.FileSonidoSalto = MediaDir + "MySounds\\portazo.wav";
-                    personaje.VelocidadMax = 70;
+                    personaje.VelocidadMax = 60;
                     personaje.VelocidadMin = -5;
-                    personaje.ConstanteAceleracion = 0.6f;
+                    personaje.ConstanteAceleracion = 0.5f;
+                    personaje.NroPersonaje = 1;
                     break;
                 case 2:
                     personaje.FileMesh = MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Auto\\Auto-TgcScene.xml";
@@ -309,9 +329,10 @@ namespace TGC.Group.Model
                     personaje.FileSonidoSalto = MediaDir + "MySounds\\portazo.wav";
                     personaje.VelocidadMax = 90;
                     personaje.VelocidadMin = -15;
-                    personaje.ConstanteAceleracion = 0.8f;
+                    personaje.ConstanteAceleracion = 0.7f;
+                    personaje.NroPersonaje = 2;
                     break;
-                default:
+                case 3:
                     personaje.FileMesh = MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Patrullero\\Patrullero-TgcScene.xml";
                     personaje.FileSonidoMotor = MediaDir + "MySounds\\Engine1.wav";
                     personaje.FileSonidoArma = MediaDir + "MySounds\\Special1.wav";
@@ -319,7 +340,21 @@ namespace TGC.Group.Model
                     personaje.FileSonidoSalto = MediaDir + "MySounds\\portazo.wav";
                     personaje.VelocidadMax = 80;
                     personaje.VelocidadMin = -10;
-                    personaje.ConstanteAceleracion = 0.7f;
+                    personaje.ConstanteAceleracion = 0.6f;
+                    personaje.NroPersonaje = 3;
+                    break;
+                case 4:
+                    personaje.FileMesh = MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Warthog\\Warthog-TgcScene.xml";
+                    personaje.FileSonidoMotor = MediaDir + "MySounds\\Engine5.wav";
+                    personaje.FileSonidoArma = MediaDir + "MySounds\\risa.wav";
+                    personaje.FileSonidoItem = MediaDir + "MySounds\\PickUp2.wav";
+                    personaje.FileSonidoSalto = MediaDir + "MySounds\\portazo.wav";
+                    personaje.VelocidadMax = 80;
+                    personaje.VelocidadMin = -15;
+                    personaje.ConstanteAceleracion = 0.6f;
+                    personaje.NroPersonaje = 4;
+                    break;
+                default:
                     break;
             }
         }
@@ -365,13 +400,14 @@ namespace TGC.Group.Model
                                                          controladorDeVehiculos.getAutoPrincipal().getMesh().Position.Y,
                                                         controladorDeVehiculos.getAutoPrincipal().getMesh().Position.Z);
                         sonido.playSound(MediaDir + "MySounds\\risa.wav", vecDisparo);
+                        sonido.startSound();
                         controladorDeVehiculos.crearEnemigoFinal();
                         enemigoFinalCreado = true;
                         manejadorDeColiciones.addBoundingBoxMeshColisionable(controladorDeVehiculos.getEnemigo().getMesh());
                     }*/
 
                     //enemigoFinalCreado && 
-                    if (controladorDeVehiculos.getEnemigo().getLifeLevel().nivelDeVida() == 0)
+                    if (controladorDeVehiculos.getEnemigo().getLifeLevel().nivelDeVida() == 0 )
                     {
                         terminarJuego(true);
                     }
@@ -384,12 +420,14 @@ namespace TGC.Group.Model
                         seleccionaPersonaje(opcionSeleccionada);
                         gameMode = MENU;
                         opcionSeleccionada = 1;
+                        rotacion = 0;
                     }
                     
                 } else
                 {
                     if (gameMode == MENU)
                     {
+                        
                         if (base.Input.keyPressed(Key.Space))
                         {
                             switch (opcionSeleccionada)
@@ -408,6 +446,7 @@ namespace TGC.Group.Model
                                 case 2:
                                     gameMode = SELECTION;
                                     opcionSeleccionada = 1;
+                                    rotacion = 0;
                                     break;
                                 case 3:
                                     EndGame = true;
@@ -427,24 +466,28 @@ namespace TGC.Group.Model
                         opcionSeleccionada += 1;
                         if (opcionSeleccionada > 3) opcionSeleccionada = 1;
                     }
-
+                    rotacion += ROTATION_SPEED;
                     if (gameMode == MENU) {
+
+                        puntoMenu = new Vector3(3000 - 200, 900, 3000 + 3000);
+                        puntoPersonaje = new Vector3(3000, -500, 3000 + 3200);
+                        puntoPersonajeOculto = new Vector3(3000, -500, 3000 + 3200);
                         switch (opcionSeleccionada)
                         {
                             case 1:
-                                boxComenzar.rotateX(ROTATION_SPEED);
-                                boxPersonaje.Transform = boxPersonajeOrig;
-                                boxSalir.Transform = boxSalirOrig;
+                                mBoxComenzar = Matrix.RotationX(rotacion);
+                                mBoxPersonaje = Matrix.Identity;
+                                mBoxSalir = Matrix.Identity;
                                 break;
                             case 2:
-                                boxPersonaje.rotateX(ROTATION_SPEED);
-                                boxComenzar.Transform = boxComenzarOrig;
-                                boxSalir.Transform = boxSalirOrig;
+                                mBoxComenzar = Matrix.Identity;
+                                mBoxPersonaje = Matrix.RotationX(rotacion);
+                                mBoxSalir = Matrix.Identity;
                                 break;
                             case 3:
-                                boxSalir.rotateX(ROTATION_SPEED);
-                                boxComenzar.Transform = boxComenzarOrig;
-                                boxPersonaje.Transform = boxPersonajeOrig;
+                                mBoxComenzar = Matrix.Identity;
+                                mBoxPersonaje = Matrix.Identity;
+                                mBoxSalir = Matrix.RotationX(rotacion);
                                 break;
                             default:
                                 break;
@@ -452,19 +495,35 @@ namespace TGC.Group.Model
 
                     } else //Estoy en modo SELECTION
                     {
+                        puntoMenu = new Vector3(3000 - 200, -500, 3000 + 3000);
+                        puntoPersonaje = new Vector3(3000, 800, 3000 + 3200);
+                        puntoPersonajeOculto = new Vector3(3000, -500, 3000 + 3200);
                         switch (opcionSeleccionada)
                         {
                             case 1:
-                                personaje1.rotateY(ROTATION_SPEED);
+                                //personaje1.rotateY(ROTATION_SPEED);
+                                mPersonaje1 = Matrix.RotationY(rotacion);
+                                mPersonaje2 = Matrix.Identity;
+                                mPersonaje3 = Matrix.Identity;
+                                mPersonaje4 = Matrix.Identity;
                                 break;
                             case 2:
-                                personaje2.rotateY(ROTATION_SPEED);
+                                mPersonaje1 = Matrix.Identity;
+                                mPersonaje2 = Matrix.RotationY(rotacion);
+                                mPersonaje3 = Matrix.Identity;
+                                mPersonaje4 = Matrix.Identity;
                                 break;
                             case 3:
-                                personaje3.rotateY(ROTATION_SPEED);
+                                mPersonaje1 = Matrix.Identity;
+                                mPersonaje2 = Matrix.Identity;
+                                mPersonaje3 = Matrix.RotationY(rotacion);
+                                mPersonaje4 = Matrix.Identity;
                                 break;
                             case 4:
-                                personaje4.rotateY(ROTATION_SPEED);
+                                mPersonaje1 = Matrix.Identity;
+                                mPersonaje2 = Matrix.Identity;
+                                mPersonaje3 = Matrix.Identity;
+                                mPersonaje4 = Matrix.RotationY(rotacion);
                                 break;
                             default:
                                 break;
@@ -569,11 +628,39 @@ namespace TGC.Group.Model
         }
         private void renderNormal()
         {
+            Vector3 centro = new Vector3(3000, 5, 3000);
+           
+            Vector3 nvaPosicion = new Vector3(centro.X + 2500 * (float)System.Math.Cos(ElapsedTime),
+                                               800,
+                                               centro.Z + 2500 * (float)System.Math.Sin(ElapsedTime));
+            Vector3 vecDireccion = new Vector3( centro.X - nvaPosicion.X,
+                                                750,
+                                                centro.Z - nvaPosicion.Z);
             if (juegoTerminado)
             {
                 contadorFinal = contadorFinal - 1;
-                text2d2.render();
-                text2d.render();
+                rotacion += ROTATION_SPEED;
+
+                centro = new Vector3(3000, 1500, 3000);
+                var centroResult = new Vector3(3000, 3300, 3000);
+                Matrix mScale = Matrix.Scaling(new Vector3(4f, 4f, 4f));
+                Matrix mRot = Matrix.RotationY(FastMath.PI) *
+                              Matrix.RotationYawPitchRoll((float)System.Math.Cos(rotacion / 6),
+                                                          (float)System.Math.Sin(rotacion / 6),
+                                                          (float)System.Math.Tan(rotacion / 6));
+                Matrix mRot2 = Matrix.RotationYawPitchRoll((float)System.Math.Sin(rotacion / 6),
+                                                          (float)System.Math.Cos(rotacion / 6),
+                                                          1f);
+                boxGameOver.Transform = mScale * mRot * Matrix.Translation(centro);
+                boxResult.Transform = Matrix.Scaling(new Vector3(5f, 5f, 5f)) * mRot2 * Matrix.Translation(centroResult);
+                boxGameOver.render();
+                boxResult.render();
+                Ciudad.Render();
+                camaraMenu.rotateY(ElapsedTime / 3);
+                nvaPosicion = new Vector3(4500, 8200, 4500);
+                camaraRotante.SetCamera(nvaPosicion, new Vector3(3000, 2300, 3000));
+                camaraMenu.Target = new Vector3(3000, 2300, 3000);
+                this.Camara = camaraMenu;
                 if (contadorFinal == 0)
                 {
                     EndGame = true;
@@ -583,8 +670,7 @@ namespace TGC.Group.Model
                 if (TwistedMetal.inicializado)
                 {
 
-                    if (gameMode == PLAYING)
-                    {
+                    if (gameMode == PLAYING) {
                        
                         controladorDeVehiculos.render();
                         this.cronometro.render(ElapsedTime);
@@ -593,6 +679,56 @@ namespace TGC.Group.Model
                             terminarJuego(false);
                         }
                        
+                    } else {
+                        if (gameMode == MENU) {
+                            
+                            messages.MostrarComandosDeSeleccion();
+                            messages.MostrarPosicioMeshPorPantalla(camaraRotante.Position);
+
+                        }
+                        if (gameMode == SELECTION) {
+                            messages.MostrarComandosDeSeleccion();
+                           
+
+                        }
+                        nvaPosicion = new Vector3(centro.X + 2500, 800, centro.Z + 2500);
+                        //puntoMenu = new Vector3(centro.X - 200, 900, centro.Z + 3000);
+
+                        camaraRotante.SetCamera(nvaPosicion, centro);
+                        //camaraMenu.rotateY(ElapsedTime/3);
+                        camaraMenu.Target = centro;
+                        this.Camara = camaraMenu;
+
+                        Vector3 ptoCamara = this.Camara.Position;
+                        Vector3 vectorAlCentro = new Vector3(centro.X - ptoCamara.X, centro.Y - ptoCamara.Y, centro.Z - ptoCamara.Z);
+
+                        vecDireccion = new Vector3(camaraMenu.Position.X * 0.8f * (float)System.Math.Cos(ElapsedTime),
+                                                    850,
+                                                    camaraMenu.Position.Z * 0.8f * (float)System.Math.Sin(ElapsedTime));
+
+                        Matrix mScale = Matrix.Scaling(new Vector3(1f, 1f, 1f));
+                        Matrix mRot = Matrix.RotationY(FastMath.PI);
+                        boxComenzar.Transform = mScale * mRot * mBoxComenzar * Matrix.Translation(puntoMenu);
+                        boxPersonaje.Transform = mScale * mRot * mBoxPersonaje * Matrix.Translation(new Vector3(puntoMenu.X, 
+                                                                                                                puntoMenu.Y - 100, 
+                                                                                                                puntoMenu.Z));
+                        boxSalir.Transform = mScale * mRot * mBoxSalir * Matrix.Translation(new Vector3(puntoMenu.X, 
+                                                                                                        puntoMenu.Y - 200, 
+                                                                                                        puntoMenu.Z));
+
+                        personaje1.Transform = mScale * mPersonaje1 * Matrix.Translation(new Vector3(puntoPersonaje.X + 200,
+                                                                                                     puntoPersonaje.Y,
+                                                                                                     puntoPersonaje.Z));
+                        personaje2.Transform = mScale * mPersonaje2 * Matrix.Translation(new Vector3(puntoPersonaje.X,
+                                                                                                     puntoPersonaje.Y,
+                                                                                                     puntoPersonaje.Z));
+                        personaje3.Transform = mScale * mPersonaje3 * Matrix.Translation(new Vector3(puntoPersonaje.X - 200,
+                                                                                                     puntoPersonaje.Y,
+                                                                                                     puntoPersonaje.Z));
+                        personaje4.Transform = mScale * mPersonaje4 * Matrix.Translation(new Vector3(puntoPersonaje.X,
+                                                                                                     puntoPersonaje.Y - 200,
+                                                                                                     puntoPersonaje.Z));
+
                     }
 
                     Ciudad.Render();
@@ -602,32 +738,6 @@ namespace TGC.Group.Model
                     boxComenzar.render();
                     boxPersonaje.render();
                     boxSalir.render();
-
-
-
-                    if (gameMode == MENU)
-                    {
-
-                        //camaraRotante.;
-                        camaraRotante.CameraDistance = 2000;
-                        camaraRotante.UpdateCamera(ElapsedTime);
-                        this.Camara = camaraRotante;
-                        messages.MostrarComandosDeSeleccion();
-                        messages.MostrarPosicioMeshPorPantalla(camaraRotante.Position);
-
-
-                    }
-                    if (gameMode == SELECTION)
-                    {
-                        messages.MostrarComandosDeSeleccion();
-                        //camaraRotante.CameraCenter = new Vector3(3000, 50, 3000);
-                        //camaraRotante.SetCamera(new Vector3(250, 450, 3000), new Vector3(3000, 150, 3000));
-                        camaraRotante.CameraDistance = 3100;
-                        camaraRotante.UpdateCamera(ElapsedTime);
-                        this.Camara = camaraRotante;
-
-
-                    }
 
                 }
             }

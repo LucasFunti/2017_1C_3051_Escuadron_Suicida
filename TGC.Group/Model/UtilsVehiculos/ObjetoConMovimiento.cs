@@ -63,13 +63,21 @@ namespace TGC.Group.Model
         private Sonido sonidoColision;
         private Sonido sonidoItem;
         private Sonido sonidoSalto;
+        public bool esEnemigo = false;
 
         public List<Arma> listaDeArmas;
         //Lisa de meshes proximos
         private List<TgcMesh> MeshesCeranos;
         private Vector3 posicionReferencia;
-        private TgcMesh[] rueda;
+        private TgcMesh[] ruedaDelDer;
+        private TgcMesh[] ruedaDelIzq;
+        private TgcMesh[] ruedaTraDer;
+        private TgcMesh[] ruedaTraIzq;
         private TgcMesh meshDeOrigen;
+
+        public Matrix transRuedaDel;
+        public Matrix transRuedaTra;
+        public Matrix transGiro;
 
         public ObjetoConMovimiento(TwistedMetal env)
         {
@@ -85,14 +93,32 @@ namespace TGC.Group.Model
             this.MeshesCeranos = new List<TgcMesh>();
         }
 
-        public TgcMesh[] getRueda()
-        {
-            return this.rueda;
+        public TgcMesh[] getRuedaDelDer() {
+            return this.ruedaDelDer;
+        }
+        public void setRuedaDelDer(TgcMesh[] rueda) {
+            this.ruedaDelDer = rueda;
         }
 
-        public void setRueda(TgcMesh[] rueda)
-        {
-            this.rueda = rueda;
+        public TgcMesh[] getRuedaDelIzq() {
+            return this.ruedaDelIzq;
+        }
+        public void setRuedaDelIzq(TgcMesh[] rueda) {
+            this.ruedaDelIzq = rueda;
+        }
+
+        public TgcMesh[] getRuedaTraDer() {
+            return this.ruedaTraDer;
+        }
+        public void setRuedaTraDer(TgcMesh[] rueda) {
+            this.ruedaTraDer = rueda;
+        }
+
+        public TgcMesh[] getRuedaTraIzq() {
+            return this.ruedaTraIzq;
+        }
+        public void setRuedaTraIzq(TgcMesh[] rueda) {
+            this.ruedaTraIzq = rueda;
         }
 
         public TgcMesh getMeshDeOrigen()
@@ -392,62 +418,47 @@ namespace TGC.Group.Model
             float rotate = 0;
             var movingX = false;
             var movingY = false;
-          
+            transGiro = Matrix.Identity;
+
             movingY = ProcesarMovimientoEnY();
-            if (!movingY)
-            {
+            if (!movingY) {
                 movingX = ProcesarMovimientoEnX();
                 rotate = ProcesarRotacion();
-
-            }
-            //Rota solo si hay movimiento en X y no hay movimiento en Y
-            if (rotate != 0 && movingX && !movingY)
-            {
-                this.doblar(rotate);
-                anguloPrev = anguloRueda;
-                sonidoMotor.startSound();
             }
 
-            if (rotate == 0 && ruedaGirada == true) {
-                if (this.getRueda() != null) {
-                    var angulo = anguloRueda * -1;
-                    foreach (var r in this.getRueda())
-                    {
-                        Matrix mRot = Matrix.RotationY(angulo);
-                        r.Transform = mRot;
-                        r.rotateY(angulo);
-                    }
+            //Para las ruedas
+            if (rotate != 0) {
+                //Calculo de rotacion de la rueda
+                var posicion = rotate;
+                var angulo = FastMath.PI_HALF / 3;
+                if (posicion > 0)
+                {
+                    angulo = angulo * -1;
+                }
+                Matrix mRot = Matrix.RotationY(angulo);
+                transRuedaDel = mRot * Matrix.RotationY(FastMath.PI_HALF);
+                transRuedaTra = Matrix.RotationY(FastMath.PI_HALF);
+                ruedaGirada = true;
+            } else {
+                if (ruedaGirada == true) {
+                    Matrix mRot = Matrix.RotationY(FastMath.PI_HALF);
+                    transRuedaDel = mRot;
+                    transRuedaTra = mRot;
                     ruedaGirada = false;
                 }
             }
 
-            //Si hubo rotacion y no movimiento mover las ruedas unicamente
-            if (rotate != 0 && !movingX && this.VelocidadX == 0)
-            {
-                var posicion = rotate;
-                if (this.getRueda()!= null && ruedaGirada == false) {
+            //Rota solo si hay movimiento en X y no hay movimiento en Y
+            if (rotate != 0 && movingX && !movingY) {
+                this.doblar(rotate);
+                anguloPrev = anguloRueda;
+                sonidoMotor.startSound();
 
-                    //Calculo de rotacion de la rueda
-                    var angulo = FastMath.PI_HALF / 3;
-                    if (posicion > 0) {
-                        angulo = angulo * -1;
-                    }
-                    foreach (var r in this.getRueda())
-                    {
-                        Matrix mRot = Matrix.RotationY(angulo);
-                        r.Transform = mRot;
-                        r.rotateY(angulo);
-                    }
-                    ruedaGirada = true;
-                    anguloRueda = angulo;
-                }
             }
 
             //Si hubo desplazamiento
-            if (movingX || movingY)
-            {
+            if (movingX || movingY)  {
                 this.mover();
-                
             }
 
             //Si no se esta moviendo, activar animacion de Parado
@@ -484,27 +495,20 @@ namespace TGC.Group.Model
         protected virtual void doblar(float sentido)
         {
 
-            if (this.getVelocidadX() < 0)
+            if (this.getVelocidadX() < 0 )
                 sentido *= -1;
             var sentidoR = sentido * 0.3f;
             sentido = sentido * this.getVelocidadRotacion();
 
             orientacion += sentido * 1f * this.env.ElapsedTime;
-
             anguloFinal = anguloFinal - sentido * 1f * this.env.ElapsedTime;
-            //var anguloFinalR = anguloFinalR - sentido * 1f * this.env.ElapsedTime;
+
             matrixRotacion = Matrix.Multiply( Matrix.RotationY(anguloFinal), Matrix.Scaling(escalado) );
             this.rotar(new Vector3(0, -sentido * 1f * this.env.ElapsedTime, 0), matrixRotacion, -sentido * 1f * this.env.ElapsedTime);
-            if (this.getRueda() != null)
-            {
-                foreach (var r in this.getRueda())
-                {
-                    Matrix mRot = Matrix.RotationY(anguloFinal);
-                    //r.rotateY(anguloFinal);
-                    r.Transform = mRot;
-                    //r.rotateY(anguloFinal);
-                }
-            }
+
+            Vector3 nvaPosRuedas = NuevaPosicionRueda(new Vector3(0, 0, 0));
+
+            Matrix mRot = Matrix.RotationY(FastMath.PI_HALF);
         }
 
         private bool ProcesarMovimientoEnY()
@@ -604,12 +608,6 @@ namespace TGC.Group.Model
         {
             this.getMesh().Transform = m;
             this.boxDeColision.rotate(v);
-            /*if (this.getRueda() != null) {
-                //movemos la rueda
-                foreach (var r in this.getRueda()) {
-                    r.Transform = m;
-                }
-            }*/
 
         }
         //mueve el objeto.
@@ -618,24 +616,24 @@ namespace TGC.Group.Model
             NuevaPosicion = this.calcularProximaPosicion();
             this.boxDeColision.Center = calcularCentroDelBox();
 
-            Vector3 scale3 = new Vector3(1f, 1f, 1f);
-            var m = Matrix.Scaling(scale3) * this.matrixRotacion * Matrix.Translation(NuevaPosicion);
+            Vector3 scaleAuto = new Vector3(1f, 1f, 1f);
+            Vector3 scaleRueda = new Vector3(0.1f, 0.1f, 0.1f);
+            var m = Matrix.Scaling(scaleAuto) * this.matrixRotacion * Matrix.Translation(NuevaPosicion);
 
             this.getMesh().Transform = m;
             this.getMesh().Position = NuevaPosicion;
 
-            if (this.getRueda()!= null)
-            {
-                var nvaPosRuedas = NuevaPosicionRueda(this.boxDeColision.Center);
-                var mRuedas = Matrix.Scaling(scale3) * this.matrixRotacion * Matrix.Translation(nvaPosRuedas);
-                //movemos la rueda
-                foreach ( var r in this.getRueda())
-                {
-                    //r.Position = new Vector3(NuevaPosicion.X + 50, NuevaPosicion.Y, NuevaPosicion.Z + 100);
-                    r.Transform = mRuedas;
-                    r.Position = nvaPosRuedas;
-                }
-            }
+            var nvaPosRuedas = NuevaPosicionRueda(this.boxDeColision.Center);
+            var mRuedas = Matrix.Scaling(scaleRueda) * this.matrixRotacion * Matrix.Translation(nvaPosRuedas);
+            //transRueda = Matrix.RotationZ(0.3f);
+            float sentido = 0.3f;
+            if (this.getVelocidadX() < 0)
+                sentido *= -1;
+            sentido = sentido * this.getVelocidadRotacion();
+
+            float anguloGiro = 5f * sentido * 1f * this.env.ElapsedTime; //anguloFinal - sentido * 1f * this.env.ElapsedTime;
+            // Se calcula la matriz resultante, para utilizarse en render.
+            transGiro = Matrix.RotationX(anguloGiro);
 
             if (!this.getEsRueda())
             {
@@ -650,9 +648,9 @@ namespace TGC.Group.Model
         //Calcula la próxima posicion del objeto en base a los datos de velocidad.
         protected Vector3 NuevaPosicionRueda(Vector3 centro)
         {
-            return new Vector3(centro.X + 73.71f * (float)System.Math.Cos(this.orientacion),
+            return new Vector3(centro.X + 83.71f * (float)System.Math.Cos(this.orientacion),
                                 centro.Y + this.getVelocidadY(),
-                                centro.Z + 73.71f * (float)System.Math.Sin(this.orientacion));
+                                centro.Z + 83.71f * (float)System.Math.Sin(this.orientacion));
 
         }
 
@@ -704,6 +702,13 @@ namespace TGC.Group.Model
                         {
                             chocoEnemigo = true;
                         }
+                        if (ControladorDeVehiculos.getInstance().getEnemigoFinal() != null) {
+                            if (ControladorDeVehiculos.getInstance().getEnemigoFinal().getMesh().Equals(mesh)
+                                && !mesh.Equals(getMeshDeOrigen()))
+                                {
+                                    chocoEnemigo = true;
+                                }
+                        }
                         float t;
                         Vector3 p;
                         chocoAdelante = (intersectRayAABB(ray, escenaAABB, out t, out p) || t > 1.0f);
@@ -717,7 +722,7 @@ namespace TGC.Group.Model
             if (collisionFound)
             {
                 aplicarEfecto();
-                sonidoColision.startSound();
+                if (TwistedMetal.getInstance().juegoTerminado== false) sonidoColision.startSound();
                 if (!this.esArma) {
 
                     if (this.getMesh().Position.Y == 5 || this.getMesh().Position.Y >= 25)
@@ -744,6 +749,14 @@ namespace TGC.Group.Model
                         } else {
                             ControladorDeVehiculos.getInstance().getEnemigo().dañoPorArma();
                         }
+                    }
+                    try
+                    {
+                        this.getMesh().dispose();
+                    }
+                    catch (System.NullReferenceException)
+                    {
+
                     }
                 }
 

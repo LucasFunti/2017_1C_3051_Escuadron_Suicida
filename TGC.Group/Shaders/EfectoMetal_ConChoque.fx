@@ -28,6 +28,7 @@ float3 fvLightPosition = float3(-100.00, 100.00, -100.00);
 float3 fvEyePosition = float3(0.00, 0.00, -100.00);
 float ChoqueAtras;
 float ChoqueAdelante;
+int   Energia = 10;
 
 float k_la = 0.6;							// luz ambiente global
 float k_ld = 0.3;							// luz difusa
@@ -63,25 +64,23 @@ VS_OUTPUT vs_main(float4 Pos:POSITION, float3 Normal : NORMAL, float2 Texcoord :
 	Pos.y = Y/v;// *cos(v) - Z * sin(v);
 
 
-	if (ChoqueAdelante >0)
-	{
-		if (Pos.z < 0.22)
-		{
-			Pos.z = Z - 10 * sin(Y * 200);
-
-			Pos.x = Pos.x - 10 * sin(Y * 200);
+	if (ChoqueAdelante >0)	{
+		if (Pos.z < 0.22) {
+			Pos.z = Z - 3 * sin(Y * 200);
+			Pos.x = Pos.x - 3 * sin(Y * 200);
 		}
-	}
-	else {
-		if (ChoqueAtras<0)
-		{
-			if (Pos.z > 0.22)
-			{
+	} else {
+		if (ChoqueAtras<0) {
+			if (Pos.z > 0.22)	{
 				Pos.z = Z - 5 * sin(Y * 200);
-
 				Pos.x = Pos.x - 5 * sin(Y * 200);
 			}
 		}
+	}
+	if (Energia < 10) {
+		int fx = 10 - Energia;
+		Pos.z = Z - fx * sin(Y * 200);
+		Pos.x = Pos.x - fx * sin(Y * 200);
 	}
 	
 	//Proyectar posicion

@@ -22,7 +22,7 @@ namespace TGC.Group.Model.UtilsEfectos
         public Humo(TwistedMetal env)
         {
             this.env = env;
-            offsetEscape = new Vector3(10, 5, 32);
+            offsetEscape = new Vector3(10, 5, 52);
             Init();
 
         }
@@ -55,7 +55,7 @@ namespace TGC.Group.Model.UtilsEfectos
 
             //emmiter1 humo
             emitterEscape = new ParticleEmitter(this.env.MediaDir+ "Particulas\\pisada.png", selectedParticleCount);
-            emitterEscape.Position = new Vector3(0, 15, 0);
+            emitterEscape.Position = new Vector3(0, 10, 50);
 
             Vector3 speed = new Vector3(5, 5, 5);
             setEmmiter(emitterEscape);

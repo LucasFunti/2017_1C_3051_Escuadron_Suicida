@@ -17,6 +17,7 @@ namespace TGC.Group.Model
         private string fileSonidoSalto;
         private float velocidadMax;
         private float velocidadMin;
+        private int nroPersonaje;
         private float constanteAceleracion;
         public static Personaje myInstance;
         public Personaje()
@@ -39,5 +40,6 @@ namespace TGC.Group.Model
         public float VelocidadMax { get => velocidadMax; set => velocidadMax = value; }
         public float VelocidadMin { get => velocidadMin; set => velocidadMin = value; }
         public float ConstanteAceleracion { get => constanteAceleracion; set => constanteAceleracion = value; }
+        public int NroPersonaje { get => nroPersonaje; set => nroPersonaje = value; }
     }
 }

@@ -13,12 +13,13 @@ namespace TGC.Group.Model.UtilsVehiculos
     {
         private VehiculoPrincipal autoPrincipal;
         private TwistedMetal env;
-        private readonly List<Vehiculo> listaDeVehiculos = new List<Vehiculo>();
+        private List<Vehiculo> listaDeVehiculos = new List<Vehiculo>();
         private readonly List<Vehiculo> listaDeEnemigos = new List<Vehiculo>();
         private readonly List<Vehiculo> listaDeArmas = new List<Vehiculo>();
         private TgcSceneLoader loader;
         private static ControladorDeVehiculos myInstance;
         Enemigo enemigo1aux;
+        Enemigo enemigoFinal;
         public static ControladorDeVehiculos getInstance()
         {
             return myInstance;
@@ -85,24 +86,33 @@ namespace TGC.Group.Model.UtilsVehiculos
 
             var sceneAuto = loader.loadSceneFromFile(this.env.MediaDir + "MeshCreator\\Meshes\\Vehiculos\\GruaExcavadora\\GruaExcavadora-TgcScene.xml");
 
-            Enemigo enemigo = new Enemigo(this.env, sceneAuto.Meshes[0]);
-            enemigo.esEnemigoFinal = true;
-            enemigo.setAutoTarget(this.getAutoPrincipal());
+            //Enemigo enemigoF = new Enemigo(this.env, sceneAuto.Meshes[0]);
+            TgcMesh enemigoF = sceneAuto.Meshes[0];
+            enemigoF.AutoUpdateBoundingBox = true;
+            enemigo1aux.setMesh(enemigoF);
+            enemigo1aux.esEnemigoFinal = true;
+            enemigo1aux.getLifeLevel().recibirVida(100);
+            enemigo1aux.setAutoTarget(this.getAutoPrincipal());
             //   enemigo.setPosicionInicial(new Vector3(-100, 5, 3000));
 
-
-            enemigo.setPosicionInicial(new Vector3(5000, 5, 5750));
-            enemigo.setVelocidadMaxima(10);
-            enemigo.setVelocidadMinima(-5);
-            enemigo.setConstanteDeAsceleracionX(0.5f);
-            enemigo1aux = enemigo;
-            this.listaDeVehiculos.Add(enemigo);
-            this.listaDeEnemigos.Add(enemigo);
+            enemigo1aux.estaMuerto = false;
+            //enemigoF.getLifeLevel();
+            enemigo1aux.setPosicionInicial(new Vector3(5000, 5, 5750));
+            enemigo1aux.setVelocidadMaxima(10);
+            enemigo1aux.setVelocidadMinima(-5);
+            enemigo1aux.setConstanteDeAsceleracionX(0.5f);
+            //enemigoFinal = enemigoF;
+            //this.listaDeVehiculos.Add(enemigoF);
+            //this.listaDeEnemigos.Add(enemigoF);
         }
 
         public Enemigo getEnemigo()
         {
             return enemigo1aux;
+        }
+        public Enemigo getEnemigoFinal()
+        {
+            return enemigoFinal;
         }
         public void update()
         {
@@ -110,7 +120,6 @@ namespace TGC.Group.Model.UtilsVehiculos
             {
                 enemigo.Update();
             }
-                
 
             foreach (var arma in this.listaDeArmas)
                 if (arma.getMesh().Enabled ) arma.Update();
@@ -128,15 +137,8 @@ namespace TGC.Group.Model.UtilsVehiculos
         {
             foreach (var vehiculo in this.listaDeVehiculos)
             { 
-                if (!vehiculo.esAutoPrincipal())
-                {
-                    //rendereo solo lo que esta dentro del frustrum
-                    //     var c = TgcCollisionUtils.classifyFrustumAABB(this.env.Frustum, vehiculo.getMesh().BoundingBox);
-                     //  if (c != TgcCollisionUtils.FrustumResult.OUTSIDE)
-                    // {
+                if (!vehiculo.esAutoPrincipal()){
                     if (!vehiculo.estaMuerto) vehiculo.Render();
-                     //   vehiculo.getMesh().render();
-                    //}
                 }
             }
             this.autoPrincipal.Render();
@@ -144,9 +146,11 @@ namespace TGC.Group.Model.UtilsVehiculos
 
         public void deshabilitarObjeto(TgcMesh arma)
         {
-            foreach (var vehiculo in this.listaDeVehiculos)
-                if (vehiculo.getMesh() == arma)
-                    vehiculo.dispose();
+            var listaDeVehiculosBackup = this.listaDeVehiculos;
+            this.listaDeVehiculos = new List<Vehiculo>();
+            foreach (var vehiculo in listaDeVehiculosBackup)
+                if (vehiculo.getMesh() != arma)
+                    this.listaDeVehiculos.Add(vehiculo);
         }
 
         public void dispose()

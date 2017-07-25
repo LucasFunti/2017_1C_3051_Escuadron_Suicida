@@ -12,7 +12,7 @@ namespace TGC.Group.Model.UtilsVehiculos
 {
     public class LifeLevel
     {
-        private TgcText2D text2d, text2d2;
+        private TgcText2D text2d = new TgcText2D(), text2d2 = new TgcText2D();
         TwistedMetal env;
         private float lifeLevel = 0;
         private Boolean auto_principal;
@@ -28,23 +28,27 @@ namespace TGC.Group.Model.UtilsVehiculos
             if (!this.auto_principal)
                 return;
 
-                text2d = new TgcText2D();
-                text2d.Text = "Vida: " + Math.Truncate(this.lifeLevel).ToString() + "%";
-                text2d.Color = Color.WhiteSmoke;
-                text2d.Align = TgcText2D.TextAlign.LEFT;
-                text2d.Position = new Point((D3DDevice.Instance.Width / 2) - 100, 0);
-                text2d.Size = new Size(300, 100);
-                text2d.changeFont(new Font("TimesNewRoman", 25, FontStyle.Bold));
-                text2d.Color = Color.Green;
-                if(this.lifeLevel<65)
+            text2d.Text = "Vida: " + Math.Truncate(this.lifeLevel).ToString() + "%";
+            text2d.Color = Color.WhiteSmoke;
+            text2d.Align = TgcText2D.TextAlign.LEFT;
+            text2d.Position = new Point((D3DDevice.Instance.Width / 2) - 100, 0);
+            text2d.Size = new Size(300, 100);
+            text2d.changeFont(new Font("TimesNewRoman", 25, FontStyle.Bold));
+            text2d.Color = Color.Green;
+            if (this.lifeLevel < 65)
                 text2d.Color = Color.Yellow;
-                if (this.lifeLevel < 40)
+            if (this.lifeLevel < 40)
                 text2d.Color = Color.Orange;
-                if (this.lifeLevel < 20)
+            if (this.lifeLevel < 20)
                 text2d.Color = Color.Red;
 
-            var vidaEnemigo = ControladorDeVehiculos.getInstance().getEnemigo().getLifeLevel().nivelDeVida();
-            text2d2 = new TgcText2D();
+            var vidaEnemigo = 0f;
+            if (ControladorDeVehiculos.getInstance().getEnemigoFinal() != null) {
+                vidaEnemigo = ControladorDeVehiculos.getInstance().getEnemigoFinal().getLifeLevel().nivelDeVida();
+            } else { 
+                vidaEnemigo = ControladorDeVehiculos.getInstance().getEnemigo().getLifeLevel().nivelDeVida();
+            }
+
             text2d2.Text = "Vida Enemigo: " + Math.Truncate(vidaEnemigo).ToString() + "%";
             text2d2.Color = Color.WhiteSmoke;
             text2d2.Align = TgcText2D.TextAlign.LEFT;

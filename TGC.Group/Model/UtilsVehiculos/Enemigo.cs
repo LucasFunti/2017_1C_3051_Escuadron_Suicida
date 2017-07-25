@@ -32,6 +32,7 @@ namespace TGC.Group.Model.UtilsVehiculos
 
             base.doblar(0.001f);//Inicializa las matrices de rotación, no tocar!!
             this.getMesh().AutoUpdateBoundingBox = true;
+            base.esEnemigo = true;
 
          }
         public void setAutoTarget(VehiculoPrincipal auto)
@@ -68,14 +69,14 @@ namespace TGC.Group.Model.UtilsVehiculos
             
             //Cada 70 ciclos dispara
             bolDisparar = false;
-            if (TiempoDisparo>150 || (esEnemigoFinal && TiempoDisparo > 20))
+            if (TiempoDisparo>30 || (esEnemigoFinal && TiempoDisparo > 10))
             {
                 bolDisparar = true;
                 TiempoDisparo = 0;
             }
             //Cada 150 ciclos dispara un misil 
             bolDispararMisil = false;
-            if (TiempoDisparoMisil > 300 || (esEnemigoFinal && TiempoDisparoMisil > 50))
+            if (TiempoDisparoMisil > 40 || (esEnemigoFinal && TiempoDisparoMisil > 15))
             {
                 bolDispararMisil = true;
                 TiempoDisparoMisil = 0;
